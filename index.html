@@ -3,17 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard - Form Management (Tech Style)</title>
+  <title>Dashboard - Ricoh AI</title>
   <link rel="stylesheet" href="./styles.css" />
-  <!-- Chart.js CDN（僅供前端預覽） -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <!-- Header -->
   <header class="header">
-    <div class="logo">KOLTIVA</div>
+    <div class="logo"> <img src="Ricoh_Logo.png" alt="Ricoh Logo" width="150"/></div>
     <div class="search-bar">
-      <input type="search" placeholder="搜尋文件、表單、紀錄..." />
+      <input type="search" placeholder="Serach" />
     </div>
     <nav class="nav-menu">
       <button>Saved Searches</button>
@@ -25,37 +24,31 @@
   </header>
 
   <div class="container">
+    <button class="sidebar-toggle" id="sidebarToggle">
+      <span class="toggle-icon">◀</span>
+    </button>
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="menu-section">Dashboard</div>
       <ul class="menu">
         <li class="active">Dashboard</li>
-        <li>Plocate</li>
-        <li>Starred</li>
         <li>Recent Documents</li>
+        <li>Process</li>
       </ul>
 
       <div class="menu-section">Manage</div>
       <ul class="menu">
         <li>Records Management</li>
-        <li>Audit Centre</li>
+        <li>OCR Documents</li>
         <li>Knowledge Base</li>
-        <li>Recycle Bin</li>
         <li>Reporting</li>
       </ul>
 
-      <div class="menu-section">Forms</div>
-      <ul class="menu">
-        <li>Form B</li>
-        <li>Form P</li>
-        <li>Form A</li>
-        <li>Form C</li>
-      </ul>
     </aside>
 
     <!-- Main -->
     <main class="main-content">
-      <h1>Dashboard - Form Management</h1>
+      <h1>Dashboard</h1>
       <p class="subtle">Forms Status Comparison</p>
 
       <!-- Charts: 4 pies -->
@@ -83,7 +76,7 @@
         <h3>Overall Status Trend</h3>
         <div class="line-chart-wrap"><canvas id="lineChart" height="140"></canvas></div>
       </section>
-
+      <br>  
       <!-- Table -->
       <section class="table-section">
         <h3>Recent Documents</h3>

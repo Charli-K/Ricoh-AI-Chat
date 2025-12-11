@@ -111,3 +111,15 @@ tableSearch.addEventListener("input", () => {
     tr.style.display = match ? "" : "none";
   });
 });
+
+// 側邊欄切換功能
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebar = document.querySelector('.sidebar');
+const container = document.querySelector('.container');
+
+if (sidebarToggle && sidebar && container) {
+  sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    container.classList.toggle('sidebar-collapsed');
+  });
+}
