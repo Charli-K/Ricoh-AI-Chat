@@ -15,8 +15,6 @@
       <input type="search" placeholder="Search" />
     </div>
     <nav class="nav-menu">
-      <button>Saved Searches</button>
-      <button>Search Filters</button>
       <button class="active">AI Chat</button>
       <button>Configuration</button>
     </nav>
@@ -39,7 +37,7 @@
 
       <div class="menu-section">Quick Actions</div>
       <ul class="menu">
-        <li onclick="insertQuickMessage('Summarize recent documents')">📄 Summarize Documents</li>
+        <li onclick="insertQuickMessage('Summarize recent documents')">Summarize Documents</li>
         <li onclick="insertQuickMessage('Find pending approvals')">✓ Find Pending Items</li>
       </ul>
     </aside>
@@ -48,19 +46,19 @@
       <div class="chat-header">
         <h1>AI Assistant</h1>
         <div class="chat-actions">
-          <button class="btn-secondary" onclick="clearChat()">🗑️ Clear Chat</button>
-          <button class="btn-secondary" onclick="exportChat()">💾 Export</button>
+          <button class="btn-secondary" onclick="clearChat()">Clear Chat</button>
+          <button class="btn-secondary" onclick="exportChat()">Export</button>
+          <label>Powered by Ricoh Hong Kong Limited </label> 
         </div>
       </div>
-
       <div class="chat-messages" id="chatMessages">
         <div class="message assistant-message">
           <div class="message-avatar">🤖</div>
           <div class="message-content">
             <div class="message-text">
               <p>Good to see you here.</p>
-              <p>When you start using the <strong>InTune support</strong>, you agree to <strong>Ricoh's privacy and acknowledge</strong> that your information will be reported for follow-up and performance improvement. <a href="http://www.ricoh.com/privacy-policy" target="_blank">Privacy policy</a></p>
-              <p>當您開始使用InTune支援時，即表示您同意Ricoh的隱私權並承認您的資訊將被報告以供後續追蹤和效能改善。相關資訊記錄在隱私政策中。相關於隱私政策: <a href="http://www.ricoh.com/zh-tw/int/privacy-policy" target="_blank">http://www.ricoh.com/zh-tw/int/privacy-policy</a></p>
+              <p>When you start using the <strong>Ricoh Hong Kong AI support</strong>, you agree to <strong>Ricoh's privacy and acknowledge</strong> that your information will be reported for follow-up and performance improvement. <a href="http://www.ricoh.com/privacy-policy" target="_blank">Privacy policy</a></p>
+              <p>當您開始使用Ricoh Hong Kong AI支援時，即表示您同意Ricoh的隱私權並承認您的資訊將被報告以供後續追蹤和效能改善。相關資訊記錄在隱私政策中。相關於隱私政策: <a href="http://www.ricoh.com/zh-tw/int/privacy-policy" target="_blank">http://www.ricoh.com/zh-tw/int/privacy-policy</a></p>
               <div class="message-actions">
                 <button class="btn-accept" onclick="acceptPolicy()">Accept</button>
                 <button class="btn-reject" onclick="rejectPolicy()">Reject</button>

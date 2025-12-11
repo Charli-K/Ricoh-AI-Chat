@@ -17,6 +17,85 @@ const formData = {
   formC: { pending: 4, inProgress: 2, approve: 2, completed: 8, cancel: 1 },
 };
 
+// Token usage data by department and date
+const tokenData = [
+  { date: "2023-07-17", department: "IT", tokens: 1500 },
+  { date: "2024-06-23", department: "Finance", tokens: 2300 },
+  { date: "2024-07-11", department: "HR", tokens: 1800 },
+  { date: "2025-07-11", department: "IT", tokens: 3200 },
+  { date: "2025-07-18", department: "Operations", tokens: 2100 },
+  { date: "2025-09-12", department: "Finance", tokens: 2800 },
+  { date: "2025-10-02", department: "HR", tokens: 1900 },
+  { date: "2023-07-17", department: "Operations", tokens: 1600 },
+  { date: "2024-06-23", department: "IT", tokens: 2500 },
+  { date: "2024-07-11", department: "Finance", tokens: 3100 },
+  { date: "2025-07-11", department: "HR", tokens: 2200 },
+  { date: "2025-07-18", department: "IT", tokens: 2900 },
+  { date: "2025-09-12", department: "Operations", tokens: 2400 },
+  { date: "2025-10-02", department: "Finance", tokens: 3500 },
+];
+
+function filterTokenData(fromDate, toDate) {
+  const from = fromDate ? new Date(fromDate) : new Date('2022-01-01');
+  const to = toDate ? new Date(toDate) : new Date('2025-12-31');
+  to.setHours(23, 59, 59, 999);
+  
+  return tokenData.filter(item => {
+    const itemDate = new Date(item.date);
+    return itemDate >= from && itemDate <= to;
+  });
+}
+
+function calculateTokenStats(filteredData) {
+  const total = filteredData.reduce((sum, item) => sum + item.tokens, 0);
+  const byDepartment = {};
+  
+  filteredData.forEach(item => {
+    if (!byDepartment[item.department]) {
+      byDepartment[item.department] = 0;
+    }
+    byDepartment[item.department] += item.tokens;
+  });
+  
+  return { total, byDepartment };
+}
+
+function updateTokenDisplay(fromDate, toDate) {
+  const filteredData = filterTokenData(fromDate, toDate);
+  const stats = calculateTokenStats(filteredData);
+  
+  // Update total tokens
+  const totalTokensEl = document.getElementById('totalTokens');
+  if (totalTokensEl) {
+    totalTokensEl.textContent = stats.total.toLocaleString();
+  }
+  
+  // Update department tokens
+  const departmentGrid = document.getElementById('departmentTokensGrid');
+  if (departmentGrid) {
+    departmentGrid.innerHTML = '';
+    
+    // Sort departments by token usage (descending)
+    const sortedDepts = Object.entries(stats.byDepartment)
+      .sort((a, b) => b[1] - a[1]);
+    
+    sortedDepts.forEach(([dept, tokens]) => {
+      const card = document.createElement('div');
+      card.className = 'department-card';
+      card.innerHTML = `
+        <div class="department-name">${dept}</div>
+        <div class="department-tokens">${tokens.toLocaleString()}</div>
+        <div class="department-label">tokens used</div>
+      `;
+      departmentGrid.appendChild(card);
+    });
+  }
+}
+
+// Initialize token display with default date range
+updateTokenDisplay('2022-01-01', '2025-12-31');
+
+
 function pieConfig(data){
   return {
     type: "pie",
@@ -246,6 +325,7 @@ function filterTableByDate() {
   });
   
   updateLineChart(dateFrom.value, dateTo.value);
+  updateTokenDisplay(dateFrom.value, dateTo.value);
 }
 
 if (applyDateFilter) {
@@ -261,6 +341,7 @@ if (resetDateFilter) {
       tr.style.display = "";
     });
     updateLineChart('2022-01-01', '2025-12-31');
+    updateTokenDisplay('2022-01-01', '2025-12-31');
   });
 }
 

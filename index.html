@@ -15,8 +15,6 @@
       <input type="search" placeholder="Serach" />
     </div>
     <nav class="nav-menu">
-      <button>Saved Searches</button>
-      <button>Search Filters</button>
       <button onclick="window.location.href='AI Chat.html'">AI Chat</button>
       <button>Configuration</button>
     </nav>
@@ -57,6 +55,22 @@
           <button class="btn-reset" id="resetDateFilter">Reset</button>
         </div>
       </div>
+      <section class="tokens-section">
+        <div class="stat-card total-tokens-card">
+          <div class="stat-info">
+            <h4>Total Tokens Used</h4>
+            <div class="stat-value" id="totalTokens">0</div>
+            <div class="stat-subtext">Across all departments</div>
+          </div>
+        </div>
+        <div class="department-tokens-container">
+          <h3>Token Usage by Department</h3>
+          <div class="department-tokens-grid" id="departmentTokensGrid">
+            <!-- Department cards will be generated here -->
+          </div>
+        </div>
+      </section>
+
       <section class="charts-container">
         <div class="charts-grid">
           <div class="chart-card">
@@ -97,7 +111,7 @@
           </div>
           
           <div class="column-manager">
-            <button class="btn-column-manager" id="columnManagerBtn" title="Manage Columns">⚙️ Columns</button>
+            <button class="btn-column-manager" id="columnManagerBtn" title="Manage Columns"> Columns</button>
             <div class="column-manager-dropdown" id="columnManagerDropdown" style="display: none;">
               <div class="column-option">
                 <input type="checkbox" id="col-number" checked data-column="0">
