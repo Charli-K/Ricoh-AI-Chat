@@ -30,8 +30,7 @@ function pieConfig(data){
           chartColors.completed,
           chartColors.cancel,
         ],
-        borderWidth: 2,
-        borderColor: "#0a0f1a",
+        borderWidth: 0,
       }],
     },
     options: {
@@ -40,7 +39,7 @@ function pieConfig(data){
       plugins: {
         legend: {
           position: "bottom",
-          labels: { boxWidth: 12, color: "#cfe8ff", font: { size: 11 } },
+          labels: { boxWidth: 12, color: "#000000", font: { size: 11 } },
         },
       },
     },
@@ -93,11 +92,11 @@ new Chart(document.getElementById("lineChart"), {
     responsive: true,
     maintainAspectRatio: true,
     plugins: {
-      legend: { position: "top", labels: { color: "#cfe8ff" } },
+      legend: { position: "top", labels: { color: "#000000" } },
     },
     scales: {
-      x: { ticks: { color: "#bcd7f0" }, grid: { color: "rgba(140,170,200,0.12)" } },
-      y: { beginAtZero: true, ticks: { stepSize: 2, color: "#bcd7f0" }, grid: { color: "rgba(140,170,200,0.12)" } },
+      x: { ticks: { color: "#000000" }, grid: { color: "rgba(140,170,200,0.12)" } },
+      y: { beginAtZero: true, ticks: { stepSize: 2, color: "#000000" }, grid: { color: "rgba(140,170,200,0.12)" } },
     },
   },
 });
@@ -123,3 +122,105 @@ if (sidebarToggle && sidebar && container) {
     container.classList.toggle('sidebar-collapsed');
   });
 }
+
+// 圖表放大功能
+const chartModal = document.getElementById('chartModal');
+const modalClose = document.getElementById('modalClose');
+const modalChartWrap = document.getElementById('modalChartWrap');
+const expandBtns = document.querySelectorAll('.expand-btn');
+
+let currentExpandedChart = null;
+
+expandBtns.forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const chartId = btn.getAttribute('data-chart');
+    const originalCanvas = document.getElementById(chartId);
+    
+    if (originalCanvas && chartModal && modalChartWrap) {
+      // 清空模態框內容
+      modalChartWrap.innerHTML = '';
+      
+      // 創建新的canvas
+      const newCanvas = document.createElement('canvas');
+      newCanvas.id = 'modalChart';
+      modalChartWrap.appendChild(newCanvas);
+      
+      // 獲取原始圖表的Chart.js實例
+      const originalChart = Chart.getChart(originalCanvas);
+      if (originalChart) {
+        // 深度複製圖表配置
+        const config = {
+          type: originalChart.config.type,
+          data: {
+            labels: [...originalChart.config.data.labels],
+            datasets: originalChart.config.data.datasets.map(dataset => ({
+              ...dataset,
+              data: [...dataset.data],
+              backgroundColor: Array.isArray(dataset.backgroundColor) 
+                ? [...dataset.backgroundColor] 
+                : dataset.backgroundColor,
+              borderColor: dataset.borderColor,
+              borderWidth: dataset.borderWidth,
+              tension: dataset.tension
+            }))
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                position: originalChart.config.options.plugins.legend.position,
+                labels: {
+                  ...originalChart.config.options.plugins.legend.labels
+                }
+              }
+            },
+            scales: originalChart.config.options.scales ? {
+              x: originalChart.config.options.scales.x ? {...originalChart.config.options.scales.x} : undefined,
+              y: originalChart.config.options.scales.y ? {...originalChart.config.options.scales.y} : undefined
+            } : undefined
+          }
+        };
+        
+        currentExpandedChart = new Chart(newCanvas, config);
+      }
+      
+      // 顯示模態框
+      chartModal.classList.add('active');
+    }
+  });
+});
+
+// 關閉模態框
+function closeModal() {
+  if (chartModal) {
+    chartModal.classList.remove('active');
+    if (currentExpandedChart) {
+      currentExpandedChart.destroy();
+      currentExpandedChart = null;
+    }
+    if (modalChartWrap) {
+      modalChartWrap.innerHTML = '';
+    }
+  }
+}
+
+if (modalClose) {
+  modalClose.addEventListener('click', closeModal);
+}
+
+if (chartModal) {
+  chartModal.addEventListener('click', (e) => {
+    if (e.target === chartModal) {
+      closeModal();
+    }
+  });
+}
+
+// ESC鍵關閉模態框
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && chartModal && chartModal.classList.contains('active')) {
+    closeModal();
+  }
+});

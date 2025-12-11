@@ -49,39 +49,45 @@
     <!-- Main -->
     <main class="main-content">
       <h1>Dashboard</h1>
-      <p class="subtle">Forms Status Comparison</p>
+      <!-- Charts Container -->
+      <section class="charts-container">
+        <!-- Left: 4 pie charts -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <button class="expand-btn" data-chart="chartFormB" title="Expand">⛶</button>
+            <h3>Form B</h3>
+            <div class="chart-wrap"><canvas id="chartFormB"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <button class="expand-btn" data-chart="chartFormP" title="Expand">⛶</button>
+            <h3>Form P</h3>
+            <div class="chart-wrap"><canvas id="chartFormP"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <button class="expand-btn" data-chart="chartFormA" title="Expand">⛶</button>
+            <h3>Form A</h3>
+            <div class="chart-wrap"><canvas id="chartFormA"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <button class="expand-btn" data-chart="chartFormC" title="Expand">⛶</button>
+            <h3>Form C</h3>
+            <div class="chart-wrap"><canvas id="chartFormC"></canvas></div>
+          </div>
+        </div>
 
-      <!-- Charts: 4 pies -->
-      <section class="charts-grid">
-        <div class="chart-card">
-          <h3>Form B</h3>
-          <div class="chart-wrap"><canvas id="chartFormB"></canvas></div>
+        <!-- Right: Line chart -->
+        <div class="line-chart-container">
+          <button class="expand-btn" data-chart="lineChart" title="Expand">⛶</button>
+          <h3>Overall Status Trend</h3>
+          <div class="line-chart-wrap"><canvas id="lineChart" height="140"></canvas></div>
         </div>
-        <div class="chart-card">
-          <h3>Form P</h3>
-          <div class="chart-wrap"><canvas id="chartFormP"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <h3>Form A</h3>
-          <div class="chart-wrap"><canvas id="chartFormA"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <h3>Form C</h3>
-          <div class="chart-wrap"><canvas id="chartFormC"></canvas></div>
-        </div>
-      </section>
-
-      <!-- Line chart -->
-      <section class="line-chart-container">
-        <h3>Overall Status Trend</h3>
-        <div class="line-chart-wrap"><canvas id="lineChart" height="140"></canvas></div>
       </section>
       <br>  
       <!-- Table -->
       <section class="table-section">
         <h3>Recent Documents</h3>
         <div class="search-bar-table">
-          <input type="search" id="tableSearch" placeholder="在表格中搜尋..." />
+          <input type="search" id="tableSearch" placeholder="Search" />
         </div>
 
         <div class="table-scroll">
@@ -195,6 +201,14 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <!-- Modal for expanded chart -->
+  <div class="chart-modal" id="chartModal">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">×</button>
+      <div class="modal-chart-wrap" id="modalChartWrap"></div>
+    </div>
   </div>
 
   <script src="./script.js"></script>
