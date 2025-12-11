@@ -6,18 +6,18 @@
   <title>Dashboard - Ricoh AI</title>
   <link rel="stylesheet" href="./styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 </head>
 <body>
-  <!-- Header -->
   <header class="header">
-    <div class="logo"> <img src="Ricoh_Logo.png" alt="Ricoh Logo" width="150"/></div>
+    <div class="logo"><a href="index.html" style="cursor: pointer;"><img src="Ricoh_Logo.png" alt="Ricoh Logo" width="150"/></a></div>
     <div class="search-bar">
       <input type="search" placeholder="Serach" />
     </div>
     <nav class="nav-menu">
       <button>Saved Searches</button>
       <button>Search Filters</button>
-      <button>AI Chat</button>
+      <button onclick="window.location.href='AI Chat.html'">AI Chat</button>
       <button>Configuration</button>
     </nav>
     <div class="user-menu">sysadmin</div>
@@ -27,7 +27,6 @@
     <button class="sidebar-toggle" id="sidebarToggle">
       <span class="toggle-icon">◀</span>
     </button>
-    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="menu-section">Dashboard</div>
       <ul class="menu">
@@ -46,12 +45,19 @@
 
     </aside>
 
-    <!-- Main -->
     <main class="main-content">
-      <h1>Dashboard</h1>
-      <!-- Charts Container -->
+      <div class="dashboard-header">
+        <h1>Dashboard</h1>
+        <div class="date-filter">
+          <label>Date:</label>
+          <input type="date" id="dateFrom" value="2022-01-01" />
+          <span class="date-separator">→</span>
+          <input type="date" id="dateTo" value="2025-12-31" />
+          <button class="btn-filter" id="applyDateFilter">Apply</button>
+          <button class="btn-reset" id="resetDateFilter">Reset</button>
+        </div>
+      </div>
       <section class="charts-container">
-        <!-- Left: 4 pie charts -->
         <div class="charts-grid">
           <div class="chart-card">
             <button class="expand-btn" data-chart="chartFormB" title="Expand">⛶</button>
@@ -75,7 +81,6 @@
           </div>
         </div>
 
-        <!-- Right: Line chart -->
         <div class="line-chart-container">
           <button class="expand-btn" data-chart="lineChart" title="Expand">⛶</button>
           <h3>Overall Status Trend</h3>
@@ -83,25 +88,65 @@
         </div>
       </section>
       <br>  
-      <!-- Table -->
       <section class="table-section">
         <h3>Recent Documents</h3>
-        <div class="search-bar-table">
-          <input type="search" id="tableSearch" placeholder="Search" />
+        
+        <div class="table-controls">
+          <div class="search-bar-table">
+            <input type="search" id="tableSearch" placeholder="Search" />
+          </div>
+          
+          <div class="column-manager">
+            <button class="btn-column-manager" id="columnManagerBtn" title="Manage Columns">⚙️ Columns</button>
+            <div class="column-manager-dropdown" id="columnManagerDropdown" style="display: none;">
+              <div class="column-option">
+                <input type="checkbox" id="col-number" checked data-column="0">
+                <label for="col-number">Number</label>
+              </div>
+              <div class="column-option">
+                <input type="checkbox" id="col-name" checked data-column="1">
+                <label for="col-name">Name</label>
+              </div>
+              <div class="column-option">
+                <input type="checkbox" id="col-created" checked data-column="2">
+                <label for="col-created">Created date</label>
+              </div>
+              <div class="column-option">
+                <input type="checkbox" id="col-modified" checked data-column="3">
+                <label for="col-modified">Last modified</label>
+              </div>
+              <div class="column-option">
+                <input type="checkbox" id="col-project" checked data-column="4">
+                <label for="col-project">Project</label>
+              </div>
+              <div class="column-option">
+                <input type="checkbox" id="col-termdate" checked data-column="5">
+                <label for="col-termdate">TermDate</label>
+              </div>
+              <div class="column-option">
+                <input type="checkbox" id="col-folder" checked data-column="6">
+                <label for="col-folder">Folder path</label>
+              </div>
+              <div class="column-option">
+                <input type="checkbox" id="col-status" checked data-column="7">
+                <label for="col-status">Status</label>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="table-scroll">
           <table class="data-table" id="dataTable">
             <thead>
-              <tr>
-                <th>Number</th>
-                <th>Name</th>
-                <th>Created date</th>
-                <th>Last modified</th>
-                <th>Project</th>
-                <th>TermDate</th>
-                <th>Folder path</th>
-                <th>Status</th>
+              <tr id="tableHeader">
+                <th draggable="true" data-column="0">Number</th>
+                <th draggable="true" data-column="1">Name</th>
+                <th draggable="true" data-column="2">Created date</th>
+                <th draggable="true" data-column="3">Last modified</th>
+                <th draggable="true" data-column="4">Project</th>
+                <th draggable="true" data-column="5">TermDate</th>
+                <th draggable="true" data-column="6">Folder path</th>
+                <th draggable="true" data-column="7">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -203,7 +248,6 @@
     </main>
   </div>
 
-  <!-- Modal for expanded chart -->
   <div class="chart-modal" id="chartModal">
     <div class="modal-content">
       <button class="modal-close" id="modalClose">×</button>

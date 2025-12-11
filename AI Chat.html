@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Chat - Ricoh</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./ai-chat.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo"><a href="index.html" style="cursor: pointer;"><img src="Ricoh_Logo.png" alt="Ricoh Logo" width="150"/></a></div>
+    <div class="search-bar">
+      <input type="search" placeholder="Search" />
+    </div>
+    <nav class="nav-menu">
+      <button>Saved Searches</button>
+      <button>Search Filters</button>
+      <button class="active">AI Chat</button>
+      <button>Configuration</button>
+    </nav>
+    <div class="user-menu">sysadmin</div>
+  </header>
+
+  <div class="container">
+    <button class="sidebar-toggle" id="sidebarToggle">
+      <span class="toggle-icon">◀</span>
+    </button>
+    
+    <aside class="sidebar">
+      <div class="menu-section">Chat History</div>
+      <ul class="menu">
+        <li class="active">Current Conversation</li>
+        <li>Document Analysis - Dec 10</li>
+        <li>Form Query - Dec 9</li>
+        <li>Search Help - Dec 8</li>
+      </ul>
+
+      <div class="menu-section">Quick Actions</div>
+      <ul class="menu">
+        <li onclick="insertQuickMessage('Summarize recent documents')">📄 Summarize Documents</li>
+        <li onclick="insertQuickMessage('Find pending approvals')">✓ Find Pending Items</li>
+      </ul>
+    </aside>
+
+    <main class="chat-main-content">
+      <div class="chat-header">
+        <h1>AI Assistant</h1>
+        <div class="chat-actions">
+          <button class="btn-secondary" onclick="clearChat()">🗑️ Clear Chat</button>
+          <button class="btn-secondary" onclick="exportChat()">💾 Export</button>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="message assistant-message">
+          <div class="message-avatar">🤖</div>
+          <div class="message-content">
+            <div class="message-text">
+              <p>Good to see you here.</p>
+              <p>When you start using the <strong>InTune support</strong>, you agree to <strong>Ricoh's privacy and acknowledge</strong> that your information will be reported for follow-up and performance improvement. <a href="http://www.ricoh.com/privacy-policy" target="_blank">Privacy policy</a></p>
+              <p>當您開始使用InTune支援時，即表示您同意Ricoh的隱私權並承認您的資訊將被報告以供後續追蹤和效能改善。相關資訊記錄在隱私政策中。相關於隱私政策: <a href="http://www.ricoh.com/zh-tw/int/privacy-policy" target="_blank">http://www.ricoh.com/zh-tw/int/privacy-policy</a></p>
+              <div class="message-actions">
+                <button class="btn-accept" onclick="acceptPolicy()">Accept</button>
+                <button class="btn-reject" onclick="rejectPolicy()">Reject</button>
+              </div>
+            </div>
+            <div class="message-time">Just now</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-container">
+        <div class="chat-input-wrapper">
+          <button class="btn-icon" onclick="document.getElementById('fileUpload').click()" title="Attach file">
+            📎
+          </button>
+          <input type="file" id="fileUpload" style="display: none;" onchange="handleFileUpload(event)" multiple />
+          
+          <button class="btn-icon" onclick="toggleEmojiPicker()" title="Insert emoji">
+            😊
+          </button>
+          
+          <textarea 
+            id="messageInput" 
+            class="message-input" 
+            placeholder="Type a message..." 
+            rows="1"
+            onkeydown="handleKeyDown(event)"
+          ></textarea>
+          
+          <button class="btn-send" onclick="sendMessage()" title="Send message">
+            ➤
+          </button>
+        </div>
+        
+        <div class="file-preview-area" id="filePreviewArea" style="display: none;"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="./ai-chat.js"></script>
+</body>
+</html>
