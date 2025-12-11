@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard - Form Management (Tech Style)</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <!-- Chart.js CDN（僅供前端預覽） -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">KOLTIVA</div>
+    <div class="search-bar">
+      <input type="search" placeholder="搜尋文件、表單、紀錄..." />
+    </div>
+    <nav class="nav-menu">
+      <button>Saved Searches</button>
+      <button>Search Filters</button>
+      <button>AI Chat</button>
+      <button>Configuration</button>
+    </nav>
+    <div class="user-menu">sysadmin</div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="menu-section">Dashboard</div>
+      <ul class="menu">
+        <li class="active">Dashboard</li>
+        <li>Plocate</li>
+        <li>Starred</li>
+        <li>Recent Documents</li>
+      </ul>
+
+      <div class="menu-section">Manage</div>
+      <ul class="menu">
+        <li>Records Management</li>
+        <li>Audit Centre</li>
+        <li>Knowledge Base</li>
+        <li>Recycle Bin</li>
+        <li>Reporting</li>
+      </ul>
+
+      <div class="menu-section">Forms</div>
+      <ul class="menu">
+        <li>Form B</li>
+        <li>Form P</li>
+        <li>Form A</li>
+        <li>Form C</li>
+      </ul>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+      <h1>Dashboard - Form Management</h1>
+      <p class="subtle">Forms Status Comparison</p>
+
+      <!-- Charts: 4 pies -->
+      <section class="charts-grid">
+        <div class="chart-card">
+          <h3>Form B</h3>
+          <div class="chart-wrap"><canvas id="chartFormB"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Form P</h3>
+          <div class="chart-wrap"><canvas id="chartFormP"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Form A</h3>
+          <div class="chart-wrap"><canvas id="chartFormA"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Form C</h3>
+          <div class="chart-wrap"><canvas id="chartFormC"></canvas></div>
+        </div>
+      </section>
+
+      <!-- Line chart -->
+      <section class="line-chart-container">
+        <h3>Overall Status Trend</h3>
+        <div class="line-chart-wrap"><canvas id="lineChart" height="140"></canvas></div>
+      </section>
+
+      <!-- Table -->
+      <section class="table-section">
+        <h3>Recent Documents</h3>
+        <div class="search-bar-table">
+          <input type="search" id="tableSearch" placeholder="在表格中搜尋..." />
+        </div>
+
+        <div class="table-scroll">
+          <table class="data-table" id="dataTable">
+            <thead>
+              <tr>
+                <th>Number</th>
+                <th>Name</th>
+                <th>Created date</th>
+                <th>Last modified</th>
+                <th>Project</th>
+                <th>TermDate</th>
+                <th>Folder path</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>R0006</td>
+                <td>VC507 Continued Tarbell C...</td>
+                <td>10/2/2025 2:30 PM</td>
+                <td>11/3/2025 11:54 AM</td>
+                <td>5557</td>
+                <td></td>
+                <td>\Contult Search \ICP SP Certific*...</td>
+                <td><span class="status-badge pending">Pending</span></td>
+              </tr>
+              <tr>
+                <td>R0005</td>
+                <td>Application Form</td>
+                <td>9/12/2025 2:05 PM</td>
+                <td>11/16/2025 12:01 PM</td>
+                <td>4</td>
+                <td></td>
+                <td>VA5-057</td>
+                <td><span class="status-badge cancel">Cancel</span></td>
+              </tr>
+              <tr>
+                <td>R0004</td>
+                <td>Energise 1 - Costing Phase</td>
+                <td>7/18/2025 4:06 PM</td>
+                <td>10/13/2025 4:06 PM</td>
+                <td>2</td>
+                <td></td>
+                <td>VA Test</td>
+                <td><span class="status-badge complete">Complete</span></td>
+              </tr>
+              <tr>
+                <td>R0004</td>
+                <td>New Invention & Facility</td>
+                <td>7/11/2025 1:57 PM</td>
+                <td>8/1/2025 12:07 PM</td>
+                <td>2</td>
+                <td></td>
+                <td>VA Test</td>
+                <td><span class="status-badge approve">Approve</span></td>
+              </tr>
+              <tr>
+                <td>R0003</td>
+                <td>Conditions of Contract</td>
+                <td>7/11/2024 1:59 PM</td>
+                <td>11/15/2025 2:00 PM</td>
+                <td>96</td>
+                <td></td>
+                <td>\Contult Search\ICP SP Certific*...</td>
+                <td><span class="status-badge cancel">Cancel</span></td>
+              </tr>
+              <tr>
+                <td>R0002</td>
+                <td>Partners_Certific.Local</td>
+                <td>6/23/2024 9:34 PM</td>
+                <td>8/21/2025 9:24 PM</td>
+                <td>1</td>
+                <td></td>
+                <td>\Contult Search</td>
+                <td><span class="status-badge pending">Pending</span></td>
+              </tr>
+              <tr>
+                <td>R0001</td>
+                <td>Reallocation_Loan Acquistion...</td>
+                <td>7/17/2023 11:22 PM</td>
+                <td>7/17/2025 11:22 PM</td>
+                <td>8</td>
+                <td></td>
+                <td>\ Cost \ Loan Application 2023-03...</td>
+                <td><span class="status-badge approve">Approve</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination-wrap">
+          <div class="pagination">
+            <button id="prevBtn">Previous</button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>4</button>
+            <button>5</button>
+            <button>24</button>
+            <button id="nextBtn">Next</button>
+          </div>
+          <div class="pagination-info">
+            <span>Show</span>
+            <select id="pageSize">
+              <option>10</option>
+              <option>25</option>
+              <option>50</option>
+            </select>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
