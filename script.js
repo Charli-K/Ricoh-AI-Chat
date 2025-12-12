@@ -17,7 +17,6 @@ const formData = {
   formC: { pending: 4, inProgress: 2, approve: 2, completed: 8, cancel: 1 },
 };
 
-// Token usage data by department and date
 const tokenData = [
   { date: "2023-07-17", department: "IT", tokens: 1500 },
   { date: "2024-06-23", department: "Finance", tokens: 2300 },
@@ -33,6 +32,9 @@ const tokenData = [
   { date: "2025-07-18", department: "IT", tokens: 2900 },
   { date: "2025-09-12", department: "Operations", tokens: 2400 },
   { date: "2025-10-02", department: "Finance", tokens: 3500 },
+  { date: "2025-09-12", department: "Client Services", tokens: 2400 },
+  { date: "2025-10-02", department: "Marketing", tokens: 3500 },
+  { date: "2024-01-12", department: "Client Services", tokens: 3610 },
 ];
 
 function filterTokenData(fromDate, toDate) {
@@ -64,18 +66,15 @@ function updateTokenDisplay(fromDate, toDate) {
   const filteredData = filterTokenData(fromDate, toDate);
   const stats = calculateTokenStats(filteredData);
   
-  // Update total tokens
   const totalTokensEl = document.getElementById('totalTokens');
   if (totalTokensEl) {
     totalTokensEl.textContent = stats.total.toLocaleString();
   }
   
-  // Update department tokens
   const departmentGrid = document.getElementById('departmentTokensGrid');
   if (departmentGrid) {
     departmentGrid.innerHTML = '';
     
-    // Sort departments by token usage (descending)
     const sortedDepts = Object.entries(stats.byDepartment)
       .sort((a, b) => b[1] - a[1]);
     
@@ -92,8 +91,39 @@ function updateTokenDisplay(fromDate, toDate) {
   }
 }
 
-// Initialize token display with default date range
 updateTokenDisplay('2022-01-01', '2025-12-31');
+
+const departmentGrid = document.getElementById('departmentTokensGrid');
+if (departmentGrid) {
+  let isDown = false;
+  let startX;
+  let scrollLeft;
+
+  departmentGrid.addEventListener('mousedown', (e) => {
+    isDown = true;
+    departmentGrid.style.cursor = 'grabbing';
+    startX = e.pageX - departmentGrid.offsetLeft;
+    scrollLeft = departmentGrid.scrollLeft;
+  });
+
+  departmentGrid.addEventListener('mouseleave', () => {
+    isDown = false;
+    departmentGrid.style.cursor = 'grab';
+  });
+
+  departmentGrid.addEventListener('mouseup', () => {
+    isDown = false;
+    departmentGrid.style.cursor = 'grab';
+  });
+
+  departmentGrid.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - departmentGrid.offsetLeft;
+    const walk = (x - startX) * 2; 
+    departmentGrid.scrollLeft = scrollLeft - walk;
+  });
+}
 
 
 function pieConfig(data){
