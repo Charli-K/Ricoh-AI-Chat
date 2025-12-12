@@ -35,6 +35,9 @@ const tokenData = [
   { date: "2025-09-12", department: "Client Services", tokens: 2400 },
   { date: "2025-10-02", department: "Marketing", tokens: 3500 },
   { date: "2024-01-12", department: "Client Services", tokens: 3610 },
+  { date: "2023-01-12", department: "Sales", tokens: 650 },
+  { date: "2024-05-25", department: "Sales", tokens: 1350 },
+  { date: "2025-03-18", department: "Sales", tokens: 2540 },
 ];
 
 function filterTokenData(fromDate, toDate) {
@@ -544,7 +547,17 @@ expandBtns.forEach(btn => {
     const chartId = btn.getAttribute('data-chart');
     const originalCanvas = document.getElementById(chartId);
     
+    // Get chart title from the card
+    const chartCard = btn.closest('.chart-card, .line-chart-container');
+    const chartTitle = chartCard ? chartCard.querySelector('h3').textContent : '';
+    
     if (originalCanvas && chartModal && modalChartWrap) {
+      // Set modal title
+      const modalTitle = document.getElementById('modalChartTitle');
+      if (modalTitle) {
+        modalTitle.textContent = chartTitle;
+      }
+      
       modalChartWrap.innerHTML = '';
       
       const newCanvas = document.createElement('canvas');
@@ -583,6 +596,9 @@ expandBtns.forEach(btn => {
               },
               tooltip: isPieChart ? {
                 callbacks: {
+                  title: function() {
+                    return '';
+                  },
                   label: function(context) {
                     const label = context.label || '';
                     const value = context.parsed;
@@ -594,17 +610,18 @@ expandBtns.forEach(btn => {
                 }
               } : originalChart.config.options.plugins.tooltip,
               datalabels: isPieChart ? {
-                color: '#000',
+                color: '#fff',
                 font: {
                   weight: 'bold',
-                  size: 16
+                  size: 18
                 },
                 formatter: (value, context) => {
                   const dataset = context.dataset;
                   const total = dataset.data.reduce((acc, val) => acc + val, 0);
                   const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                  return `${percentage}%`;
-                }
+                  return value > 0 ? `${percentage}%` : '';
+                },
+                textAlign: 'center'
               } : undefined
             },
             scales: originalChart.config.options.scales ? {
@@ -631,6 +648,10 @@ function closeModal() {
     }
     if (modalChartWrap) {
       modalChartWrap.innerHTML = '';
+    }
+    const modalTitle = document.getElementById('modalChartTitle');
+    if (modalTitle) {
+      modalTitle.textContent = '';
     }
   }
 }
