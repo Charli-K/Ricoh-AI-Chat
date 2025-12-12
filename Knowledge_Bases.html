@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Knowledge Bases - Ricoh AI</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./knowledge-bases.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="logo"><a href="index.html" style="cursor: pointer;"><img src="Ricoh_Logo.png" alt="Ricoh Logo" width="150"/></a></div>
+    <div class="search-bar">
+      <input type="search" placeholder="Search" />
+    </div>
+    <nav class="nav-menu">
+      <button onclick="window.location.href='AI Chat.html'">AI Chat</button>
+      <button>Configuration</button>
+    </nav>
+    <div class="user-menu">sysadmin</div>
+  </header>
+
+  <div class="container">
+    <button class="sidebar-toggle" id="sidebarToggle">
+      <span class="toggle-icon">◀</span>
+    </button>
+    <aside class="sidebar">
+      <div class="menu-section">Dashboard</div>
+      <ul class="menu">
+        <li onclick="window.location.href='index.html'" style="cursor: pointer;">Dashboard</li>
+        <li>Recent Documents</li>
+        <li>Process</li>
+      </ul>
+
+      <div class="menu-section">Manage</div>
+      <ul class="menu">
+        <li>OCR Documents</li>
+        <li class="active">Knowledge Base</li>
+        <li>Reporting</li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="kb-header">
+        <div>
+          <h1>Knowledge Bases</h1>
+          <p class="kb-subtitle">Manage AI chat knowledge bases for intelligent responses</p>
+        </div>
+        <button class="btn-create-kb" id="createKbBtn">
+          <span class="btn-icon">+</span>
+          Create Knowledge Base
+        </button>
+      </div>
+
+      <div class="kb-search-bar">
+        <input type="search" id="kbSearch" placeholder="Search knowledge bases..." />
+        <div class="kb-filter">
+          <label>Sort by:</label>
+          <select id="kbSort">
+            <option value="name">Name</option>
+            <option value="created">Created Date</option>
+            <option value="modified">Modified Date</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="kb-grid" id="kbGrid">
+      </div>
+    </main>
+  </div>
+
+  <div class="kb-modal" id="kbModal">
+    <div class="kb-modal-content">
+      <div class="kb-modal-header">
+        <h2 id="modalTitle">Create Knowledge Base</h2>
+        <button class="kb-modal-close" id="modalClose">×</button>
+      </div>
+      <form id="kbForm" class="kb-form">
+        <input type="hidden" id="kbId" />
+        
+        <div class="form-group">
+          <label for="kbName">Knowledge Base Name *</label>
+          <input type="text" id="kbName" required placeholder="Enter knowledge base name" />
+        </div>
+
+        <div class="form-group">
+          <label for="kbDescription">Description</label>
+          <textarea id="kbDescription" rows="4" placeholder="Describe the purpose and content of this knowledge base"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="kbCategory">Category</label>
+          <select id="kbCategory">
+            <option value="general">General</option>
+            <option value="technical">Technical</option>
+            <option value="product">Product Information</option>
+            <option value="support">Customer Support</option>
+            <option value="policy">Policies & Procedures</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="kbStatus">Status</label>
+          <select id="kbStatus">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="draft">Draft</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Documents</label>
+          <div class="file-upload-area" id="fileUploadArea">
+            <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.ppt,.pptx" style="display: none;" />
+            <div class="upload-placeholder" id="uploadPlaceholder">
+              <div class="upload-icon">📄</div>
+              <div class="upload-text">Click or drag files here to upload</div>
+              <div class="upload-subtext">Supported: PDF, DOC, DOCX, TXT, XLSX, XLS, PPT, PPTX</div>
+            </div>
+          </div>
+          <div class="uploaded-files" id="uploadedFiles"></div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn-save">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="kb-modal" id="deleteModal">
+    <div class="kb-modal-content kb-modal-small">
+      <div class="kb-modal-header">
+        <h2>Delete Knowledge Base</h2>
+        <button class="kb-modal-close" id="deleteModalClose">×</button>
+      </div>
+      <div class="kb-modal-body">
+        <p>Are you sure you want to delete "<span id="deleteKbName"></span>"?</p>
+        <p class="warning-text">This action cannot be undone.</p>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn-delete" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./knowledge-bases.js"></script>
+</body>
+</html>

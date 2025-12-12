@@ -34,12 +34,6 @@
         <li>Form Query - Dec 9</li>
         <li>Search Help - Dec 8</li>
       </ul>
-
-      <div class="menu-section">Quick Actions</div>
-      <ul class="menu">
-        <li onclick="insertQuickMessage('Summarize recent documents')">Summarize Documents</li>
-        <li onclick="insertQuickMessage('Find pending approvals')">✓ Find Pending Items</li>
-      </ul>
     </aside>
 
     <main class="chat-main-content">
@@ -76,8 +70,8 @@
           </button>
           <input type="file" id="fileUpload" style="display: none;" onchange="handleFileUpload(event)" multiple />
           
-          <button class="btn-icon" onclick="toggleEmojiPicker()" title="Insert emoji">
-            😊
+          <button class="btn-icon" onclick="openKnowledgeBaseModal()" title="Select Knowledge Bases">
+            📚
           </button>
           
           <textarea 
@@ -96,6 +90,26 @@
         <div class="file-preview-area" id="filePreviewArea" style="display: none;"></div>
       </div>
     </main>
+  </div>
+
+  <div class="kb-modal" id="kbSelectionModal">
+    <div class="kb-modal-overlay" onclick="closeKnowledgeBaseModal()"></div>
+    <div class="kb-modal-content">
+      <div class="kb-modal-header">
+        <h2>Select Knowledge Bases</h2>
+        <button class="kb-modal-close" onclick="closeKnowledgeBaseModal()">×</button>
+      </div>
+      <div class="kb-modal-body">
+        <p class="kb-modal-subtitle">Select which knowledge bases the AI should use for answering questions</p>
+        <div class="kb-selection-list" id="kbSelectionList">
+          <!-- Knowledge bases will be loaded here -->
+        </div>
+      </div>
+      <div class="kb-modal-footer">
+        <button class="btn-secondary" onclick="closeKnowledgeBaseModal()">Cancel</button>
+        <button class="btn-primary" onclick="saveKnowledgeBaseSelection()">Apply Selection</button>
+      </div>
+    </div>
   </div>
 
   <script src="./ai-chat.js"></script>

@@ -12,6 +12,70 @@ if (sidebarToggle && sidebar && container) {
 let chatMessages = [];
 let acceptedPolicy = false;
 let attachedFiles = [];
+let selectedKnowledgeBases = [];
+
+// Knowledge base data (matching from knowledge-bases.js)
+const knowledgeBases = [
+  {
+    id: 1,
+    name: "Product Documentation",
+    description: "Comprehensive product documentation including user manuals, technical specifications, and troubleshooting guides for all Ricoh products.",
+    category: "product",
+    status: "active",
+    createdDate: "2024-01-15",
+    modifiedDate: "2024-12-10",
+    documents: [
+      { name: "Product_Manual_2024.pdf", size: 2458000 },
+      { name: "Technical_Specs.docx", size: 856000 }
+    ]
+  },
+  {
+    id: 2,
+    name: "Customer Support FAQs",
+    description: "Frequently asked questions and answers for common customer support inquiries.",
+    category: "support",
+    status: "active",
+    createdDate: "2024-02-20",
+    modifiedDate: "2024-12-08",
+    documents: [
+      { name: "FAQ_Database.xlsx", size: 345000 }
+    ]
+  },
+  {
+    id: 3,
+    name: "Technical Troubleshooting",
+    description: "Technical troubleshooting procedures and solutions for complex issues.",
+    category: "technical",
+    status: "active",
+    createdDate: "2024-03-10",
+    modifiedDate: "2024-11-28",
+    documents: []
+  },
+  {
+    id: 4,
+    name: "Company Policies",
+    description: "Internal policies, procedures, and guidelines for employees and contractors.",
+    category: "policy",
+    status: "draft",
+    createdDate: "2024-11-01",
+    modifiedDate: "2024-12-05",
+    documents: []
+  },
+  {
+    id: 5,
+    name: "Sales Training Materials",
+    description: "Training materials and resources for sales team including pitch decks and product comparisons.",
+    category: "general",
+    status: "inactive",
+    createdDate: "2024-05-15",
+    modifiedDate: "2024-09-20",
+    documents: [
+      { name: "Sales_Pitch_Deck.pptx", size: 5678000 },
+      { name: "Product_Comparison.xlsx", size: 234000 },
+      { name: "Training_Guide.pdf", size: 1890000 }
+    ]
+  }
+];
 
 function getCurrentTime() {
   const now = new Date();
@@ -248,6 +312,80 @@ function clearAttachedFiles() {
 function toggleEmojiPicker() {
   alert('Emoji picker feature coming soon! 😊');
 }
+
+// Knowledge Base Selection Functions
+function openKnowledgeBaseModal() {
+  const modal = document.getElementById('kbSelectionModal');
+  const listContainer = document.getElementById('kbSelectionList');
+  
+  // Render knowledge bases
+  if (knowledgeBases.length === 0) {
+    listContainer.innerHTML = '<div class="kb-empty-state">No knowledge bases available</div>';
+  } else {
+    listContainer.innerHTML = knowledgeBases.map(kb => `
+      <div class="kb-selection-item ${selectedKnowledgeBases.includes(kb.id) ? 'selected' : ''} ${kb.status !== 'active' ? 'disabled' : ''}" 
+           data-kb-id="${kb.id}"
+           onclick="toggleKnowledgeBase(${kb.id})">
+        <div class="kb-checkbox"></div>
+        <div class="kb-selection-info">
+          <div class="kb-selection-name">${kb.name}</div>
+          <div class="kb-selection-desc">${kb.description}</div>
+          <div class="kb-selection-meta">
+            <span class="kb-status-badge status-${kb.status}">${kb.status}</span>
+            <span>${kb.documents ? kb.documents.length : 0} documents</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  modal.classList.add('active');
+}
+
+function closeKnowledgeBaseModal() {
+  const modal = document.getElementById('kbSelectionModal');
+  modal.classList.remove('active');
+}
+
+function toggleKnowledgeBase(kbId) {
+  const kb = knowledgeBases.find(k => k.id === kbId);
+  if (!kb || kb.status !== 'active') return;
+  
+  const index = selectedKnowledgeBases.indexOf(kbId);
+  if (index > -1) {
+    selectedKnowledgeBases.splice(index, 1);
+  } else {
+    selectedKnowledgeBases.push(kbId);
+  }
+  
+  // Update UI
+  const item = document.querySelector(`.kb-selection-item[data-kb-id="${kbId}"]`);
+  if (item) {
+    item.classList.toggle('selected');
+  }
+}
+
+function saveKnowledgeBaseSelection() {
+  const selectedNames = knowledgeBases
+    .filter(kb => selectedKnowledgeBases.includes(kb.id))
+    .map(kb => kb.name);
+  
+  if (selectedNames.length > 0) {
+    addMessage(`Selected knowledge bases: ${selectedNames.join(', ')}`, false);
+  } else {
+    addMessage('No knowledge bases selected. AI will respond with general knowledge.', false);
+  }
+  
+  closeKnowledgeBaseModal();
+}
+
+// Keyboard shortcuts for modal
+document.addEventListener('keydown', (e) => {
+  const modal = document.getElementById('kbSelectionModal');
+  if (modal && modal.classList.contains('active') && e.key === 'Escape') {
+    closeKnowledgeBaseModal();
+  }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   const input = document.getElementById('messageInput');
