@@ -1,10 +1,8 @@
-// Dark Mode Toggle
 function toggleDarkMode() {
   document.body.classList.toggle('dark-mode');
   const isDarkMode = document.body.classList.contains('dark-mode');
   localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
   
-  // Reload charts with new colors
   if (typeof renderLineChart === 'function') {
     renderLineChart();
   }
@@ -13,7 +11,6 @@ function toggleDarkMode() {
   }
 }
 
-// Load dark mode preference on page load
 function loadDarkModePreference() {
   const darkMode = localStorage.getItem('darkMode');
   if (darkMode === 'enabled') {
@@ -21,8 +18,6 @@ function loadDarkModePreference() {
   }
 }
 
-// Initialize dark mode on page load
-loadDarkModePreference();
 
 const chartColors = {
   pending: "#ffd966",
@@ -197,19 +192,17 @@ function pieConfig(data){
 let pieCharts = {};
 
 function renderPieCharts() {
-  // Destroy existing charts
+
   Object.values(pieCharts).forEach(chart => {
     if (chart) chart.destroy();
   });
-  
-  // Create new charts with updated colors
+
   pieCharts.formB = new Chart(document.getElementById("chartFormB"), pieConfig(formData.formB));
   pieCharts.formP = new Chart(document.getElementById("chartFormP"), pieConfig(formData.formP));
   pieCharts.formA = new Chart(document.getElementById("chartFormA"), pieConfig(formData.formA));
   pieCharts.formC = new Chart(document.getElementById("chartFormC"), pieConfig(formData.formC));
 }
 
-// Initial render
 renderPieCharts();
 
 let lineChartInstance = null;
