@@ -46,6 +46,7 @@ body {
 
 .search-bar { 
   flex: 1; 
+  min-width: 200px;
   max-width: 650px;
   padding-left: 50px;
  }
@@ -74,7 +75,7 @@ body {
   height: 40px;
   padding: 0;
   font-size: 18px;
-  margin-left: 50%;
+  margin-left: 40%;
 }
 
 .theme-toggle:hover {
@@ -678,8 +679,7 @@ body.dark-mode .stat-subtext {
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid rgba(0, 0, 0, 0.18);
-  background: rgba(254, 254, 254, 0.7);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.707);
   outline: none;
   transition: box-shadow 0.2s, border-color 0.2s;
 }
@@ -797,9 +797,17 @@ body.dark-mode .stat-subtext {
 .status-badge.inprogress { background: rgb(104, 200, 255); color:#ffffff;}
 
 .pagination-wrap {
-  display:flex; justify-content: space-between; gap:12px; align-items: center; flex-wrap: wrap; margin-top:12px;
+  display:flex; 
+  justify-content: space-between; 
+  gap:12px;
+  align-items: center; 
+  flex-wrap: wrap; 
+  margin-top:12px;
 }
-.pagination { display:flex; align-items:center; gap:8px; }
+.pagination { display:flex; 
+  align-items:center; 
+  gap:8px; 
+}
 .pagination button {
   padding: 6px 12px;
   border: 1px solid rgba(106, 54, 54, 0.18);
@@ -809,14 +817,22 @@ body.dark-mode .stat-subtext {
   border-radius: 8px;
   transition: all 0.2s;
 }
-.pagination button:hover { background: #7d7d7d9a; }
+.pagination button:hover { 
+  background: #008680;
+  color: #ffffff;
+ }
 .pagination button.active {
   background: #008680;
   color: #ffffff;
   border-color: transparent;
   box-shadow: 0 6px 18px var(--glow);
 }
-.pagination-info { display:flex; align-items:center; gap:8px; color:#7d7d7d9a; }
+.pagination-info { 
+  display:flex; 
+  align-items:center; 
+  gap:8px; 
+  color:#7d7d7d9a; 
+}
 .pagination-info select {
   padding: 6px 10px;
   border-radius: 8px;
@@ -825,7 +841,10 @@ body.dark-mode .stat-subtext {
   border: 1px solid rgba(255, 255, 255, 0.18);
   outline: none;
 }
-.pagination-info select:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgb(0, 0, 0); }
+.pagination-info select:focus { 
+  border-color: var(--brand); 
+  box-shadow: 0 0 0 3px rgb(0, 0, 0); 
+}
 
 .pagination-hidden {
   display: none !important;

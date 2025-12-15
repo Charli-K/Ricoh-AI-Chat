@@ -324,6 +324,28 @@ body.dark-mode .kb-modal-body select {
   border-color: rgba(255, 255, 255, 0.1);
   color: var(--text);
 }
+body.dark-mode .btn-column-manager{
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+body.dark-mode .column-manager-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: #0f1419;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 200px;
+  padding: 8px;
+}
+
+body.dark-mode .column-option:hover {
+  background: #6b7280;
+}
 
 body.dark-mode .kb-modal-body input::placeholder,
 body.dark-mode .kb-modal-body textarea::placeholder {
@@ -401,6 +423,81 @@ body.dark-mode .kb-card-actions button:hover {
   background: rgba(102, 126, 234, 0.2);
   border-color: rgba(102, 126, 234, 0.4);
 }
+
+body.dark-mode .kb-filter select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(204, 204, 204, 0.18);
+  background: rgba(42, 48, 60, 0.7);
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+body.dark-mode .kb-search-bar input[type="search"] {
+  flex: 1;
+  width: 500px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(204, 204, 204, 0.18);
+  background: rgba(42, 48, 60, 0.7);
+  color: var(--text);
+  outline: none;
+  transition: all 0.2s;
+}
+
+body.dark-mode.search-bar-table input {
+  width: 100%;
+  max-width: 420px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(136, 133, 133, 0.18);
+  background: rgba(67, 67, 67, 0.7);
+  color: var(--text);
+  outline: none;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+body.dark-mode .pagination button {
+  padding: 6px 12px;
+  border: 1px solid rgba(230, 230, 230, 0.18);
+  background: rgba(42, 48, 60, 0.7);
+  color: #ffffff;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+body.dark-mode .pagination button:hover { 
+  background: #008680;
+}
+
+body.dark-mode .pagination button.active {
+  background: #008680;
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 6px 18px var(--glow);
+}
+
+body.dark-mode .pagination-info { 
+  display:flex; 
+  align-items:center; 
+  gap:8px; 
+  color:#ffffffdd; 
+}
+body.dark-mode .pagination-info select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(42, 48, 60, 0.7);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  outline: none;
+}
+.pagination-info select:focus { 
+  border-color: var(--brand); 
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0); 
+}
+
 
 body.dark-mode .form-group label {
   color: var(--text);

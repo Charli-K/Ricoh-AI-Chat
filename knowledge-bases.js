@@ -13,7 +13,6 @@ function loadDarkModePreference() {
   }
 }
 
-// Initialize dark mode on page load
 loadDarkModePreference();
 
 let knowledgeBases = [
