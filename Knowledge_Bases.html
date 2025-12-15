@@ -11,13 +11,34 @@
 <body>
   <header class="header">
     <div class="logo"><a href="index.html" style="cursor: pointer;"><img src="Ricoh_Logo.png" alt="Ricoh Logo" width="150"/></a></div>
+    
+    <nav class="nav-menu">
+      <div class="nav-dropdown">
+        <button class="nav-btn">Dashboard</button>
+        <div class="dropdown-content">
+          <a href="index.html">Dashboard</a>
+          <a href="#">Recent Documents</a>
+          <a href="#">Process</a>
+        </div>
+      </div>
+      
+      <div class="nav-dropdown">
+        <button class="nav-btn active">Manage</button>
+        <div class="dropdown-content">
+          <a href="#">OCR Documents</a>
+          <a href="Knowledge_Bases.html" class="active">Knowledge Base</a>
+          <a href="#">Reporting</a>
+        </div>
+      </div>
+      
+      <button class="nav-btn" onclick="window.location.href='AI Chat.html'">AI Chat</button>
+      <button class="nav-btn">Configuration</button>
+    </nav>
+    
     <div class="search-bar">
       <input type="search" placeholder="Search" />
     </div>
-    <nav class="nav-menu">
-      <button onclick="window.location.href='AI Chat.html'">AI Chat</button>
-      <button>Configuration</button>
-    </nav>
+    
     <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
       <span class="theme-icon">🌙</span>
     </button>
@@ -25,24 +46,6 @@
   </header>
 
   <div class="container">
-    <button class="sidebar-toggle" id="sidebarToggle">
-      <span class="toggle-icon">◀</span>
-    </button>
-    <aside class="sidebar">
-      <div class="menu-section">Dashboard</div>
-      <ul class="menu">
-        <li onclick="window.location.href='index.html'" style="cursor: pointer;">Dashboard</li>
-        <li>Recent Documents</li>
-        <li>Process</li>
-      </ul>
-
-      <div class="menu-section">Manage</div>
-      <ul class="menu">
-        <li>OCR Documents</li>
-        <li class="active">Knowledge Base</li>
-        <li>Reporting</li>
-      </ul>
-    </aside>
 
     <main class="main-content">
       <div class="kb-header">

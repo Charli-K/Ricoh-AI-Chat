@@ -103,17 +103,6 @@ function init() {
   renderKnowledgeBases();
   attachEventListeners();
   setupFileUpload();
-  
-  const sidebarToggle = document.getElementById('sidebarToggle');
-  const sidebar = document.querySelector('.sidebar');
-  const container = document.querySelector('.container');
-  
-  if (sidebarToggle && sidebar && container) {
-    sidebarToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('collapsed');
-      container.classList.toggle('sidebar-collapsed');
-    });
-  }
 }
 
 function renderKnowledgeBases(filter = '', sortBy = 'name') {

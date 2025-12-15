@@ -581,17 +581,6 @@ document.addEventListener('click', () => {
   if (columnManagerDropdown) columnManagerDropdown.style.display = 'none';
 });
 
-const sidebarToggle = document.getElementById('sidebarToggle');
-const sidebar = document.querySelector('.sidebar');
-const container = document.querySelector('.container');
-
-if (sidebarToggle && sidebar && container) {
-  sidebarToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-    container.classList.toggle('sidebar-collapsed');
-  });
-}
-
 const chartModal = document.getElementById('chartModal');
 const modalClose = document.getElementById('modalClose');
 const modalChartWrap = document.getElementById('modalChartWrap');
