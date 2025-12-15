@@ -1,3 +1,20 @@
+// Dark Mode Toggle
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+}
+
+// Load dark mode preference on page load
+function loadDarkModePreference() {
+  const darkMode = localStorage.getItem('darkMode');
+  if (darkMode === 'enabled') {
+    document.body.classList.add('dark-mode');
+  }
+}
+
+// Initialize dark mode on page load
+loadDarkModePreference();
 
 let knowledgeBases = [
   {
@@ -58,7 +75,7 @@ let knowledgeBases = [
       { name: "Product_Comparison.xlsx", size: 234000 },
       { name: "Training_Guide.pdf", size: 1890000 }
     ]
-  }
+  },
 ];
 
 let nextId = 6;

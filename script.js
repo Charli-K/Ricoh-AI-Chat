@@ -1,3 +1,29 @@
+// Dark Mode Toggle
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+  
+  // Reload charts with new colors
+  if (typeof renderLineChart === 'function') {
+    renderLineChart();
+  }
+  if (typeof renderPieCharts === 'function') {
+    renderPieCharts();
+  }
+}
+
+// Load dark mode preference on page load
+function loadDarkModePreference() {
+  const darkMode = localStorage.getItem('darkMode');
+  if (darkMode === 'enabled') {
+    document.body.classList.add('dark-mode');
+  }
+}
+
+// Initialize dark mode on page load
+loadDarkModePreference();
+
 const chartColors = {
   pending: "#ffd966",
   inProgress: "#9dc3e6",
@@ -38,6 +64,10 @@ const tokenData = [
   { date: "2023-01-12", department: "Sales", tokens: 650 },
   { date: "2024-05-25", department: "Sales", tokens: 1350 },
   { date: "2025-03-18", department: "Sales", tokens: 2540 },
+  { date: "2023-02-08", department: "Legal", tokens: 1235 },
+  { date: "2024-11-01", department: "Legal", tokens: 3530 },
+  { date: "2024-12-08", department: "Solutions & Portfolio", tokens: 1880 },
+  { date: "2025-03-14", department: "Solutions & Portfolio", tokens: 4550 },
 ];
 
 function filterTokenData(fromDate, toDate) {
@@ -130,6 +160,7 @@ if (departmentGrid) {
 
 
 function pieConfig(data){
+  const isDarkMode = document.body.classList.contains('dark-mode');
   return {
     type: "pie",
     data: {
@@ -152,17 +183,34 @@ function pieConfig(data){
       plugins: {
         legend: {
           position: "bottom",
-          labels: { boxWidth: 12, color: "#000000", font: { size: 11 } },
+          labels: { 
+            boxWidth: 12, 
+            color: isDarkMode ? "#e4e6eb" : "#000000", 
+            font: { size: 11 } 
+          },
         },
       },
     },
   };
 }
 
-new Chart(document.getElementById("chartFormB"), pieConfig(formData.formB));
-new Chart(document.getElementById("chartFormP"), pieConfig(formData.formP));
-new Chart(document.getElementById("chartFormA"), pieConfig(formData.formA));
-new Chart(document.getElementById("chartFormC"), pieConfig(formData.formC));
+let pieCharts = {};
+
+function renderPieCharts() {
+  // Destroy existing charts
+  Object.values(pieCharts).forEach(chart => {
+    if (chart) chart.destroy();
+  });
+  
+  // Create new charts with updated colors
+  pieCharts.formB = new Chart(document.getElementById("chartFormB"), pieConfig(formData.formB));
+  pieCharts.formP = new Chart(document.getElementById("chartFormP"), pieConfig(formData.formP));
+  pieCharts.formA = new Chart(document.getElementById("chartFormA"), pieConfig(formData.formA));
+  pieCharts.formC = new Chart(document.getElementById("chartFormC"), pieConfig(formData.formC));
+}
+
+// Initial render
+renderPieCharts();
 
 let lineChartInstance = null;
 
@@ -268,9 +316,18 @@ function generateLineChartData(fromDate, toDate) {
 
 function updateLineChart(fromDate, toDate) {
   const chartData = generateLineChartData(fromDate, toDate);
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  const textColor = isDarkMode ? '#c2c2c2ff' : '#9d9d9dff';
+  const gridColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(140,170,200,0.12)';
   
   if (lineChartInstance) {
     lineChartInstance.data = chartData;
+    lineChartInstance.options.plugins.legend.labels.color = textColor;
+    lineChartInstance.options.scales.x.ticks.color = textColor;
+    lineChartInstance.options.scales.x.title.color = textColor;
+    lineChartInstance.options.scales.x.grid.color = gridColor;
+    lineChartInstance.options.scales.y.ticks.color = textColor;
+    lineChartInstance.options.scales.y.grid.color = gridColor;
     lineChartInstance.update();
   } else {
     const ctx = document.getElementById("lineChart");
@@ -281,22 +338,30 @@ function updateLineChart(fromDate, toDate) {
         responsive: true,
         maintainAspectRatio: true,
         plugins: {
-          legend: { position: "top", labels: { color: "#000000" } },
+          legend: { 
+            position: "top", 
+            labels: { 
+              color: textColor
+            } 
+          },
         },
         scales: {
           x: { 
-            ticks: { color: "#000000" }, 
-            grid: { color: "rgba(140,170,200,0.12)" },
+            ticks: { color: textColor }, 
+            grid: { color: gridColor },
             title: {
               display: true,
               text: 'Date (Year-Month)',
-              color: "#000000"
+              color: textColor
             }
           },
           y: { 
             beginAtZero: true, 
-            ticks: { stepSize: 1, color: "#000000" }, 
-            grid: { color: "rgba(140,170,200,0.12)" } 
+            ticks: { 
+              stepSize: 1, 
+              color: textColor
+            }, 
+            grid: { color: gridColor } 
           },
         },
       },

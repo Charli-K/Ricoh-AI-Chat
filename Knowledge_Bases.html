@@ -6,6 +6,7 @@
   <title>Knowledge Bases - Ricoh AI</title>
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./knowledge-bases.css" />
+  <link rel="stylesheet" href="./dark-mode.css" />
 </head>
 <body>
   <header class="header">
@@ -17,6 +18,9 @@
       <button onclick="window.location.href='AI Chat.html'">AI Chat</button>
       <button>Configuration</button>
     </nav>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+      <span class="theme-icon">🌙</span>
+    </button>
     <div class="user-menu">sysadmin</div>
   </header>
 
@@ -53,14 +57,14 @@
       </div>
 
       <div class="kb-search-bar">
-        <input type="search" id="kbSearch" placeholder="Search knowledge bases..." />
-        <div class="kb-filter">
+          <div class="kb-filter">
           <label>Sort by:</label>
           <select id="kbSort">
             <option value="name">Name</option>
             <option value="created">Created Date</option>
             <option value="modified">Modified Date</option>
           </select>
+        <input type="search" id="kbSearch" placeholder="Search knowledge bases..." />
         </div>
       </div>
 
