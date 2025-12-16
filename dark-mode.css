@@ -301,7 +301,7 @@ body.dark-mode #modalChartTitle {
 }
 
 body.dark-mode .kb-modal-content {
-  background: var(--bg-1);
+  background: #1a1f2e98;);
   color: var(--text);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
 }
@@ -365,7 +365,7 @@ body.dark-mode .kb-modal-footer {
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-/* KB Selection */
+
 body.dark-mode .kb-selection-item {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.1);
