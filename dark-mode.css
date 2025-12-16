@@ -292,7 +292,8 @@ body.dark-mode .page-btn.active {
 }
 
 body.dark-mode .modal-content {
-  background: var(--bg-1);
+  background:#23232398
+  
 }
 
 body.dark-mode #modalChartTitle {
@@ -314,12 +315,11 @@ body.dark-mode .kb-modal-header h2 {
 }
 
 body.dark-mode .kb-modal-close {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text);
+  background: #ffffffbb
 }
 
 body.dark-mode .kb-modal-close:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(249, 249, 249, 0.585);
 }
 
 body.dark-mode .kb-modal-body label {
@@ -676,3 +676,5 @@ body.dark-mode .message-input {
 body.dark-mode .message-input::placeholder {
   color: #6b7280;
 }
+
+

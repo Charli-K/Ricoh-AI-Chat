@@ -129,7 +129,7 @@ body {
 }
 
 .dropdown-content a.active {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(99, 60, 60, 0.05);
   font-weight: 600;
   border-left-color: var(--brand-2);
 }
@@ -588,17 +588,17 @@ body.dark-mode .stat-subtext {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.492);
   z-index: 1000;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(8px);
 }
 .chart-modal.active {
   display: flex;
 }
 .modal-content {
-  background: #ffffff;
+  background: #ffffffbc;
   border-radius: 16px;
   padding: 30px;
   max-width: 90vw;
@@ -612,7 +612,7 @@ body.dark-mode .stat-subtext {
   right: 10px;
   width: 40px;
   height: 40px;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(131, 131, 131, 0.1);
   border: none;
   border-radius: 50%;
   font-size: 28px;
@@ -621,7 +621,7 @@ body.dark-mode .stat-subtext {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  color: #333;
+  color: #9d9d9d;
 }
 .modal-close:hover {
   background: rgba(0, 0, 0, 0.2);
@@ -820,14 +820,14 @@ body.dark-mode .stat-subtext {
   display:flex; 
   align-items:center; 
   gap:8px; 
-  color:#7d7d7d9a; 
+  color:#000000d2; 
 }
 .pagination-info select {
   padding: 6px 10px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.7);
   color: var(--text);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(175, 175, 175, 0.553);
   outline: none;
 }
 .pagination-info select:focus { 
@@ -838,6 +838,24 @@ body.dark-mode .stat-subtext {
 .pagination-hidden {
   display: none !important;
 }
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('circuit-pattern.svg');
+  opacity: 0.1; /* 淡淡的電路紋理 */
+  animation: moveCircuit 20s linear infinite;
+}
+
+@keyframes moveCircuit {
+  from { transform: translateX(0); }
+  to { transform: translateX(-200px); }
+}
+
 
 @media (max-width: 1024px){
   .sidebar { width: 200px; }
