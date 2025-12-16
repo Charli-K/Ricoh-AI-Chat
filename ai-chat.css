@@ -230,7 +230,6 @@ body.dark-mode .message-actions {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
 }
-
 .chat-input-container {
   padding: 16px 20px 20px 20px;
   background: #ffffff;
@@ -718,5 +717,6 @@ body.dark-mode .kb-modal-header h2{
   .chat-actions {
     width: 100%;
     justify-content: flex-start;
+
   }
 }
