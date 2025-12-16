@@ -42,12 +42,10 @@ body {
   gap: 20px;
   position: sticky;
   top: 20px;
-  left: 150%;
-  transform: translateX(-30%);
+  left: 5%;
   z-index: 50;
   backdrop-filter: blur(12px);
   border-radius: 999px;
-
   max-width: 1200px;
   min-width: 800px;
   margin: 0 auto;
@@ -59,10 +57,11 @@ body {
   margin-right: 20px;
 }
 
-.nav-menu { 
+.nav-menu {  
   display: flex; 
   gap: 8px;
   flex: 1;
+
 }
 
 .nav-dropdown {
@@ -102,9 +101,10 @@ body {
   min-width: 200px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   border-radius: 8px;
-  z-index: 1;
   border: 1px solid var(--card-border);
-  margin-top: 4px;
+  margin-top: 8px;
+  background-color: #ffffffd0;
+  backdrop-filter: blur(12px);
 }
 
 .dropdown-content a {
@@ -249,7 +249,9 @@ body.dark-mode .main-content {
   padding: 20px;
   box-shadow: 0 8px 24px var(--shadow), inset 0 1px 0 rgba(0, 0, 0, 0.04);
   backdrop-filter: blur(8px);
-  transition: transform .2s ease, box-shadow .2s ease;  position: relative;}
+  transition: transform .2s ease, box-shadow .2s ease;  
+  position: relative;
+}
 .chart-card:hover, .line-chart-container:hover, .table-section:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 28px rgba(0,0,0,0.45);

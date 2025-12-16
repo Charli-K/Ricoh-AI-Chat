@@ -1,8 +1,8 @@
 
 body.dark-mode {
   --bg-0:#0f1419;
-  --bg-1:#1a1f2e;
-  --bg-2:#252b3b;
+  --bg-1:#0f1419;
+  --bg-2:#0f1419;
   --card:rgba(42, 48, 60, 0.7);
   --card-border:rgba(255, 255, 255, 0.1);
   --text:#e4e6eb;
