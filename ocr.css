@@ -1,4 +1,4 @@
-/* OCR Page Styles */
+
 .main-content {
     padding: 20px;
     padding-top: 60px;
@@ -10,10 +10,10 @@
 
 .ocr-container {
     display: flex;
+    gap: 20px;
     height: 100%;
 }
 
-/* Left Panel Styles */
 .left-panel {
     flex: 0 0 350px;
     display: flex;
@@ -263,6 +263,7 @@
     left: 0;
     width: 100%;
     height: 100%;
+
     pointer-events: none;
 }
 
@@ -403,7 +404,7 @@
 }
 
 .download-format-btn:hover {
-    background: #764ba2;
+    background: #2d3748
     transform: translateY(-2px);
 }
 
@@ -469,7 +470,8 @@ body.dark-mode .text-box textarea {
 }
 
 body.dark-mode .canvas-container {
-    background: #1a202c;
+    color:#000000
+    background-color: #1a202c;
 }
 
 body.dark-mode .download-options {
@@ -477,6 +479,31 @@ body.dark-mode .download-options {
     color: #e2e8f0;
 }
 
+body.dark-mode .download-options h3 {
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.download-format-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: #1a202c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1100;
+}
+
+body.dark-mode .download-format-btn:hover {
+    background: #4a5568;
+    transform: translateY(-2px);
+}
 /* Responsive Design */
 @media (max-width: 1024px) {
     .ocr-container {
