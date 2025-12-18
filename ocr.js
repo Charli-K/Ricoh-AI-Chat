@@ -1,439 +1,800 @@
-let uploadedDocuments = [];
-let selectedDocument = null;
-let currentPage = 1;
-const itemsPerPage = 8;
+// OCR Functionality
+let uploadedImages = [];
+let currentImage = null;
+let textBoxes = [];
 let zoomLevel = 1;
-let ocrResults = [];
+let rotation = 0;
+let isDragging = false;
+let startX, startY;
+let canvasOffsetX = 0;
+let canvasOffsetY = 0;
 
-const uploadArea = document.getElementById('uploadArea');
-const fileInput = document.getElementById('fileInput');
-const documentCardsGrid = document.getElementById('documentCardsGrid');
-const paginationControls = document.getElementById('paginationControls');
-const prevPageBtn = document.getElementById('prevPage');
-const nextPageBtn = document.getElementById('nextPage');
-const pageInfo = document.getElementById('pageInfo');
-const scanButton = document.getElementById('scanButton');
-const scanProgress = document.getElementById('scanProgress');
-const progressFill = document.getElementById('progressFill');
-const progressText = document.getElementById('progressText');
-const previewEmpty = document.getElementById('previewEmpty');
-const previewContent = document.getElementById('previewContent');
-const documentCanvas = document.getElementById('documentCanvas');
-const textBoxesContainer = document.getElementById('textBoxesContainer');
-const applyButton = document.getElementById('applyButton');
-const downloadOptions = document.getElementById('downloadOptions');
-const downloadPDFBtn = document.getElementById('downloadPDF');
-const downloadPNGBtn = document.getElementById('downloadPNG');
-const clearButton = document.getElementById('clearButton');
-const zoomInButton = document.getElementById('zoomInButton');
-const zoomOutButton = document.getElementById('zoomOutButton');
-const resetButton = document.getElementById('resetButton');
-const canvasContainer = document.getElementById('canvasContainer');
+// Configure PDF.js worker
+if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
 
-
-function initializeEventListeners() {
-
-    uploadArea.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', handleFileSelect);
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    setupEventListeners();
     
-    uploadArea.addEventListener('dragover', handleDragOver);
-    uploadArea.addEventListener('dragleave', handleDragLeave);
-    uploadArea.addEventListener('drop', handleDrop);
+    // Click outside to deactivate all text boxes
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.text-box')) {
+            document.querySelectorAll('.text-box').forEach(box => {
+                box.classList.remove('active');
+            });
+        }
+    });
+});
 
-    prevPageBtn.addEventListener('click', () => changePage(-1));
-    nextPageBtn.addEventListener('click', () => changePage(1));
-
-    scanButton.addEventListener('click', performOCR);
-
-    zoomInButton.addEventListener('click', () => adjustZoom(0.1));
-    zoomOutButton.addEventListener('click', () => adjustZoom(-0.1));
-    resetButton.addEventListener('click', resetView);
+function setupEventListeners() {
+    // Image upload
+    document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
     
-    applyButton.addEventListener('click', showDownloadOptions);
-    downloadPDFBtn.addEventListener('click', () => downloadDocument('pdf'));
-    downloadPNGBtn.addEventListener('click', () => downloadDocument('png'));
-    clearButton.addEventListener('click', clearAll);
+    // Toolbar buttons
+    document.getElementById('zoomIn').addEventListener('click', () => zoom(1.2));
+    document.getElementById('zoomOut').addEventListener('click', () => zoom(0.8));
+    document.getElementById('rotateLeft').addEventListener('click', () => rotate(-90));
+    document.getElementById('rotateRight').addEventListener('click', () => rotate(90));
+    document.getElementById('moveMode').addEventListener('click', toggleMoveMode);
+    document.getElementById('addTextBox').addEventListener('click', addNewTextBox);
+    document.getElementById('applyBtn').addEventListener('click', showDownloadOptions);
+    
+    // Canvas dragging
+    const canvas = document.getElementById('ocrCanvas');
+    canvas.addEventListener('mousedown', startDrag);
+    canvas.addEventListener('mousemove', drag);
+    canvas.addEventListener('mouseup', endDrag);
+    canvas.addEventListener('mouseleave', endDrag);
 }
 
-
-function handleFileSelect(event) {
-    const files = Array.from(event.target.files);
-    processFiles(files);
-    fileInput.value = '';
-}
-
-function handleDragOver(event) {
-    event.preventDefault();
-    uploadArea.classList.add('drag-over');
-}
-
-function handleDragLeave(event) {
-    event.preventDefault();
-    uploadArea.classList.remove('drag-over');
-}
-
-function handleDrop(event) {
-    event.preventDefault();
-    uploadArea.classList.remove('drag-over');
-    const files = Array.from(event.dataTransfer.files);
-    processFiles(files);
-}
-
-function processFiles(files) {
-    files.forEach(file => {
-        if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+async function handleImageUpload(event) {
+    const files = event.target.files;
+    
+    for (let file of files) {
+        if (file.type.startsWith('image/')) {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const document = {
+            reader.onload = function(e) {
+                const imageData = {
                     id: Date.now() + Math.random(),
+                    src: e.target.result,
                     name: file.name,
-                    size: formatFileSize(file.size),
-                    type: file.type,
-                    data: e.target.result,
-                    file: file
+                    type: 'image'
                 };
-                uploadedDocuments.push(document);
-                updateDocumentGrid();
+                uploadedImages.push(imageData);
+                addImageCard(imageData);
             };
             reader.readAsDataURL(file);
+        } else if (file.type === 'application/pdf') {
+            // Handle PDF files
+            await processPDFFile(file);
         }
-    });
-}
-
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
-}
-
-function updateDocumentGrid() {
-    const totalPages = Math.ceil(uploadedDocuments.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentDocuments = uploadedDocuments.slice(startIndex, endIndex);
-    
-    documentCardsGrid.innerHTML = '';
-    
-    currentDocuments.forEach(doc => {
-        const card = createDocumentCard(doc);
-        documentCardsGrid.appendChild(card);
-    });
-    
-    updatePagination(totalPages);
-    updateScanButton();
-}
-
-function createDocumentCard(doc) {
-    const card = document.createElement('div');
-    card.className = 'document-card';
-    if (selectedDocument && selectedDocument.id === doc.id) {
-        card.classList.add('selected');
     }
+    // Clear the input so the same file can be uploaded again
+    event.target.value = '';
+}
+
+async function processPDFFile(file) {
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const numPages = pdf.numPages;
+        
+        // Process each page of the PDF
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 2.0 });
+            
+            // Create canvas for this page
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            
+            // Render PDF page to canvas
+            await page.render({
+                canvasContext: context,
+                viewport: viewport
+            }).promise;
+            
+            // Convert canvas to image data
+            const imageDataUrl = canvas.toDataURL('image/png');
+            
+            const imageData = {
+                id: Date.now() + Math.random() + pageNum,
+                src: imageDataUrl,
+                name: `${file.name} - Page ${pageNum}`,
+                type: 'pdf',
+                pageNum: pageNum,
+                totalPages: numPages
+            };
+            
+            uploadedImages.push(imageData);
+            addImageCard(imageData);
+            
+            // Small delay between pages to prevent UI blocking
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        console.log(`Successfully processed ${numPages} pages from ${file.name}`);
+    } catch (error) {
+        console.error('Error processing PDF:', error);
+        alert(`Failed to process PDF: ${error.message}`);
+    }
+}
+
+function addImageCard(imageData) {
+    const imageCards = document.getElementById('imageCards');
+    
+    const card = document.createElement('div');
+    card.className = 'image-card';
+    card.dataset.imageId = imageData.id;
+    
+    const pageInfo = imageData.type === 'pdf' ? 
+        `<div class="page-info">📄 Page ${imageData.pageNum}/${imageData.totalPages}</div>` : '';
     
     card.innerHTML = `
-        <img src="${doc.data}" alt="${doc.name}" class="document-card-image">
-        <div class="document-card-info">
-            <p class="document-card-name" title="${doc.name}">${doc.name}</p>
-            <p class="document-card-size">${doc.size}</p>
+        <img src="${imageData.src}" alt="${imageData.name}">
+        ${pageInfo}
+        <div class="image-card-actions">
+            <button class="scan-btn" onclick="scanImage('${imageData.id}')">
+                <span>🔍</span> Scan
+            </button>
+            <button class="delete-btn" onclick="deleteImage('${imageData.id}')">
+                <span>🗑️</span> Delete
+            </button>
         </div>
-        <button class="document-card-delete" onclick="deleteDocument(${doc.id})">×</button>
     `;
     
-    card.addEventListener('click', (e) => {
-        if (!e.target.classList.contains('document-card-delete')) {
-            selectDocument(doc);
-        }
+    imageCards.appendChild(card);
+}
+
+function scanImage(imageId) {
+    const imageData = uploadedImages.find(img => img.id == imageId);
+    if (!imageData) return;
+    
+    // Hide placeholder
+    const placeholder = document.getElementById('canvasPlaceholder');
+    if (placeholder) {
+        placeholder.classList.add('hidden');
+    }
+    
+    // Reset zoom and rotation for new scan
+    zoomLevel = 1;
+    rotation = 0;
+    
+    // Set active card
+    document.querySelectorAll('.image-card').forEach(card => {
+        card.classList.remove('active');
     });
+    document.querySelector(`[data-image-id="${imageId}"]`).classList.add('active');
     
-    return card;
+    currentImage = imageData;
+    
+    // Wait for canvas to be displayed and centered before OCR
+    displayImageOnCanvas(imageData, () => {
+        performOCR(imageData);
+    });
 }
 
-function selectDocument(doc) {
-    selectedDocument = doc;
-    updateDocumentGrid();
-    updateScanButton();
-}
-
-function deleteDocument(id) {
-    uploadedDocuments = uploadedDocuments.filter(doc => doc.id !== id);
-    if (selectedDocument && selectedDocument.id === id) {
-        selectedDocument = null;
-        clearPreview();
-    }
-
-    const totalPages = Math.ceil(uploadedDocuments.length / itemsPerPage);
-    if (currentPage > totalPages && currentPage > 1) {
-        currentPage = totalPages;
-    }
+function displayImageOnCanvas(imageData, callback) {
+    const canvas = document.getElementById('ocrCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('canvasContainer');
+    const img = new Image();
     
-    updateDocumentGrid();
-}
-
-
-function updatePagination(totalPages) {
-    if (uploadedDocuments.length > itemsPerPage) {
-        paginationControls.style.display = 'flex';
-        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-        prevPageBtn.disabled = currentPage === 1;
-        nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
-    } else {
-        paginationControls.style.display = 'none';
-    }
-}
-
-function changePage(direction) {
-    const totalPages = Math.ceil(uploadedDocuments.length / itemsPerPage);
-    const newPage = currentPage + direction;
-    
-    if (newPage >= 1 && newPage <= totalPages) {
-        currentPage = newPage;
-        updateDocumentGrid();
-    }
-}
-
-
-async function performOCR() {
-    if (!selectedDocument) return;
-    
-
-    scanButton.disabled = true;
-    scanProgress.style.display = 'block';
-    progressFill.style.width = '0%';
-    progressText.textContent = 'Initializing...';
-    
-    try {
-        const img = new Image();
-        img.src = selectedDocument.data;
+    img.onload = function() {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
+        // Apply rotation
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((rotation * Math.PI) / 180);
+        ctx.translate(-canvas.width / 2, -canvas.height / 2);
+        ctx.drawImage(img, 0, 0);
+        ctx.restore();
+        
+        // Calculate zoom to fit image in container with padding
+        const containerWidth = container.offsetWidth;
+        const containerHeight = container.offsetHeight;
+        const padding = 40; // Padding around the image
+        
+        const scaleX = (containerWidth - padding) / img.width;
+        const scaleY = (containerHeight - padding) / img.height;
+        
+        // Use the smaller scale to ensure the entire image fits
+        zoomLevel = Math.min(scaleX, scaleY, 1); // Don't zoom in beyond 100%
+        
+        // Apply zoom
+        canvas.style.transform = `scale(${zoomLevel})`;
+        
+        // Center canvas after a brief delay to ensure transform is applied
+        setTimeout(() => {
+            centerCanvas();
+            // Call callback after canvas is centered
+            if (callback) {
+                setTimeout(callback, 50);
+            }
+        }, 10);
+    };
+    
+    img.src = imageData.src;
+}
+
+function performOCR(imageData) {
+    const scanBtn = document.querySelector(`[data-image-id="${imageData.id}"] .scan-btn`);
+    scanBtn.disabled = true;
+    scanBtn.innerHTML = '<span class="loading-spinner"></span> Scanning...';
+    
+    Tesseract.recognize(
+        imageData.src,
+        'chi_tra+eng',
+        {
+            logger: info => console.log(info)
+        }
+    ).then(({ data: { text, words } }) => {
+        console.log('OCR Result:', text);
+        console.log('Words:', words);
+        
+        // Clear existing text boxes
+        clearTextBoxes();
+        
+        // Create text boxes for each word
+        words.forEach((word, index) => {
+            if (word.text.trim()) {
+                createTextBox(
+                    word.bbox.x0,
+                    word.bbox.y0,
+                    word.bbox.x1 - word.bbox.x0,
+                    word.bbox.y1 - word.bbox.y0,
+                    word.text
+                );
+            }
         });
         
-        documentCanvas.width = img.width;
-        documentCanvas.height = img.height;
-        const ctx = documentCanvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        
-        progressText.textContent = 'Recognizing text...';
-        progressFill.style.width = '30%';
-        
-        const result = await Tesseract.recognize(
-            selectedDocument.data,
-            'chi_tra+eng',
-            {
-                logger: (m) => {
-                    if (m.status === 'recognizing text') {
-                        const progress = Math.round(m.progress * 70) + 30;
-                        progressFill.style.width = progress + '%';
-                    }
-                }
-            }
-        );
-        
-        progressFill.style.width = '100%';
-        progressText.textContent = 'Complete!';
-        
-        ocrResults = result.data.words;
-        displayOCRResults(result.data.words);
-        
-        previewEmpty.style.display = 'none';
-        previewContent.style.display = 'block';
-        applyButton.disabled = false;
-        
+        // Update positions after all text boxes are created
         setTimeout(() => {
-            scanProgress.style.display = 'none';
-            scanButton.disabled = false;
-        }, 1000);
+            updateTextBoxPositions();
+        }, 100);
         
-    } catch (error) {
-        console.error('OCR Error:', error);
-        progressText.textContent = 'Error: Unable to recognize text';
-        setTimeout(() => {
-            scanProgress.style.display = 'none';
-            scanButton.disabled = false;
-        }, 2000);
-    }
-}
-
-function displayOCRResults(words) {
-    textBoxesContainer.innerHTML = '';
-    
-    words.forEach((word, index) => {
-        if (word.text.trim()) {
-            createTextBox(word, index);
-        }
+        scanBtn.disabled = false;
+        scanBtn.innerHTML = '<span>🔍</span> Scan';
+    }).catch(err => {
+        console.error('OCR Error:', err);
+        scanBtn.disabled = false;
+        scanBtn.innerHTML = '<span>🔍</span> Scan';
+        alert('OCR scan failed, please try again');
     });
 }
 
-function createTextBox(word, index) {
+function createTextBox(x, y, width, height, text) {
+    const container = document.getElementById('textBoxContainer');
+    const canvas = document.getElementById('ocrCanvas');
     const textBox = document.createElement('div');
     textBox.className = 'text-box';
-    textBox.id = `textbox-${index}`;
-    textBox.style.left = word.bbox.x0 + 'px';
-    textBox.style.top = word.bbox.y0 + 'px';
-    textBox.style.width = (word.bbox.x1 - word.bbox.x0) + 'px';
-    textBox.style.height = (word.bbox.y1 - word.bbox.y0) + 'px';
     
-    const textarea = document.createElement('textarea');
-    textarea.value = word.text;
-    textarea.rows = 1;
-    textarea.style.width = '100%';
-    textarea.style.height = '100%';
+    // 確保最小尺寸
+    const minWidth = 150;
+    const minHeight = 80;
+    const finalWidth = Math.max(width * zoomLevel, minWidth);
+    const finalHeight = Math.max(height * zoomLevel, minHeight);
     
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'delete-text-box';
-    deleteBtn.innerHTML = '×';
-    deleteBtn.onclick = () => textBox.remove();
+    // Calculate position relative to canvas offset
+    const canvasRect = canvas.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
     
-    textBox.appendChild(textarea);
-    textBox.appendChild(deleteBtn);
+    const relativeX = canvasRect.left - containerRect.left + (x * zoomLevel);
+    const relativeY = canvasRect.top - containerRect.top + (y * zoomLevel);
     
-    makeDraggable(textBox);
+    textBox.style.left = `${relativeX}px`;
+    textBox.style.top = `${relativeY}px`;
+    textBox.style.width = `${finalWidth}px`;
+    textBox.style.height = `${finalHeight}px`;
     
-    textBoxesContainer.appendChild(textBox);
+    textBox.innerHTML = `
+        <button class="text-box-delete" onclick="deleteTextBox(this)">×</button>
+        <div class="text-box-content">
+            <textarea>${text}</textarea>
+        </div>
+        <div class="text-box-resize-handle"></div>
+    `;
+    
+    // Make text box draggable
+    makeTextBoxDraggable(textBox);
+    
+    // Add click event to activate
+    textBox.addEventListener('click', function(e) {
+        // Remove active class from all text boxes
+        document.querySelectorAll('.text-box').forEach(box => {
+            box.classList.remove('active');
+        });
+        // Add active class to this text box
+        textBox.classList.add('active');
+    });
+    
+    // Auto-adjust height based on content
+    const textarea = textBox.querySelector('textarea');
+    function adjustHeight() {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+        textBox.style.height = (textarea.scrollHeight + 38) + 'px'; // +38 for padding
+    }
+    
+    textarea.addEventListener('input', adjustHeight);
+    textarea.addEventListener('change', adjustHeight);
+    
+    // Initial height adjustment
+    setTimeout(adjustHeight, 0);
+    
+    container.appendChild(textBox);
+    textBoxes.push({
+        element: textBox,
+        x: x,
+        y: y,
+        originalX: x,
+        originalY: y,
+        width: Math.max(width, minWidth / zoomLevel),
+        height: Math.max(height, minHeight / zoomLevel),
+        text: text
+    });
 }
 
-function makeDraggable(element) {
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+// Add new text box at center of canvas
+function addNewTextBox() {
+    if (!currentImage) {
+        alert('Please upload and scan an image first');
+        return;
+    }
     
+    const canvas = document.getElementById('ocrCanvas');
+    const container = document.getElementById('canvasContainer');
+    
+    // Calculate center position
+    const centerX = (container.offsetWidth / 2 - 100) / zoomLevel;
+    const centerY = (container.offsetHeight / 2 - 50) / zoomLevel;
+    
+    createTextBox(centerX, centerY, 200 / zoomLevel, 100 / zoomLevel, 'Enter text here...');
+}
+
+// Get canvas boundaries for text box constraint
+function getCanvasBoundaries() {
+    const canvas = document.getElementById('ocrCanvas');
+    const container = document.getElementById('textBoxContainer');
+    const canvasRect = canvas.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    
+    return {
+        left: canvasRect.left - containerRect.left,
+        top: canvasRect.top - containerRect.top,
+        right: canvasRect.right - containerRect.left,
+        bottom: canvasRect.bottom - containerRect.top,
+        width: canvasRect.width,
+        height: canvasRect.height
+    };
+}
+
+function makeTextBoxDraggable(element) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    let isResizing = false;
+    
+    // Dragging
     element.onmousedown = dragMouseDown;
     
+    // Resizing
+    const resizeHandle = element.querySelector('.text-box-resize-handle');
+    if (resizeHandle) {
+        resizeHandle.onmousedown = startResize;
+    }
+    
     function dragMouseDown(e) {
-        if (e.target.tagName === 'TEXTAREA' || e.target.classList.contains('delete-text-box')) {
+        // Don't drag if clicking on textarea, delete button, or resize handle
+        if (e.target.tagName === 'TEXTAREA' || 
+            e.target.classList.contains('text-box-delete') ||
+            e.target.classList.contains('text-box-resize-handle')) {
             return;
         }
         
         e.preventDefault();
         pos3 = e.clientX;
         pos4 = e.clientY;
-        
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
-        
-        element.classList.add('dragging');
     }
     
     function elementDrag(e) {
+        if (isResizing) return;
         e.preventDefault();
         pos1 = pos3 - e.clientX;
         pos2 = pos4 - e.clientY;
         pos3 = e.clientX;
         pos4 = e.clientY;
         
-        element.style.top = (element.offsetTop - pos2) + 'px';
-        element.style.left = (element.offsetLeft - pos1) + 'px';
+        // Calculate new position
+        let newTop = element.offsetTop - pos2;
+        let newLeft = element.offsetLeft - pos1;
+        
+        // Get canvas boundaries
+        const boundaries = getCanvasBoundaries();
+        
+        // Constrain to canvas boundaries
+        const boxWidth = element.offsetWidth;
+        const boxHeight = element.offsetHeight;
+        
+        // Keep text box within canvas bounds
+        newLeft = Math.max(boundaries.left, Math.min(newLeft, boundaries.right - boxWidth));
+        newTop = Math.max(boundaries.top, Math.min(newTop, boundaries.bottom - boxHeight));
+        
+        element.style.top = newTop + "px";
+        element.style.left = newLeft + "px";
     }
     
     function closeDragElement() {
         document.onmouseup = null;
         document.onmousemove = null;
-        element.classList.remove('dragging');
+    }
+    
+    function startResize(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        isResizing = true;
+        
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startWidth = element.offsetWidth;
+        const startHeight = element.offsetHeight;
+        
+        function resize(e) {
+            const newWidth = startWidth + (e.clientX - startX);
+            const newHeight = startHeight + (e.clientY - startY);
+            
+            // Get canvas boundaries
+            const boundaries = getCanvasBoundaries();
+            const boxLeft = element.offsetLeft;
+            const boxTop = element.offsetTop;
+            
+            // Constrain width and height to stay within canvas
+            const maxWidth = boundaries.right - boxLeft;
+            const maxHeight = boundaries.bottom - boxTop;
+            
+            const constrainedWidth = Math.max(150, Math.min(newWidth, maxWidth));
+            const constrainedHeight = Math.max(80, Math.min(newHeight, maxHeight));
+            
+            element.style.width = constrainedWidth + 'px';
+            element.style.height = constrainedHeight + 'px';
+        }
+        
+        function stopResize() {
+            isResizing = false;
+            document.removeEventListener('mousemove', resize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+        
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', stopResize);
     }
 }
 
-function adjustZoom(delta) {
-    zoomLevel = Math.max(0.5, Math.min(3, zoomLevel + delta));
-    applyZoom();
+function deleteTextBox(button) {
+    const textBox = button.parentElement;
+    const index = textBoxes.findIndex(tb => tb.element === textBox);
+    if (index > -1) {
+        textBoxes.splice(index, 1);
+    }
+    textBox.remove();
 }
 
-function applyZoom() {
-    canvasContainer.style.transform = `scale(${zoomLevel})`;
-    canvasContainer.style.transformOrigin = 'top left';
+function clearTextBoxes() {
+    const container = document.getElementById('textBoxContainer');
+    container.innerHTML = '';
+    textBoxes = [];
 }
 
-function resetView() {
-    zoomLevel = 1;
-    applyZoom();
+function deleteImage(imageId) {
+    const index = uploadedImages.findIndex(img => img.id == imageId);
+    if (index > -1) {
+        uploadedImages.splice(index, 1);
+    }
+    
+    const card = document.querySelector(`[data-image-id="${imageId}"]`);
+    if (card) {
+        card.remove();
+    }
+    
+    if (currentImage && currentImage.id == imageId) {
+        const canvas = document.getElementById('ocrCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.width = 0;
+        canvas.height = 0;
+        clearTextBoxes();
+        currentImage = null;
+        
+        // Show placeholder again
+        const placeholder = document.getElementById('canvasPlaceholder');
+        if (placeholder) {
+            placeholder.classList.remove('hidden');
+        }
+    }
 }
 
+// Zoom functionality
+function zoom(factor) {
+    zoomLevel *= factor;
+    zoomLevel = Math.max(0.1, Math.min(5, zoomLevel)); // Limit zoom between 0.1x and 5x
+    
+    if (currentImage) {
+        const canvas = document.getElementById('ocrCanvas');
+        canvas.style.transform = `scale(${zoomLevel})`;
+        
+        // Recenter canvas
+        centerCanvas();
+        
+        // Update text box positions and sizes
+        updateTextBoxPositions();
+    }
+}
+
+function updateTextBoxPositions() {
+    const canvas = document.getElementById('ocrCanvas');
+    const container = document.getElementById('textBoxContainer');
+    const canvasRect = canvas.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    
+    textBoxes.forEach(tb => {
+        const relativeX = canvasRect.left - containerRect.left + (tb.originalX * zoomLevel);
+        const relativeY = canvasRect.top - containerRect.top + (tb.originalY * zoomLevel);
+        
+        tb.element.style.left = `${relativeX}px`;
+        tb.element.style.top = `${relativeY}px`;
+        tb.element.style.width = `${tb.width * zoomLevel}px`;
+        tb.element.style.height = `${tb.height * zoomLevel}px`;
+    });
+}
+
+// Rotate functionality
+function rotate(degrees) {
+    rotation = (rotation + degrees) % 360;
+    if (currentImage) {
+        displayImageOnCanvas(currentImage);
+    }
+}
+
+// Move mode toggle
+let moveMode = false;
+function toggleMoveMode() {
+    moveMode = !moveMode;
+    const button = document.getElementById('moveMode');
+    button.classList.toggle('active', moveMode);
+    
+    const canvas = document.getElementById('ocrCanvas');
+    if (moveMode) {
+        canvas.style.cursor = 'grab';
+    } else {
+        canvas.style.cursor = 'default';
+    }
+}
+
+// Canvas dragging
+function startDrag(e) {
+    if (moveMode) {
+        isDragging = true;
+        startX = e.clientX - canvasOffsetX;
+        startY = e.clientY - canvasOffsetY;
+        e.target.style.cursor = 'grabbing';
+    }
+}
+
+function drag(e) {
+    if (isDragging && moveMode) {
+        canvasOffsetX = e.clientX - startX;
+        canvasOffsetY = e.clientY - startY;
+        
+        const canvas = document.getElementById('ocrCanvas');
+        canvas.style.left = `${canvasOffsetX}px`;
+        canvas.style.top = `${canvasOffsetY}px`;
+        
+        // Update text box positions when canvas moves
+        updateTextBoxPositions();
+    }
+}
+
+function endDrag(e) {
+    if (isDragging) {
+        isDragging = false;
+        if (moveMode) {
+            e.target.style.cursor = 'grab';
+        }
+    }
+}
+
+function centerCanvas() {
+    const canvas = document.getElementById('ocrCanvas');
+    const container = document.getElementById('canvasContainer');
+    
+    if (!canvas.width || !canvas.height) return;
+    
+    const scaledWidth = canvas.width * zoomLevel;
+    const scaledHeight = canvas.height * zoomLevel;
+    
+    canvasOffsetX = (container.offsetWidth - scaledWidth) / 2;
+    canvasOffsetY = (container.offsetHeight - scaledHeight) / 2;
+    
+    canvas.style.left = `${canvasOffsetX}px`;
+    canvas.style.top = `${canvasOffsetY}px`;
+    canvas.style.transformOrigin = 'top left';
+}
+
+// Download functionality
 function showDownloadOptions() {
-    downloadOptions.style.display = 'flex';
-}
-
-async function downloadDocument(format) {
-    if (format === 'pdf') {
-        await downloadAsPDF();
-    } else if (format === 'png') {
-        await downloadAsPNG();
+    if (!currentImage) {
+        alert('Please scan an image first');
+        return;
     }
-    downloadOptions.style.display = 'none';
+    document.getElementById('downloadOptions').style.display = 'block';
 }
 
-async function downloadAsPDF() {
-    const { jsPDF } = window.jspdf;
-    
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = documentCanvas.width;
-    tempCanvas.height = documentCanvas.height;
-    const ctx = tempCanvas.getContext('2d');
-    
-    ctx.drawImage(documentCanvas, 0, 0);
-    
-    const textBoxes = textBoxesContainer.querySelectorAll('.text-box');
-    textBoxes.forEach(box => {
-        const textarea = box.querySelector('textarea');
-        const left = parseInt(box.style.left);
-        const top = parseInt(box.style.top);
-        
-        ctx.font = '16px Arial';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.fillRect(left, top, parseInt(box.style.width), parseInt(box.style.height));
-        
-        ctx.fillStyle = '#333';
-        ctx.fillText(textarea.value, left + 8, top + 20);
-    });
-    
-    const imgData = tempCanvas.toDataURL('image/png');
-    const pdf = new jsPDF({
-        orientation: tempCanvas.width > tempCanvas.height ? 'landscape' : 'portrait',
-        unit: 'px',
-        format: [tempCanvas.width, tempCanvas.height]
-    });
-    
-    pdf.addImage(imgData, 'PNG', 0, 0, tempCanvas.width, tempCanvas.height);
-    pdf.save(`${selectedDocument.name.split('.')[0]}_ocr.pdf`);
+function hideDownloadOptions() {
+    document.getElementById('downloadOptions').style.display = 'none';
 }
 
-async function downloadAsPNG() {
-    const canvas = await html2canvas(canvasContainer, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        logging: false
+async function downloadAs(format) {
+    hideDownloadOptions();
+    
+    const canvas = document.getElementById('ocrCanvas');
+    const container = document.getElementById('canvasContainer');
+    
+    // Hide UI elements temporarily
+    const deleteButtons = document.querySelectorAll('.text-box-delete');
+    const resizeHandles = document.querySelectorAll('.text-box-resize-handle');
+    const textBoxElements = document.querySelectorAll('.text-box');
+    
+    // Store original styles
+    const originalStyles = [];
+    textBoxElements.forEach(box => {
+        originalStyles.push({
+            border: box.style.border,
+            boxShadow: box.style.boxShadow,
+            cursor: box.style.cursor
+        });
+        // Remove borders and shadows for export
+        box.style.border = 'none';
+        box.style.boxShadow = 'none';
+        box.style.cursor = 'default';
     });
     
+    // Hide delete buttons and resize handles
+    deleteButtons.forEach(btn => btn.style.display = 'none');
+    resizeHandles.forEach(handle => handle.style.display = 'none');
+    
+    // Create export canvas with optimized size
+    const maxWidth = 2480; // A4 width at 300dpi
+    const maxHeight = 3508; // A4 height at 300dpi
+    
+    let exportWidth = canvas.width;
+    let exportHeight = canvas.height;
+    let scale = 1;
+    
+    // Scale down if image is too large
+    if (exportWidth > maxWidth || exportHeight > maxHeight) {
+        const widthScale = maxWidth / exportWidth;
+        const heightScale = maxHeight / exportHeight;
+        scale = Math.min(widthScale, heightScale);
+        exportWidth = Math.floor(exportWidth * scale);
+        exportHeight = Math.floor(exportHeight * scale);
+    }
+    
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = exportWidth;
+    exportCanvas.height = exportHeight;
+    const exportCtx = exportCanvas.getContext('2d');
+    
+    // Fill with white background
+    exportCtx.fillStyle = '#FFFFFF';
+    exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    
+    // Calculate font size based on canvas size (proportional to width)
+    const baseFontSize = Math.max(24, Math.floor(exportWidth / 40));
+    
+    // Draw text boxes on the canvas
+    for (const tb of textBoxes) {
+        const textarea = tb.element.querySelector('textarea');
+        const text = textarea.value;
+        
+        if (!text.trim()) continue;
+        
+        // Get current position from element style (after user dragging)
+        const canvasElem = document.getElementById('ocrCanvas');
+        const containerElem = document.getElementById('textBoxContainer');
+        const canvasRect = canvasElem.getBoundingClientRect();
+        const containerRect = containerElem.getBoundingClientRect();
+        
+        // Calculate actual position relative to original canvas
+        const currentLeft = parseInt(tb.element.style.left) || 0;
+        const currentTop = parseInt(tb.element.style.top) || 0;
+        
+        // Convert back to canvas coordinates
+        const canvasOffsetLeft = canvasRect.left - containerRect.left;
+        const canvasOffsetTop = canvasRect.top - containerRect.top;
+        
+        const x = ((currentLeft - canvasOffsetLeft) / zoomLevel) * scale;
+        const y = ((currentTop - canvasOffsetTop) / zoomLevel) * scale;
+        
+        // Get actual dimensions
+        const currentWidth = parseInt(tb.element.style.width) || tb.width * zoomLevel;
+        const currentHeight = parseInt(tb.element.style.height) || tb.height * zoomLevel;
+        
+        const width = (currentWidth / zoomLevel) * scale;
+        const height = (currentHeight / zoomLevel) * scale;
+        
+        // Calculate actual content area (excluding padding)
+        const paddingTop = 30 * scale;
+        const paddingOther = 8 * scale;
+        const contentY = y + paddingTop;
+        
+        // Calculate required height for all text lines
+        const lines = text.split('\n');
+        const lineHeight = baseFontSize * 1.4;
+        const requiredTextHeight = lines.length * lineHeight;
+        const requiredTotalHeight = requiredTextHeight + paddingTop + paddingOther;
+        
+        // Use the larger of current height or required height
+        const finalHeight = Math.max(height, requiredTotalHeight);
+        
+        // Draw transparent background (no background)
+        // Remove the background drawing to make it transparent
+        
+        // Draw text with proper font and line breaks
+        exportCtx.fillStyle = '#000000';
+        exportCtx.font = `bold ${baseFontSize}px Arial`;
+        exportCtx.textBaseline = 'top';
+        
+        // Draw all lines without height restriction
+        lines.forEach((line, index) => {
+            const textY = contentY + (index * lineHeight);
+            exportCtx.fillText(line, x + paddingOther + 5, textY);
+        });
+    }
+    
+    // Restore original styles
+    textBoxElements.forEach((box, index) => {
+        box.style.border = originalStyles[index].border;
+        box.style.boxShadow = originalStyles[index].boxShadow;
+        box.style.cursor = originalStyles[index].cursor;
+    });
+    
+    // Show UI elements again
+    deleteButtons.forEach(btn => btn.style.display = 'flex');
+    resizeHandles.forEach(handle => handle.style.display = 'block');
+    
+    if (format === 'pdf') {
+        downloadPDF(exportCanvas);
+    } else if (format === 'jpg') {
+        downloadImage(exportCanvas, 'jpeg');
+    } else if (format === 'png') {
+        downloadImage(exportCanvas, 'png');
+    }
+}
+
+function downloadImage(canvas, format) {
     const link = document.createElement('a');
-    link.download = `${selectedDocument.name.split('.')[0]}_ocr.png`;
-    link.href = canvas.toDataURL('image/png');
+    link.download = `ocr-result-${Date.now()}.${format}`;
+    link.href = canvas.toDataURL(`image/${format}`);
     link.click();
 }
 
-function clearAll() {
-    clearPreview();
-    selectedDocument = null;
-    updateDocumentGrid();
+function downloadPDF(canvas) {
+    const { jsPDF } = window.jspdf;
+    const imgData = canvas.toDataURL('image/png');
+    
+    const pdf = new jsPDF({
+        orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+    });
+    
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+    pdf.save(`ocr-result-${Date.now()}.pdf`);
 }
-
-function clearPreview() {
-    previewEmpty.style.display = 'flex';
-    previewContent.style.display = 'none';
-    textBoxesContainer.innerHTML = '';
-    ocrResults = [];
-    applyButton.disabled = true;
-    downloadOptions.style.display = 'none';
-    zoomLevel = 1;
-    applyZoom();
-}
-
-function updateScanButton() {
-    scanButton.disabled = !selectedDocument;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    initializeEventListeners();
-    updateScanButton();
-});
-
-window.deleteDocument = deleteDocument;
