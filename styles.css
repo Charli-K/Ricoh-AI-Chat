@@ -242,7 +242,7 @@ body.dark-mode .theme-toggle::before {
 }
 
 body.dark-mode .main-content {
-  background: linear-gradient(180deg, rgba(102, 126, 234, 0.08), transparent 120px) var(--bg-0);
+  background: linear-gradient(180deg, rgba(102, 126, 234, 0.08), transparent 120px) var#0f1419;
 }
 
 .chart-card, .line-chart-container, .table-section {
@@ -384,14 +384,14 @@ body.dark-mode .date-separator {
   justify-content: center;
   align-items: center;
   gap: 20px;
-  width: 25%;
+  width: 24.5%;
   height: 200px;
-  flex-shrink: 0;
+  flex-shrink: 1;
 }
 
 .total-tokens-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
 }
 
 .stat-icon {
@@ -470,26 +470,29 @@ body.dark-mode .stat-subtext {
   user-select: none;
   scrollbar-width: none; 
   -ms-overflow-style: none;
+  
 }
 
 .department-tokens-grid:active {
   cursor: grabbing;
 }
 
-.department-tokens-grid::-webkit-scrollbar {
-  display: none;
-}
 
 .department-card {
   background: var(--card);
   border: 1px solid var(--card-border);
   border-radius: 12px;
   padding: 20px;
-
+  background: rgb(255, 255, 255);
   backdrop-filter: blur(8px);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   min-width: 200px;
   flex-shrink: 0;
+}
+.department-card:hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transform: translateY(1px);
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
 }
 
 

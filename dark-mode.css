@@ -173,27 +173,27 @@ body.dark-mode table tbody tr:hover {
 
 body.dark-mode .status-pending {
   background: rgba(255, 217, 102, 0.2);
-  color: #ffd966;
+  color: #ffffff;
 }
 
 body.dark-mode .status-in-progress {
   background: rgba(157, 195, 230, 0.2);
-  color: #9dc3e6;
+  color: #ffffff;
 }
 
 body.dark-mode .status-approve {
   background: rgba(169, 208, 142, 0.2);
-  color: #a9d08e;
+  color: #ffffff;
 }
 
 body.dark-mode .status-completed {
   background: rgba(112, 173, 71, 0.2);
-  color: #70ad47;
+  color: #ffffff;
 }
 
 body.dark-mode .status-cancel {
   background: rgba(237, 125, 49, 0.2);
-  color: #ed7d31;
+  color: #ffffff;
 }
 
 body.dark-mode .btn-apply {
@@ -677,4 +677,21 @@ body.dark-mode .message-input::placeholder {
   color: #6b7280;
 }
 
+body.dark-mode .search-bar-table input {
+  width: 100%;
+  max-width: 420px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(96, 96, 96, 0.426);
+  background: rgba(42, 48, 60, 0.7);
+  outline: none;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  color: #ffffff;
+}
 
+body.dark-mode .stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: rgba(0, 232, 220, 0.933)
+}

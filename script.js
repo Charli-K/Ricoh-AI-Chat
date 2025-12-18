@@ -203,8 +203,6 @@ function renderPieCharts() {
   pieCharts.formC = new Chart(document.getElementById("chartFormC"), pieConfig(formData.formC));
 }
 
-renderPieCharts();
-
 let lineChartInstance = null;
 
 function getTableData() {
@@ -361,8 +359,6 @@ function updateLineChart(fromDate, toDate) {
     });
   }
 }
-
-updateLineChart('2022-01-01', '2025-12-31');
 
 const tableSearch = document.getElementById("tableSearch");
 const columnManagerBtn = document.getElementById("columnManagerBtn");
@@ -720,3 +716,7 @@ document.addEventListener('keydown', (e) => {
     closeModal();
   }
 });
+
+loadDarkModePreference();
+renderPieCharts();
+updateLineChart('2022-01-01', '2025-12-31');

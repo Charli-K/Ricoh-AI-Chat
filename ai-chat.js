@@ -1,11 +1,9 @@
-// Dark Mode Toggle
 function toggleDarkMode() {
   document.body.classList.toggle('dark-mode');
   const isDarkMode = document.body.classList.contains('dark-mode');
   localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
 }
 
-// Load dark mode preference on page load
 function loadDarkModePreference() {
   const darkMode = localStorage.getItem('darkMode');
   if (darkMode === 'enabled') {
@@ -13,7 +11,6 @@ function loadDarkModePreference() {
   }
 }
 
-// Initialize dark mode on page load
 loadDarkModePreference();
 
 let chatMessages = [];
@@ -21,7 +18,6 @@ let acceptedPolicy = false;
 let attachedFiles = [];
 let selectedKnowledgeBases = [];
 
-// Knowledge base data (matching from knowledge-bases.js)
 const knowledgeBases = [
   {
     id: 1,

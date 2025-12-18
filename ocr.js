@@ -1,4 +1,3 @@
-// OCR Functionality
 let uploadedImages = [];
 let currentImage = null;
 let textBoxes = [];
@@ -9,16 +8,14 @@ let startX, startY;
 let canvasOffsetX = 0;
 let canvasOffsetY = 0;
 
-// Configure PDF.js worker
 if (typeof pdfjsLib !== 'undefined') {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 
-// Initialize
 document.addEventListener('DOMContentLoaded', function() {
+    loadDarkModePreference();
     setupEventListeners();
     
-    // Click outside to deactivate all text boxes
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.text-box')) {
             document.querySelectorAll('.text-box').forEach(box => {
@@ -29,10 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function setupEventListeners() {
-    // Image upload
     document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
     
-    // Toolbar buttons
     document.getElementById('zoomIn').addEventListener('click', () => zoom(1.2));
     document.getElementById('zoomOut').addEventListener('click', () => zoom(0.8));
     document.getElementById('rotateLeft').addEventListener('click', () => rotate(-90));
@@ -41,7 +36,6 @@ function setupEventListeners() {
     document.getElementById('addTextBox').addEventListener('click', addNewTextBox);
     document.getElementById('applyBtn').addEventListener('click', showDownloadOptions);
     
-    // Canvas dragging
     const canvas = document.getElementById('ocrCanvas');
     canvas.addEventListener('mousedown', startDrag);
     canvas.addEventListener('mousemove', drag);
@@ -67,11 +61,9 @@ async function handleImageUpload(event) {
             };
             reader.readAsDataURL(file);
         } else if (file.type === 'application/pdf') {
-            // Handle PDF files
             await processPDFFile(file);
         }
     }
-    // Clear the input so the same file can be uploaded again
     event.target.value = '';
 }
 
@@ -81,24 +73,20 @@ async function processPDFFile(file) {
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         const numPages = pdf.numPages;
         
-        // Process each page of the PDF
         for (let pageNum = 1; pageNum <= numPages; pageNum++) {
             const page = await pdf.getPage(pageNum);
             const viewport = page.getViewport({ scale: 2.0 });
             
-            // Create canvas for this page
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
             canvas.height = viewport.height;
             canvas.width = viewport.width;
             
-            // Render PDF page to canvas
             await page.render({
                 canvasContext: context,
                 viewport: viewport
             }).promise;
             
-            // Convert canvas to image data
             const imageDataUrl = canvas.toDataURL('image/png');
             
             const imageData = {
@@ -113,7 +101,6 @@ async function processPDFFile(file) {
             uploadedImages.push(imageData);
             addImageCard(imageData);
             
-            // Small delay between pages to prevent UI blocking
             await new Promise(resolve => setTimeout(resolve, 100));
         }
         
@@ -154,17 +141,14 @@ function scanImage(imageId) {
     const imageData = uploadedImages.find(img => img.id == imageId);
     if (!imageData) return;
     
-    // Hide placeholder
     const placeholder = document.getElementById('canvasPlaceholder');
     if (placeholder) {
         placeholder.classList.add('hidden');
     }
     
-    // Reset zoom and rotation for new scan
     zoomLevel = 1;
     rotation = 0;
     
-    // Set active card
     document.querySelectorAll('.image-card').forEach(card => {
         card.classList.remove('active');
     });
@@ -172,7 +156,6 @@ function scanImage(imageId) {
     
     currentImage = imageData;
     
-    // Wait for canvas to be displayed and centered before OCR
     displayImageOnCanvas(imageData, () => {
         performOCR(imageData);
     });
@@ -189,7 +172,6 @@ function displayImageOnCanvas(imageData, callback) {
         canvas.height = img.height;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Apply rotation
         ctx.save();
         ctx.translate(canvas.width / 2, canvas.height / 2);
         ctx.rotate((rotation * Math.PI) / 180);
@@ -197,24 +179,19 @@ function displayImageOnCanvas(imageData, callback) {
         ctx.drawImage(img, 0, 0);
         ctx.restore();
         
-        // Calculate zoom to fit image in container with padding
         const containerWidth = container.offsetWidth;
         const containerHeight = container.offsetHeight;
-        const padding = 40; // Padding around the image
+        const padding = 40;
         
         const scaleX = (containerWidth - padding) / img.width;
         const scaleY = (containerHeight - padding) / img.height;
         
-        // Use the smaller scale to ensure the entire image fits
-        zoomLevel = Math.min(scaleX, scaleY, 1); // Don't zoom in beyond 100%
+        zoomLevel = Math.min(scaleX, scaleY, 1);
         
-        // Apply zoom
         canvas.style.transform = `scale(${zoomLevel})`;
         
-        // Center canvas after a brief delay to ensure transform is applied
         setTimeout(() => {
             centerCanvas();
-            // Call callback after canvas is centered
             if (callback) {
                 setTimeout(callback, 50);
             }
@@ -239,10 +216,8 @@ function performOCR(imageData) {
         console.log('OCR Result:', text);
         console.log('Words:', words);
         
-        // Clear existing text boxes
         clearTextBoxes();
         
-        // Create text boxes for each word
         words.forEach((word, index) => {
             if (word.text.trim()) {
                 createTextBox(
@@ -255,7 +230,6 @@ function performOCR(imageData) {
             }
         });
         
-        // Update positions after all text boxes are created
         setTimeout(() => {
             updateTextBoxPositions();
         }, 100);
@@ -276,13 +250,11 @@ function createTextBox(x, y, width, height, text) {
     const textBox = document.createElement('div');
     textBox.className = 'text-box';
     
-    // 確保最小尺寸
     const minWidth = 150;
     const minHeight = 80;
     const finalWidth = Math.max(width * zoomLevel, minWidth);
     const finalHeight = Math.max(height * zoomLevel, minHeight);
     
-    // Calculate position relative to canvas offset
     const canvasRect = canvas.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
     
@@ -302,31 +274,25 @@ function createTextBox(x, y, width, height, text) {
         <div class="text-box-resize-handle"></div>
     `;
     
-    // Make text box draggable
     makeTextBoxDraggable(textBox);
     
-    // Add click event to activate
     textBox.addEventListener('click', function(e) {
-        // Remove active class from all text boxes
         document.querySelectorAll('.text-box').forEach(box => {
             box.classList.remove('active');
         });
-        // Add active class to this text box
         textBox.classList.add('active');
     });
     
-    // Auto-adjust height based on content
     const textarea = textBox.querySelector('textarea');
     function adjustHeight() {
         textarea.style.height = 'auto';
         textarea.style.height = textarea.scrollHeight + 'px';
-        textBox.style.height = (textarea.scrollHeight + 38) + 'px'; // +38 for padding
+        textBox.style.height = (textarea.scrollHeight + 38) + 'px';
     }
     
     textarea.addEventListener('input', adjustHeight);
     textarea.addEventListener('change', adjustHeight);
     
-    // Initial height adjustment
     setTimeout(adjustHeight, 0);
     
     container.appendChild(textBox);
@@ -342,7 +308,6 @@ function createTextBox(x, y, width, height, text) {
     });
 }
 
-// Add new text box at center of canvas
 function addNewTextBox() {
     if (!currentImage) {
         alert('Please upload and scan an image first');
@@ -352,14 +317,12 @@ function addNewTextBox() {
     const canvas = document.getElementById('ocrCanvas');
     const container = document.getElementById('canvasContainer');
     
-    // Calculate center position
     const centerX = (container.offsetWidth / 2 - 100) / zoomLevel;
     const centerY = (container.offsetHeight / 2 - 50) / zoomLevel;
     
     createTextBox(centerX, centerY, 200 / zoomLevel, 100 / zoomLevel, 'Enter text here...');
 }
 
-// Get canvas boundaries for text box constraint
 function getCanvasBoundaries() {
     const canvas = document.getElementById('ocrCanvas');
     const container = document.getElementById('textBoxContainer');
@@ -380,17 +343,14 @@ function makeTextBoxDraggable(element) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     let isResizing = false;
     
-    // Dragging
     element.onmousedown = dragMouseDown;
     
-    // Resizing
     const resizeHandle = element.querySelector('.text-box-resize-handle');
     if (resizeHandle) {
         resizeHandle.onmousedown = startResize;
     }
     
     function dragMouseDown(e) {
-        // Don't drag if clicking on textarea, delete button, or resize handle
         if (e.target.tagName === 'TEXTAREA' || 
             e.target.classList.contains('text-box-delete') ||
             e.target.classList.contains('text-box-resize-handle')) {
@@ -412,18 +372,14 @@ function makeTextBoxDraggable(element) {
         pos3 = e.clientX;
         pos4 = e.clientY;
         
-        // Calculate new position
         let newTop = element.offsetTop - pos2;
         let newLeft = element.offsetLeft - pos1;
         
-        // Get canvas boundaries
         const boundaries = getCanvasBoundaries();
         
-        // Constrain to canvas boundaries
         const boxWidth = element.offsetWidth;
         const boxHeight = element.offsetHeight;
         
-        // Keep text box within canvas bounds
         newLeft = Math.max(boundaries.left, Math.min(newLeft, boundaries.right - boxWidth));
         newTop = Math.max(boundaries.top, Math.min(newTop, boundaries.bottom - boxHeight));
         
@@ -450,12 +406,10 @@ function makeTextBoxDraggable(element) {
             const newWidth = startWidth + (e.clientX - startX);
             const newHeight = startHeight + (e.clientY - startY);
             
-            // Get canvas boundaries
             const boundaries = getCanvasBoundaries();
             const boxLeft = element.offsetLeft;
             const boxTop = element.offsetTop;
             
-            // Constrain width and height to stay within canvas
             const maxWidth = boundaries.right - boxLeft;
             const maxHeight = boundaries.bottom - boxTop;
             
@@ -512,7 +466,6 @@ function deleteImage(imageId) {
         clearTextBoxes();
         currentImage = null;
         
-        // Show placeholder again
         const placeholder = document.getElementById('canvasPlaceholder');
         if (placeholder) {
             placeholder.classList.remove('hidden');
@@ -520,19 +473,16 @@ function deleteImage(imageId) {
     }
 }
 
-// Zoom functionality
 function zoom(factor) {
     zoomLevel *= factor;
-    zoomLevel = Math.max(0.1, Math.min(5, zoomLevel)); // Limit zoom between 0.1x and 5x
+    zoomLevel = Math.max(0.1, Math.min(5, zoomLevel));
     
     if (currentImage) {
         const canvas = document.getElementById('ocrCanvas');
         canvas.style.transform = `scale(${zoomLevel})`;
         
-        // Recenter canvas
         centerCanvas();
         
-        // Update text box positions and sizes
         updateTextBoxPositions();
     }
 }
@@ -554,7 +504,6 @@ function updateTextBoxPositions() {
     });
 }
 
-// Rotate functionality
 function rotate(degrees) {
     rotation = (rotation + degrees) % 360;
     if (currentImage) {
@@ -562,7 +511,6 @@ function rotate(degrees) {
     }
 }
 
-// Move mode toggle
 let moveMode = false;
 function toggleMoveMode() {
     moveMode = !moveMode;
@@ -577,7 +525,6 @@ function toggleMoveMode() {
     }
 }
 
-// Canvas dragging
 function startDrag(e) {
     if (moveMode) {
         isDragging = true;
@@ -596,7 +543,6 @@ function drag(e) {
         canvas.style.left = `${canvasOffsetX}px`;
         canvas.style.top = `${canvasOffsetY}px`;
         
-        // Update text box positions when canvas moves
         updateTextBoxPositions();
     }
 }
@@ -627,7 +573,6 @@ function centerCanvas() {
     canvas.style.transformOrigin = 'top left';
 }
 
-// Download functionality
 function showDownloadOptions() {
     if (!currentImage) {
         alert('Please scan an image first');
@@ -646,12 +591,10 @@ async function downloadAs(format) {
     const canvas = document.getElementById('ocrCanvas');
     const container = document.getElementById('canvasContainer');
     
-    // Hide UI elements temporarily
     const deleteButtons = document.querySelectorAll('.text-box-delete');
     const resizeHandles = document.querySelectorAll('.text-box-resize-handle');
     const textBoxElements = document.querySelectorAll('.text-box');
     
-    // Store original styles
     const originalStyles = [];
     textBoxElements.forEach(box => {
         originalStyles.push({
@@ -659,25 +602,21 @@ async function downloadAs(format) {
             boxShadow: box.style.boxShadow,
             cursor: box.style.cursor
         });
-        // Remove borders and shadows for export
         box.style.border = 'none';
         box.style.boxShadow = 'none';
         box.style.cursor = 'default';
     });
     
-    // Hide delete buttons and resize handles
     deleteButtons.forEach(btn => btn.style.display = 'none');
     resizeHandles.forEach(handle => handle.style.display = 'none');
     
-    // Create export canvas with optimized size
-    const maxWidth = 2480; // A4 width at 300dpi
-    const maxHeight = 3508; // A4 height at 300dpi
+    const maxWidth = 2480;
+    const maxHeight = 3508;
     
     let exportWidth = canvas.width;
     let exportHeight = canvas.height;
     let scale = 1;
     
-    // Scale down if image is too large
     if (exportWidth > maxWidth || exportHeight > maxHeight) {
         const widthScale = maxWidth / exportWidth;
         const heightScale = maxHeight / exportHeight;
@@ -691,81 +630,64 @@ async function downloadAs(format) {
     exportCanvas.height = exportHeight;
     const exportCtx = exportCanvas.getContext('2d');
     
-    // Fill with white background
     exportCtx.fillStyle = '#FFFFFF';
     exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
     
-    // Calculate font size based on canvas size (proportional to width)
     const baseFontSize = Math.max(24, Math.floor(exportWidth / 40));
     
-    // Draw text boxes on the canvas
     for (const tb of textBoxes) {
         const textarea = tb.element.querySelector('textarea');
         const text = textarea.value;
         
         if (!text.trim()) continue;
         
-        // Get current position from element style (after user dragging)
         const canvasElem = document.getElementById('ocrCanvas');
         const containerElem = document.getElementById('textBoxContainer');
         const canvasRect = canvasElem.getBoundingClientRect();
         const containerRect = containerElem.getBoundingClientRect();
         
-        // Calculate actual position relative to original canvas
         const currentLeft = parseInt(tb.element.style.left) || 0;
         const currentTop = parseInt(tb.element.style.top) || 0;
         
-        // Convert back to canvas coordinates
         const canvasOffsetLeft = canvasRect.left - containerRect.left;
         const canvasOffsetTop = canvasRect.top - containerRect.top;
         
         const x = ((currentLeft - canvasOffsetLeft) / zoomLevel) * scale;
         const y = ((currentTop - canvasOffsetTop) / zoomLevel) * scale;
         
-        // Get actual dimensions
         const currentWidth = parseInt(tb.element.style.width) || tb.width * zoomLevel;
         const currentHeight = parseInt(tb.element.style.height) || tb.height * zoomLevel;
         
         const width = (currentWidth / zoomLevel) * scale;
         const height = (currentHeight / zoomLevel) * scale;
         
-        // Calculate actual content area (excluding padding)
         const paddingTop = 30 * scale;
         const paddingOther = 8 * scale;
         const contentY = y + paddingTop;
         
-        // Calculate required height for all text lines
         const lines = text.split('\n');
         const lineHeight = baseFontSize * 1.4;
         const requiredTextHeight = lines.length * lineHeight;
         const requiredTotalHeight = requiredTextHeight + paddingTop + paddingOther;
         
-        // Use the larger of current height or required height
         const finalHeight = Math.max(height, requiredTotalHeight);
         
-        // Draw transparent background (no background)
-        // Remove the background drawing to make it transparent
-        
-        // Draw text with proper font and line breaks
         exportCtx.fillStyle = '#000000';
         exportCtx.font = `bold ${baseFontSize}px Arial`;
         exportCtx.textBaseline = 'top';
         
-        // Draw all lines without height restriction
         lines.forEach((line, index) => {
             const textY = contentY + (index * lineHeight);
             exportCtx.fillText(line, x + paddingOther + 5, textY);
         });
     }
     
-    // Restore original styles
     textBoxElements.forEach((box, index) => {
         box.style.border = originalStyles[index].border;
         box.style.boxShadow = originalStyles[index].boxShadow;
         box.style.cursor = originalStyles[index].cursor;
     });
     
-    // Show UI elements again
     deleteButtons.forEach(btn => btn.style.display = 'flex');
     resizeHandles.forEach(handle => handle.style.display = 'block');
     
