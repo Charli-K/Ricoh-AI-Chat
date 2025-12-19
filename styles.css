@@ -106,7 +106,7 @@ body {
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   border-radius: 8px;
   border: 1px solid var(--card-border);
-  background-color: #ffffffd0;
+  background-color: #ffffffd8;
   backdrop-filter: blur(12px);
 }
 
@@ -117,6 +117,7 @@ body {
   display: block;
   transition: background 0.2s;
   border-left: 3px solid transparent;
+  
 }
 
 .dropdown-content a:first-child {

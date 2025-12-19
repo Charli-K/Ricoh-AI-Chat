@@ -126,10 +126,10 @@ function addImageCard(imageData) {
         ${pageInfo}
         <div class="image-card-actions">
             <button class="scan-btn" onclick="scanImage('${imageData.id}')">
-                <span>🔍</span> Scan
+            Scan
             </button>
             <button class="delete-btn" onclick="deleteImage('${imageData.id}')">
-                <span>🗑️</span> Delete
+            Delete
             </button>
         </div>
     `;
@@ -217,6 +217,11 @@ function performOCR(imageData) {
         console.log('Words:', words);
         
         clearTextBoxes();
+        
+        const canvas = document.getElementById('ocrCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         words.forEach((word, index) => {
             if (word.text.trim()) {
