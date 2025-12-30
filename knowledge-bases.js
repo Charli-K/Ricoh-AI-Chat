@@ -11,6 +11,55 @@ function loadDarkModePreference() {
   }
 }
 
+// Tooltip functionality
+document.addEventListener('DOMContentLoaded', () => {
+  const tooltipElements = document.querySelectorAll('[data-tooltip]');
+  let activeTooltip = null;
+  
+  tooltipElements.forEach(element => {
+    element.addEventListener('mouseenter', function(e) {
+      // Remove any existing tooltip
+      if (activeTooltip) {
+        activeTooltip.tooltip.remove();
+        activeTooltip.arrow.remove();
+      }
+      
+      const tooltipText = this.getAttribute('data-tooltip');
+      const rect = this.getBoundingClientRect();
+      
+      // Create tooltip container
+      const tooltip = document.createElement('div');
+      tooltip.className = 'custom-tooltip';
+      tooltip.textContent = tooltipText;
+      
+      // Create arrow
+      const arrow = document.createElement('div');
+      arrow.className = 'custom-tooltip-arrow';
+      
+      document.body.appendChild(tooltip);
+      document.body.appendChild(arrow);
+      
+      // Position tooltip
+      const tooltipTop = rect.top + rect.height / 2;
+      tooltip.style.top = `${tooltipTop}px`;
+      tooltip.style.left = `${20 + 100 + 15}px`;
+      
+      arrow.style.top = `${tooltipTop}px`;
+      arrow.style.left = `${20 + 100 + 3}px`;
+      
+      activeTooltip = { tooltip, arrow };
+    });
+    
+    element.addEventListener('mouseleave', function() {
+      if (activeTooltip) {
+        activeTooltip.tooltip.remove();
+        activeTooltip.arrow.remove();
+        activeTooltip = null;
+      }
+    });
+  });
+});
+
 loadDarkModePreference();
 
 let knowledgeBases = [
@@ -22,6 +71,7 @@ let knowledgeBases = [
     status: "active",
     createdDate: "2024-01-15",
     modifiedDate: "2024-12-10",
+    path: "\\Knowledge Base A\\Product Documentation",
     documents: [
       { name: "Product_Manual_2024.pdf", size: 2458000 },
       { name: "Technical_Specs.docx", size: 856000 }
@@ -35,6 +85,7 @@ let knowledgeBases = [
     status: "active",
     createdDate: "2024-02-20",
     modifiedDate: "2024-12-08",
+    path: "\\Knowledge Base A\\Customer Support",
     documents: [
       { name: "FAQ_Database.xlsx", size: 345000 }
     ]
@@ -47,6 +98,7 @@ let knowledgeBases = [
     status: "active",
     createdDate: "2024-03-10",
     modifiedDate: "2024-11-28",
+    path: "\\Knowledge Base B\\Technical",
     documents: []
   },
   {
@@ -57,6 +109,7 @@ let knowledgeBases = [
     status: "draft",
     createdDate: "2024-11-01",
     modifiedDate: "2024-12-05",
+    path: "\\Knowledge Base C\\Policies",
     documents: []
   },
   {
@@ -67,6 +120,7 @@ let knowledgeBases = [
     status: "inactive",
     createdDate: "2024-05-15",
     modifiedDate: "2024-09-20",
+    path: "\\Knowledge Base A\\Sales",
     documents: [
       { name: "Sales_Pitch_Deck.pptx", size: 5678000 },
       { name: "Product_Comparison.xlsx", size: 234000 },
@@ -86,8 +140,10 @@ const kbSort = document.getElementById('kbSort');
 const createKbBtn = document.getElementById('createKbBtn');
 const kbModal = document.getElementById('kbModal');
 const deleteModal = document.getElementById('deleteModal');
+const detailModal = document.getElementById('detailModal');
 const modalClose = document.getElementById('modalClose');
 const deleteModalClose = document.getElementById('deleteModalClose');
+const detailModalClose = document.getElementById('detailModalClose');
 const kbForm = document.getElementById('kbForm');
 const cancelBtn = document.getElementById('cancelBtn');
 const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
@@ -132,15 +188,15 @@ function renderKnowledgeBases(filter = '', sortBy = 'name') {
   }
   
   kbGrid.innerHTML = filtered.map(kb => `
-    <div class="kb-card" data-id="${kb.id}">
+    <div class="kb-card" data-id="${kb.id}" onclick="showKnowledgeBaseDetail(${kb.id})" style="cursor: pointer;">
       <div class="kb-card-header">
         <div>
           <h3 class="kb-card-title">${kb.name}</h3>
           <div class="kb-card-category">${kb.category}</div>
         </div>
         <div class="kb-card-actions">
-          <button class="kb-action-btn edit" onclick="editKnowledgeBase(${kb.id})" title="Edit">✏️</button>
-          <button class="kb-action-btn delete" onclick="deleteKnowledgeBase(${kb.id})" title="Delete">🗑️</button>
+          <button class="kb-action-btn edit" onclick="event.stopPropagation(); editKnowledgeBase(${kb.id})" title="Edit">✏️</button>
+          <button class="kb-action-btn delete" onclick="event.stopPropagation(); deleteKnowledgeBase(${kb.id})" title="Delete">🗑️</button>
         </div>
       </div>
       <p class="kb-card-description">${kb.description || 'No description available'}</p>
@@ -175,6 +231,7 @@ function attachEventListeners() {
   createKbBtn.addEventListener('click', openCreateModal);
   modalClose.addEventListener('click', closeModal);
   deleteModalClose.addEventListener('click', closeDeleteModal);
+  detailModalClose.addEventListener('click', closeDetailModal);
   cancelBtn.addEventListener('click', closeModal);
   cancelDeleteBtn.addEventListener('click', closeDeleteModal);
   confirmDeleteBtn.addEventListener('click', confirmDelete);
@@ -194,6 +251,10 @@ function attachEventListeners() {
   
   deleteModal.addEventListener('click', (e) => {
     if (e.target === deleteModal) closeDeleteModal();
+  });
+
+  detailModal.addEventListener('click', (e) => {
+    if (e.target === detailModal) closeDetailModal();
   });
 }
 
@@ -293,6 +354,49 @@ function closeDeleteModal() {
   currentDeleteId = null;
 }
 
+function closeDetailModal() {
+  detailModal.classList.remove('active');
+}
+
+function showKnowledgeBaseDetail(id) {
+  const kb = knowledgeBases.find(k => k.id === id);
+  
+  if (kb) {
+    document.getElementById('detailKbName').textContent = kb.name;
+    document.getElementById('detailKbCategory').textContent = kb.category;
+    document.getElementById('detailKbCategory').className = 'kb-card-category';
+    
+    const statusElement = document.getElementById('detailKbStatus');
+    statusElement.textContent = kb.status;
+    statusElement.className = `kb-card-status ${kb.status}`;
+    
+    document.getElementById('detailKbDescription').textContent = kb.description || 'No description available';
+    
+    const pathElement = document.getElementById('detailKbPath');
+    pathElement.textContent = kb.path || '\\Knowledge Base\\Default';
+    
+    document.getElementById('detailKbCreated').textContent = formatDate(kb.createdDate);
+    document.getElementById('detailKbModified').textContent = formatDate(kb.modifiedDate);
+    
+    const documentsContainer = document.getElementById('detailKbDocuments');
+    if (kb.documents && kb.documents.length > 0) {
+      documentsContainer.innerHTML = kb.documents.map(doc => `
+        <div style="display: flex; align-items: center; padding: 10px; background: #f5f5f5; border-radius: 4px; margin-bottom: 8px;">
+          <div style="margin-right: 10px; font-size: 20px;">${getFileIcon(doc.name)}</div>
+          <div style="flex: 1;">
+            <div style="font-weight: 500; margin-bottom: 2px;">${doc.name}</div>
+            <div style="font-size: 12px; color: #666;">${formatFileSize(doc.size)}</div>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      documentsContainer.innerHTML = '<p style="color: #999; margin: 0;">No documents uploaded</p>';
+    }
+    
+    detailModal.classList.add('active');
+  }
+}
+
 function setupFileUpload() {
   fileUploadArea.addEventListener('click', () => {
     fileInput.click();
@@ -383,6 +487,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     if (kbModal.classList.contains('active')) closeModal();
     if (deleteModal.classList.contains('active')) closeDeleteModal();
+    if (detailModal.classList.contains('active')) closeDetailModal();
   }
 });
 

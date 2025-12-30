@@ -6,8 +6,8 @@ function toggleDarkMode() {
   if (typeof renderLineChart === 'function') {
     renderLineChart();
   }
-  if (typeof renderPieCharts === 'function') {
-    renderPieCharts();
+  if (typeof renderProcessCharts === 'function') {
+    renderProcessCharts();
   }
 }
 
@@ -17,6 +17,49 @@ function loadDarkModePreference() {
     document.body.classList.add('dark-mode');
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const tooltipElements = document.querySelectorAll('[data-tooltip]');
+  let activeTooltip = null;
+  
+  tooltipElements.forEach(element => {
+    element.addEventListener('mouseenter', function(e) {
+      if (activeTooltip) {
+        activeTooltip.remove();
+      }
+      
+      const tooltipText = this.getAttribute('data-tooltip');
+      const rect = this.getBoundingClientRect();
+      
+      const tooltip = document.createElement('div');
+      tooltip.className = 'custom-tooltip';
+      tooltip.textContent = tooltipText;
+      
+      const arrow = document.createElement('div');
+      arrow.className = 'custom-tooltip-arrow';
+      
+      document.body.appendChild(tooltip);
+      document.body.appendChild(arrow);
+      
+      const tooltipTop = rect.top + rect.height / 2;
+      tooltip.style.top = `${tooltipTop}px`;
+      tooltip.style.left = `${20 + 100 + 15}px`;
+      
+      arrow.style.top = `${tooltipTop}px`;
+      arrow.style.left = `${20 + 100 + 3}px`;
+      
+      activeTooltip = { tooltip, arrow };
+    });
+    
+    element.addEventListener('mouseleave', function() {
+      if (activeTooltip) {
+        activeTooltip.tooltip.remove();
+        activeTooltip.arrow.remove();
+        activeTooltip = null;
+      }
+    });
+  });
+});
 
 
 const chartColors = {
@@ -30,6 +73,109 @@ const chartColors = {
 Chart.defaults.plugins.datalabels = {
   display: false
 };
+
+function getProcessDataFromTable() {
+  const rows = document.querySelectorAll("#dataTable tbody tr");
+  const processData = {};
+  
+  rows.forEach(row => {
+    const cells = row.cells;
+    if (cells.length >= 3) {
+      const process = cells[0].innerText.trim();
+      const statusElement = cells[2].querySelector('.status-badge');
+      
+      if (statusElement && process) {
+        if (!processData[process]) {
+          processData[process] = {
+            pending: 0,
+            inProgress: 0,
+            approve: 0,
+            completed: 0,
+            cancel: 0
+          };
+        }
+        
+        const statusClass = statusElement.classList[1];
+        if (statusClass === 'pending') processData[process].pending++;
+        else if (statusClass === 'inprogress') processData[process].inProgress++;
+        else if (statusClass === 'approve') processData[process].approve++;
+        else if (statusClass === 'complete') processData[process].completed++;
+        else if (statusClass === 'cancel') processData[process].cancel++;
+      }
+    }
+  });
+  
+  return processData;
+}
+
+let pieCharts = {};
+let selectedProcesses = ['', '', '', '']; 
+
+function initializeProcessDropdowns() {
+  const processData = getProcessDataFromTable();
+  const processes = Object.keys(processData).sort();
+  
+  selectedProcesses = [
+    processes[0] || '',
+    processes[1] || '',
+    processes[2] || '',
+    processes[3] || ''
+  ];
+  
+  document.querySelectorAll('.process-selector-dropdown').forEach((dropdown, index) => {
+    dropdown.innerHTML = '';
+    
+    processes.forEach(process => {
+      const option = document.createElement('option');
+      option.value = process;
+      option.textContent = process;
+      if (process === selectedProcesses[index]) {
+        option.selected = true;
+      }
+      dropdown.appendChild(option);
+    });
+    
+    dropdown.addEventListener('change', (e) => {
+      const chartIndex = parseInt(e.target.getAttribute('data-chart-index'));
+      selectedProcesses[chartIndex] = e.target.value;
+      updateChart(chartIndex, e.target.value);
+    });
+  });
+  
+  renderAllProcessCharts();
+}
+
+function updateChart(chartIndex, processName) {
+  const processData = getProcessDataFromTable();
+  const chartId = `chartProcess${chartIndex}`;
+  const titleId = `chartTitle${chartIndex}`;
+  
+  const titleElement = document.getElementById(titleId);
+  if (titleElement) {
+    titleElement.textContent = processName;
+  }
+  
+  if (pieCharts[chartId]) {
+    pieCharts[chartId].destroy();
+  }
+  
+  const canvas = document.getElementById(chartId);
+  if (canvas && processData[processName]) {
+    pieCharts[chartId] = new Chart(canvas, pieConfig(processData[processName]));
+  }
+}
+
+function renderAllProcessCharts() {
+  const processData = getProcessDataFromTable();
+  
+  selectedProcesses.forEach((processName, index) => {
+    if (processName) {
+      updateChart(index, processName);
+    }
+  });
+  
+  attachExpandListeners();
+}
 
 const formData = {
   formB: { pending: 10, inProgress: 5, approve: 3, completed: 2, cancel: 0 },
@@ -189,18 +335,15 @@ function pieConfig(data){
   };
 }
 
-let pieCharts = {};
-
 function renderPieCharts() {
-
   Object.values(pieCharts).forEach(chart => {
     if (chart) chart.destroy();
   });
+  pieCharts = {};
+}
 
-  pieCharts.formB = new Chart(document.getElementById("chartFormB"), pieConfig(formData.formB));
-  pieCharts.formP = new Chart(document.getElementById("chartFormP"), pieConfig(formData.formP));
-  pieCharts.formA = new Chart(document.getElementById("chartFormA"), pieConfig(formData.formA));
-  pieCharts.formC = new Chart(document.getElementById("chartFormC"), pieConfig(formData.formC));
+function renderProcessCharts() {
+  renderAllProcessCharts();
 }
 
 let lineChartInstance = null;
@@ -211,16 +354,16 @@ function getTableData() {
   
   rows.forEach(row => {
     const cells = row.cells;
-    if (cells.length >= 8) {
-      const createdDate = cells[2].innerText.trim();
-      const statusElement = cells[7].querySelector('.status-badge');
+    if (cells.length >= 5) {
+      const lastUpdated = cells[4].innerText.trim(); 
+      const statusElement = cells[2].querySelector('.status-badge'); 
       const status = statusElement ? statusElement.classList[1] : '';
       
-      const parsedDate = parseDate(createdDate);
+      const parsedDate = parseDate(lastUpdated);
       if (parsedDate) {
         data.push({
           date: parsedDate,
-          dateStr: createdDate,
+          dateStr: lastUpdated,
           status: status
         });
       }
@@ -330,9 +473,28 @@ function updateLineChart(fromDate, toDate) {
         maintainAspectRatio: true,
         plugins: {
           legend: { 
-            position: "top", 
+            position: "bottom", 
             labels: { 
-              color: textColor
+              color: textColor,
+              usePointStyle: false,
+              padding: 15,
+              font: {
+                size: 12
+              },
+              generateLabels: (chart) => {
+                const datasets = chart.data.datasets;
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                const labelColor = isDarkMode ? '#c2c2c2ff' : '#9d9d9dff';
+                return datasets.map((dataset, i) => ({
+                  text: dataset.label,
+                  fillStyle: dataset.borderColor,
+                  strokeStyle: dataset.borderColor,
+                  lineWidth: 3,
+                  hidden: !chart.isDatasetVisible(i),
+                  datasetIndex: i,
+                  fontColor: labelColor
+                }));
+              }
             } 
           },
         },
@@ -361,6 +523,7 @@ function updateLineChart(fromDate, toDate) {
 }
 
 const tableSearch = document.getElementById("tableSearch");
+const processFilter = document.getElementById("processFilter");
 const columnManagerBtn = document.getElementById("columnManagerBtn");
 const columnManagerDropdown = document.getElementById("columnManagerDropdown");
 
@@ -423,6 +586,12 @@ if (resetDateFilter) {
   resetDateFilter.addEventListener("click", () => {
     dateFrom.value = "2022-01-01";
     dateTo.value = "2025-12-31";
+    if (processFilter) {
+      processFilter.value = "";
+    }
+    if (tableSearch) {
+      tableSearch.value = "";
+    }
     const rows = document.querySelectorAll("#dataTable tbody tr");
     rows.forEach(tr => {
       tr.style.display = "";
@@ -434,13 +603,34 @@ if (resetDateFilter) {
 
 if (tableSearch) {
   tableSearch.addEventListener("input", () => {
-    const query = tableSearch.value.toLowerCase().trim();
-    const rows = document.querySelectorAll("#dataTable tbody tr");
+    applyTableFilters();
+  });
+}
+
+if (processFilter) {
+  processFilter.addEventListener("change", () => {
+    applyTableFilters();
+  });
+}
+
+function applyTableFilters() {
+  const searchQuery = tableSearch ? tableSearch.value.toLowerCase().trim() : "";
+  const selectedProcess = processFilter ? processFilter.value : "";
+  const rows = document.querySelectorAll("#dataTable tbody tr");
+  
+  rows.forEach(tr => {
+    const searchMatch = tr.innerText.toLowerCase().includes(searchQuery);
     
-    rows.forEach(tr => {
-      const match = tr.innerText.toLowerCase().includes(query);
-      tr.style.display = match ? "" : "none";
-    });
+    let processMatch = true;
+    if (selectedProcess) {
+      const processCell = tr.cells[0]; // Process is now column index 0
+      if (processCell) {
+        const processText = processCell.innerText.trim();
+        processMatch = processText === selectedProcess;
+      }
+    }
+    
+    tr.style.display = (searchMatch && processMatch) ? "" : "none";
   });
 }
 
@@ -451,6 +641,29 @@ if (columnManagerBtn && columnManagerDropdown) {
       columnManagerDropdown.style.display === 'none' ? 'block' : 'none';
   });
 }
+
+// Initialize column visibility on page load
+function initializeColumnVisibility() {
+  document.querySelectorAll('.column-option input[type="checkbox"]').forEach(checkbox => {
+    const columnIndex = parseInt(checkbox.getAttribute('data-column'));
+    const table = document.getElementById('dataTable');
+    const isChecked = checkbox.checked;
+    
+    const th = table.querySelector(`thead th[data-column="${columnIndex}"]`);
+    if (th) {
+      th.classList.toggle('hidden', !isChecked);
+    }
+    
+    table.querySelectorAll('tbody tr').forEach(row => {
+      const td = row.cells[columnIndex];
+      if (td) {
+        td.classList.toggle('hidden', !isChecked);
+      }
+    });
+  });
+}
+
+initializeColumnVisibility();
 
 document.querySelectorAll('.column-option input[type="checkbox"]').forEach(checkbox => {
   checkbox.addEventListener('change', (e) => {
@@ -580,107 +793,118 @@ document.addEventListener('click', () => {
 const chartModal = document.getElementById('chartModal');
 const modalClose = document.getElementById('modalClose');
 const modalChartWrap = document.getElementById('modalChartWrap');
-const expandBtns = document.querySelectorAll('.expand-btn');
 
 let currentExpandedChart = null;
 
-expandBtns.forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const chartId = btn.getAttribute('data-chart');
-    const originalCanvas = document.getElementById(chartId);
-    
-    // Get chart title from the card
-    const chartCard = btn.closest('.chart-card, .line-chart-container');
-    const chartTitle = chartCard ? chartCard.querySelector('h3').textContent : '';
-    
-    if (originalCanvas && chartModal && modalChartWrap) {
-      // Set modal title
-      const modalTitle = document.getElementById('modalChartTitle');
-      if (modalTitle) {
-        modalTitle.textContent = chartTitle;
+function attachExpandListeners() {
+  const expandBtns = document.querySelectorAll('.expand-btn');
+  
+  expandBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      
+      const chartId = btn.getAttribute('data-chart');
+      const originalCanvas = document.getElementById(chartId);
+      
+      if (!originalCanvas) {
+        console.error('Canvas not found:', chartId);
+        return;
       }
       
-      modalChartWrap.innerHTML = '';
+      const chartCard = btn.closest('.chart-card, .line-chart-container');
+      const chartTitle = chartCard ? chartCard.querySelector('h3').textContent : '';
       
-      const newCanvas = document.createElement('canvas');
-      newCanvas.id = 'modalChart';
-      modalChartWrap.appendChild(newCanvas);
-      
-      const originalChart = Chart.getChart(originalCanvas);
-      if (originalChart) {
-        const isPieChart = originalChart.config.type === 'pie';
+      if (chartModal && modalChartWrap) {
+        const isDarkMode = document.body.classList.contains('dark-mode');
         
-        const config = {
-          type: originalChart.config.type,
-          data: {
-            labels: [...originalChart.config.data.labels],
-            datasets: originalChart.config.data.datasets.map(dataset => ({
-              ...dataset,
-              data: [...dataset.data],
-              backgroundColor: Array.isArray(dataset.backgroundColor) 
-                ? [...dataset.backgroundColor] 
-                : dataset.backgroundColor,
-              borderColor: dataset.borderColor,
-              borderWidth: dataset.borderWidth,
-              tension: dataset.tension
-            }))
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-              legend: {
-                position: originalChart.config.options.plugins.legend.position,
-                labels: {
-                  ...originalChart.config.options.plugins.legend.labels,
-                  font: { size: 14 }
-                }
-              },
-              tooltip: isPieChart ? {
-                callbacks: {
-                  title: function() {
-                    return '';
+        const modalTitle = document.getElementById('modalChartTitle');
+        if (modalTitle) {
+          modalTitle.textContent = chartTitle;
+        }
+        
+        modalChartWrap.innerHTML = '';
+        
+        const newCanvas = document.createElement('canvas');
+        newCanvas.id = 'modalChart';
+        modalChartWrap.appendChild(newCanvas);
+        
+        const originalChart = Chart.getChart(originalCanvas);
+        if (originalChart) {
+          const isPieChart = originalChart.config.type === 'pie';
+          
+          const config = {
+            type: originalChart.config.type,
+            data: {
+              labels: [...originalChart.config.data.labels],
+              datasets: originalChart.config.data.datasets.map(dataset => ({
+                ...dataset,
+                data: [...dataset.data],
+                backgroundColor: Array.isArray(dataset.backgroundColor) 
+                  ? [...dataset.backgroundColor] 
+                  : dataset.backgroundColor,
+                borderColor: dataset.borderColor,
+                borderWidth: dataset.borderWidth,
+                tension: dataset.tension
+              }))
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              plugins: {
+                legend: {
+                  position: originalChart.config.options.plugins.legend.position,
+                  labels: {
+                    ...originalChart.config.options.plugins.legend.labels,
+                    font: { size: 14 },
+                    color: isDarkMode ? "#e4e6eb" : "#000000", 
+                  }
+                },
+                tooltip: isPieChart ? {
+                  callbacks: {
+                    title: function() {
+                      return '';
+                    },
+                    label: function(context) {
+                      const label = context.label || '';
+                      const value = context.parsed;
+                      const dataset = context.dataset;
+                      const total = dataset.data.reduce((acc, val) => acc + val, 0);
+                      const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                      return `${label}: ${value} (${percentage}%)`;
+                    }
+                  }
+                } : originalChart.config.options.plugins.tooltip,
+                datalabels: isPieChart ? {
+                  color: '#fff',
+                  font: {
+                    weight: 'bold',
+                    size: 18
                   },
-                  label: function(context) {
-                    const label = context.label || '';
-                    const value = context.parsed;
+                  formatter: (value, context) => {
                     const dataset = context.dataset;
                     const total = dataset.data.reduce((acc, val) => acc + val, 0);
                     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                    return `${label}: ${value} (${percentage}%)`;
-                  }
-                }
-              } : originalChart.config.options.plugins.tooltip,
-              datalabels: isPieChart ? {
-                color: '#fff',
-                font: {
-                  weight: 'bold',
-                  size: 18
-                },
-                formatter: (value, context) => {
-                  const dataset = context.dataset;
-                  const total = dataset.data.reduce((acc, val) => acc + val, 0);
-                  const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                  return value > 0 ? `${percentage}%` : '';
-                },
-                textAlign: 'center'
+                    return value > 0 ? `${percentage}%` : '';
+                  },
+                  textAlign: 'center'
+                } : undefined
+              },
+              scales: originalChart.config.options.scales ? {
+                x: originalChart.config.options.scales.x ? {...originalChart.config.options.scales.x} : undefined,
+                y: originalChart.config.options.scales.y ? {...originalChart.config.options.scales.y} : undefined
               } : undefined
-            },
-            scales: originalChart.config.options.scales ? {
-              x: originalChart.config.options.scales.x ? {...originalChart.config.options.scales.x} : undefined,
-              y: originalChart.config.options.scales.y ? {...originalChart.config.options.scales.y} : undefined
-            } : undefined
-          }
-        };
+            }
+          };
+          
+          currentExpandedChart = new Chart(newCanvas, config);
+        }
         
-        currentExpandedChart = new Chart(newCanvas, config);
+        chartModal.classList.add('active');
       }
-      
-      chartModal.classList.add('active');
-    }
+    });
   });
-});
+}
 
 function closeModal() {
   if (chartModal) {
@@ -698,6 +922,8 @@ function closeModal() {
     }
   }
 }
+
+attachExpandListeners();
 
 if (modalClose) {
   modalClose.addEventListener('click', closeModal);
@@ -718,5 +944,5 @@ document.addEventListener('keydown', (e) => {
 });
 
 loadDarkModePreference();
-renderPieCharts();
+initializeProcessDropdowns();
 updateLineChart('2022-01-01', '2025-12-31');

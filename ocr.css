@@ -9,6 +9,7 @@
 }
 
 .ocr-container {
+    margin-left: 120px;
     display: flex;
     gap: 20px;
     height: 100%;
@@ -404,7 +405,7 @@
 }
 
 .download-format-btn:hover {
-    background: #2d3748
+    background: #2d3748;
     transform: translateY(-2px);
 }
 
@@ -416,7 +417,6 @@
     background: #5a6268;
 }
 
-/* Loading Spinner */
 .loading-spinner {
     display: inline-block;
     width: 20px;
@@ -431,7 +431,6 @@
     to { transform: rotate(360deg); }
 }
 
-/* Dark Mode Styles */
 body.dark-mode .left-panel,
 body.dark-mode .right-panel {
     background: #2d3748;
@@ -470,13 +469,13 @@ body.dark-mode .text-box textarea {
 }
 
 body.dark-mode .canvas-container {
-    color:#000000
+    color:#000000;
     background-color: #1a202c;
 }
 
 body.dark-mode .download-options {
     background: #2d3748;
-    color: #e2e8f;0;
+    color: #e2e8f0;
 }
 
 body.dark-mode .download-options h3 {

@@ -717,6 +717,7 @@ body.dark-mode .kb-modal-header h2{
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+    
   }
   
   .chat-actions {

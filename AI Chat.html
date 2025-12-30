@@ -1,126 +1,129 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>AI Chat - Ricoh</title>
   <link rel="stylesheet" href="./styles.css" />
-  <link rel="stylesheet" href="./ai-chat.css" />  <link rel="stylesheet" href="./dark-mode.css" /></head>
+  <link rel="stylesheet" href="./ai-chat.css" />
+  <link rel="stylesheet" href="./dark-mode.css" />
+</head>
+
 <body>
+  <section class="logo"><a href="index.html" style="cursor: pointer;"><img src="Ricoh_Logo.png" alt="Ricoh Logo" /></a>
+  </section>
 
-  <header class="header">
-    <div class="logo"><a href="index.html" style="cursor: pointer;"><img src="Ricoh_Logo.png" alt="Ricoh Logo" width="150"/></a></div>
-    
-    <nav class="nav-menu">
-      <div class="nav-dropdown">
-        <button class="nav-btn">Dashboard</button>
-        <div class="dropdown-content">
-          <a href="index.html">Dashboard</a>
+  <body>
+    <header class="header">
+      <nav class="nav-menu">
+        <button class="nav-btn" onclick="window.location.href='index.html'" data-tooltip="Dashboard"><img
+            src="dashboard.png" alt="Dashboard" width="30" /></button>
+        </button>
+        <!-- <div class="dropdown-content">
+          <a href="#" class="active">Dashboard</a>
           <a href="#">Recent Documents</a>
-          <a href="#">Process</a>
+          <a href="#">Process</a> -->
         </div>
-      </div>
-      
-      <div class="nav-dropdown">
-        <button class="nav-btn">Manage</button>
-        <div class="dropdown-content">
-          <a href="Knowledge_Bases.html">Knowledge Base</a>
-          <a href="#">Reporting</a>
         </div>
-      </div>
-      
-      <button class="nav-btn active">AI Chat</button>
-     <button class="nav-btn" onclick="window.location.href='ocr.html'">OCR</button>
-      <button class="nav-btn">Configuration</button>
-    </nav>
-    
-    <div class="search-bar">
-      <input type="search" placeholder="Search" />
-    </div>
-    
-    <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
-      <span class="theme-icon">🌙</span>
-    </button>
-    <div class="user-menu">sysadmin</div>
-  </header>
+        <button class="nav-btn" onclick="window.location.href='Knowledge_Bases.html'"
+          data-tooltip="Knowledge Bases"><img src="book.png" alt="Knowledge Bases" width="30" /></button>
+        <button class="nav-btn" onclick="window.location.href='AI Chat.html'" data-tooltip="AI Chat"><img
+            src="chatbot.png" alt="AI Chat" width="30" /></button>
+        <button class="nav-btn" onclick="window.location.href='ocr.html'" data-tooltip="OCR"><img src="ocr.png"
+            alt="OCR" width="30" /></button>
+        <button class="nav-btn" data-tooltip="Configuration"><img src="setting.png" alt="Configuration"
+            width="30" /></button>
+        <button class="nav-btn" onclick="window.location.href='#'" data-tooltip="Report"><img src="report.png"
+            alt="Report" width="30" /></button>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()" data-tooltip="Toggle Light / Dark Mode">
+        <span class="theme-icon">🌙</span>
+      </button>
+      <div class="user-menu" data-tooltip="Profile"><img src="user.png" alt="User Profile" width="30" /></div>
+      <button class="nav-btn" onclick="window.location.href='#'" data-tooltip="Logout">Logout</button>
+      </button>
+    </header>
 
-  <div class="container">
+    <div class="container">
 
-    <main class="chat-main-content">
-      <div class="chat-header">
-        <h1>AI Assistant</h1>
-        <div class="chat-actions">
-          <button class="btn-secondary" onclick="clearChat()">Clear Chat</button>
-          <button class="btn-secondary" onclick="exportChat()">Export</button>
-          Powered by Ricoh Hong Kong Limited
-        </div>
-      </div>
-      <div class="chat-messages" id="chatMessages">
-        <div class="message assistant-message">
-          <div class="message-avatar">🤖</div>
-          <div class="message-content">
-            <div class="message-text">
-              <p>Good to see you here.</p>
-              <p>When you start using the <strong>Ricoh Hong Kong AI support</strong>, you agree to <strong>Ricoh's privacy and acknowledge</strong> that your information will be reported for follow-up and performance improvement. <a href="http://www.ricoh.com/privacy-policy" target="_blank">Privacy policy</a></p>
-              <p>當您開始使用Ricoh Hong Kong AI支援時，即表示您同意Ricoh的隱私權並承認您的資訊將被報告以供後續追蹤和效能改善。相關資訊記錄在隱私政策中。相關於隱私政策: <a href="http://www.ricoh.com/zh-tw/int/privacy-policy" target="_blank">http://www.ricoh.com/zh-tw/int/privacy-policy</a></p>
-              <div class="message-actions">
-                <button class="btn-accept" onclick="acceptPolicy()">Accept</button>
-                <button class="btn-reject" onclick="rejectPolicy()">Reject</button>
-              </div>
-            </div>
-            <div class="message-time">Just now</div>
+      <main class="chat-main-content">
+        <div class="chat-header">
+          <h1>AI Chat</h1>
+          </section>
+          <div class="chat-actions">
+            <button class="btn-secondary" onclick="clearChat()">Clear Chat</button>
+            <button class="btn-secondary" onclick="exportChat()">Export</button>
+            Powered by Ricoh Hong Kong Limited
           </div>
         </div>
-      </div>
-
-      <div class="chat-input-container">
-        <div class="chat-input-wrapper">
-          <button class="btn-icon" onclick="document.getElementById('fileUpload').click()" title="Attach file">
-            📎
-          </button>
-          <input type="file" id="fileUpload" style="display: none;" onchange="handleFileUpload(event)" multiple />
-          
-          <button class="btn-icon" onclick="openKnowledgeBaseModal()" title="Select Knowledge Bases">
-            📚
-          </button>
-          
-          <textarea 
-            id="messageInput" 
-            class="message-input" 
-            placeholder="Type a message..." 
-            rows="1"
-            onkeydown="handleKeyDown(event)"
-          ></textarea>
-          
-          <button class="btn-send" onclick="sendMessage()" title="Send message">
-            ➤
-          </button>
+        <div class="chat-messages" id="chatMessages">
+          <div class="message assistant-message">
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+              <div class="message-text">
+                <p>Good to see you here.</p>
+                <p>When you start using the <strong>Ricoh Hong Kong AI support</strong>, you agree to <strong>Ricoh's
+                    privacy and acknowledge</strong> that your information will be reported for follow-up and
+                  performance improvement. <a href="http://www.ricoh.com/privacy-policy" target="_blank">Privacy
+                    policy</a></p>
+                <p>當您開始使用Ricoh Hong Kong AI支援時，即表示您同意Ricoh的隱私權並承認您的資訊將被報告以供後續追蹤和效能改善。相關資訊記錄在隱私政策中。相關於隱私政策: <a
+                    href="http://www.ricoh.com/zh-tw/int/privacy-policy"
+                    target="_blank">http://www.ricoh.com/zh-tw/int/privacy-policy</a></p>
+                <div class="message-actions">
+                  <button class="btn-accept" onclick="acceptPolicy()">Accept</button>
+                  <button class="btn-reject" onclick="rejectPolicy()">Reject</button>
+                </div>
+              </div>
+              <div class="message-time">Just now</div>
+            </div>
+          </div>
         </div>
-        
-        <div class="file-preview-area" id="filePreviewArea" style="display: none;"></div>
-      </div>
-    </main>
-  </div>
 
-  <div class="kb-modal" id="kbSelectionModal">
-    <div class="kb-modal-overlay" onclick="closeKnowledgeBaseModal()"></div>
-    <div class="kb-modal-content">
-      <div class="kb-modal-header">
-        <h2>Select Knowledge Bases</h2>
-        <button class="kb-modal-close" onclick="closeKnowledgeBaseModal()">×</button>
-      </div>
-      <div class="kb-modal-body">
-        <p class="kb-modal-subtitle">Select which knowledge bases the AI should use for answering questions</p>
-        <div class="kb-selection-list" id="kbSelectionList">
+        <div class="chat-input-container">
+          <div class="chat-input-wrapper">
+            <button class="btn-icon" onclick="document.getElementById('fileUpload').click()" title="Attach file">
+              📎
+            </button>
+            <input type="file" id="fileUpload" style="display: none;" onchange="handleFileUpload(event)" multiple />
+
+            <button class="btn-icon" onclick="openKnowledgeBaseModal()" title="Select Knowledge Bases">
+              📚
+            </button>
+
+            <textarea id="messageInput" class="message-input" placeholder="Type a message..." rows="1"
+              onkeydown="handleKeyDown(event)"></textarea>
+
+            <button class="btn-send" onclick="sendMessage()" title="Send message">
+              ➤
+            </button>
+          </div>
+
+          <div class="file-preview-area" id="filePreviewArea" style="display: none;"></div>
         </div>
-      </div>
-      <div class="kb-modal-footer">
-        <button class="btn-secondary" onclick="closeKnowledgeBaseModal()">Cancel</button>
-        <button class="btn-primary" onclick="saveKnowledgeBaseSelection()">Apply Selection</button>
+      </main>
+    </div>
+
+    <div class="kb-modal" id="kbSelectionModal">
+      <div class="kb-modal-overlay" onclick="closeKnowledgeBaseModal()"></div>
+      <div class="kb-modal-content">
+        <div class="kb-modal-header">
+          <h2>Select Knowledge Bases</h2>
+          <button class="kb-modal-close" onclick="closeKnowledgeBaseModal()">×</button>
+        </div>
+        <div class="kb-modal-body">
+          <p class="kb-modal-subtitle">Select which knowledge bases the AI should use for answering questions</p>
+          <div class="kb-selection-list" id="kbSelectionList">
+          </div>
+        </div>
+        <div class="kb-modal-footer">
+          <button class="btn-secondary" onclick="closeKnowledgeBaseModal()">Cancel</button>
+          <button class="btn-primary" onclick="saveKnowledgeBaseSelection()">Apply Selection</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script src="./ai-chat.js"></script>
-</body>
+    <script src="./ai-chat.js"></script>
+  </body>
+
 </html>

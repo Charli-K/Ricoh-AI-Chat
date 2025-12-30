@@ -178,7 +178,6 @@ body.dark-mode .kb-card-title {
   color: var(--text);
   line-height: 1.5;
   margin-bottom: 16px;
-  display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -249,7 +248,7 @@ body.dark-mode .kb-card-title {
 }
 
 .kb-modal-content {
-  background: white;
+  background: rgba(255, 255, 255, 0.763);
   border-radius: 16px;
   width: 90%;
   max-width: 600px;
@@ -258,6 +257,7 @@ body.dark-mode .kb-card-title {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: modalSlideIn 0.3s ease;
   scrollbar-width: none;
+
 }
 
 body.dark-mode .kb-modal-content {
