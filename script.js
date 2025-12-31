@@ -623,7 +623,7 @@ function applyTableFilters() {
     
     let processMatch = true;
     if (selectedProcess) {
-      const processCell = tr.cells[0]; // Process is now column index 0
+      const processCell = tr.cells[0]; 
       if (processCell) {
         const processText = processCell.innerText.trim();
         processMatch = processText === selectedProcess;
@@ -632,6 +632,13 @@ function applyTableFilters() {
     
     tr.style.display = (searchMatch && processMatch) ? "" : "none";
   });
+  
+  if (typeof currentPage !== 'undefined') {
+    currentPage = 1;
+  }
+  if (typeof updatePagination === 'function') {
+    updatePagination();
+  }
 }
 
 if (columnManagerBtn && columnManagerDropdown) {
@@ -642,7 +649,6 @@ if (columnManagerBtn && columnManagerDropdown) {
   });
 }
 
-// Initialize column visibility on page load
 function initializeColumnVisibility() {
   document.querySelectorAll('.column-option input[type="checkbox"]').forEach(checkbox => {
     const columnIndex = parseInt(checkbox.getAttribute('data-column'));
