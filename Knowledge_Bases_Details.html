@@ -46,7 +46,615 @@
     <main class="main-content">
       <div class="kb-header">
         <div>
-          <h1>Knowledge Bases Details</h1>
-          <p class="kb-subtitle">Manage AI chat knowledge bases for intelligent responses</p>
+          <h1 id="kbDetailName">#</h1>
+          <p class="kb-subtitle">Knowledge Bases Details</p>
+        </div>
+        <button class="btn-create-kb" onclick="window.location.href='Knowledge_Bases.html'">
+          <span class="btn-icon">←</span>
+          Back to Knowledge Bases
+        </button>
+      </div>
+
+      <!-- Two Column Layout -->
+      <div class="kb-two-column-layout">
+        <!-- Left Column: Knowledge Base Details -->
+        <div class="kb-details-container">
+          <div class="kb-details-info">
+            <div class="detail-row">
+              <label>Name:</label>
+              <div id="detailName" class="detail-value">-</div>
+            </div>
+
+            <div class="detail-row">
+              <label>Description:</label>
+              <div id="detailDescription" class="detail-value">-</div>
+            </div>
+
+            <div class="detail-row">
+              <label>Tag:</label>
+              <div id="detailTag" class="detail-value">
+                <span class="kb-card-category">-</span>
+              </div>
+            </div>
+
+            <div class="detail-row">
+              <label>Status:</label>
+              <div id="detailStatus" class="detail-value">
+                <span class="kb-card-status">-</span>
+              </div>
+            </div>
+
+            <div class="detail-row">
+              <label>Path:</label>
+              <div id="detailPath" class="detail-value">-</div>
+            </div>
+
+            <div class="detail-row">
+              <label>Created Date:</label>
+              <div id="detailCreatedDate" class="detail-value">-</div>
+            </div>
+
+            <div class="detail-row">
+              <label>Modified Date:</label>
+              <div id="detailModifiedDate" class="detail-value">-</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Files Section -->
+        <div class="kb-files-container">
+          <div class="kb-files-header">
+            <h2>Files</h2>
+            <p class="kb-subtitle">Search and manage files in this knowledge base</p>
+          </div>
+
+          <div class="kb-search-bar">
+            <input type="search" id="fileSearch" placeholder="🔍 Search files..." />
+          </div>
+
+          <div class="files-grid" id="filesGrid">
+            <div class="empty-state">
+              <div class="empty-state-icon">📄</div>
+              <div class="empty-state-text">No files found</div>
+              <div class="empty-state-subtext">Upload files to this knowledge base to get started</div>
+            </div>
+          </div>
         </div>
       </div>
+    </main>
+  </div>
+
+  <script>
+    // Dark mode and menu toggle functions (from knowledge-bases.js)
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+    }
+
+    function toggleMenu() {
+      const header = document.getElementById('mainHeader');
+      const toggleBtn = document.getElementById('menuToggleBtn');
+      
+      if (header && toggleBtn) {
+        header.classList.toggle('menu-collapsed');
+        toggleBtn.classList.toggle('menu-collapsed');
+        document.body.classList.toggle('menu-collapsed');
+        
+        const isCollapsed = header.classList.contains('menu-collapsed');
+        localStorage.setItem('menuCollapsed', isCollapsed ? 'true' : 'false');
+      }
+    }
+
+    function loadMenuState() {
+      const menuCollapsed = localStorage.getItem('menuCollapsed');
+      const header = document.getElementById('mainHeader');
+      const toggleBtn = document.getElementById('menuToggleBtn');
+      
+      if (menuCollapsed === 'true' && header && toggleBtn) {
+        header.classList.add('menu-collapsed');
+        toggleBtn.classList.add('menu-collapsed');
+        document.body.classList.add('menu-collapsed');
+      }
+    }
+
+    function loadDarkModePreference() {
+      const darkMode = localStorage.getItem('darkMode');
+      if (darkMode === 'enabled') {
+        document.body.classList.add('dark-mode');
+      }
+    }
+
+    loadDarkModePreference();
+    loadMenuState();
+
+    // Initialize everything after DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, initializing...');
+      
+      // Setup tooltips
+      const tooltipElements = document.querySelectorAll('[data-tooltip]');
+      let activeTooltip = null;
+      
+      tooltipElements.forEach(element => {
+        element.addEventListener('mouseenter', function(e) {
+          if (activeTooltip) {
+            activeTooltip.tooltip.remove();
+            activeTooltip.arrow.remove();
+          }
+          
+          const tooltipText = this.getAttribute('data-tooltip');
+          const rect = this.getBoundingClientRect();
+          
+          const tooltip = document.createElement('div');
+          tooltip.className = 'custom-tooltip';
+          tooltip.textContent = tooltipText;
+          
+          const arrow = document.createElement('div');
+          arrow.className = 'custom-tooltip-arrow';
+          
+          document.body.appendChild(tooltip);
+          document.body.appendChild(arrow);
+          
+          const tooltipTop = rect.top + rect.height / 2;
+          tooltip.style.top = `${tooltipTop}px`;
+          tooltip.style.left = `${20 + 100 + 15}px`;
+          
+          arrow.style.top = `${tooltipTop}px`;
+          arrow.style.left = `${20 + 100 + 3}px`;
+          
+          activeTooltip = { tooltip, arrow };
+        });
+        
+        element.addEventListener('mouseleave', function() {
+          if (activeTooltip) {
+            activeTooltip.tooltip.remove();
+            activeTooltip.arrow.remove();
+            activeTooltip = null;
+          }
+        });
+      });
+      
+      // Load knowledge base details
+      loadKnowledgeBaseDetails();
+    });
+
+    // Knowledge Bases Details Page Script
+    let knowledgeBases = [
+      {
+        id: 1,
+        name: "Product Documentation",
+        description: "Comprehensive product documentation including user manuals, technical specifications, and troubleshooting guides for all Ricoh products.",
+        category: "product",
+        status: "active",
+        createdDate: "2024-01-15",
+        modifiedDate: "2024-12-10",
+        path: "\\Knowledge Base A\\Product Documentation",
+        documents: [
+          { name: "Product_Manual_2024.pdf", size: 2458000 },
+          { name: "Technical_Specs.docx", size: 856000 }
+        ]
+      },
+      {
+        id: 2,
+        name: "Customer Support FAQs",
+        description: "Frequently asked questions and answers for common customer support inquiries.",
+        category: "support",
+        status: "active",
+        createdDate: "2024-02-20",
+        modifiedDate: "2024-12-08",
+        path: "\\Knowledge Base A\\Customer Support",
+        documents: [
+          { name: "FAQ_Database.xlsx", size: 345000 }
+        ]
+      },
+      {
+        id: 3,
+        name: "Technical Troubleshooting",
+        description: "Technical troubleshooting procedures and solutions for complex issues.",
+        category: "technical",
+        status: "active",
+        createdDate: "2024-03-10",
+        modifiedDate: "2024-11-28",
+        path: "\\Knowledge Base B\\Technical",
+        documents: []
+      },
+      {
+        id: 4,
+        name: "Company Policies",
+        description: "Internal policies, procedures, and guidelines for employees and contractors.",
+        category: "policy",
+        status: "draft",
+        createdDate: "2024-11-01",
+        modifiedDate: "2024-12-05",
+        path: "\\Knowledge Base C\\Policies",
+        documents: []
+      },
+      {
+        id: 5,
+        name: "Sales Training Materials",
+        description: "Training materials and resources for sales team including pitch decks and product comparisons.",
+        category: "general",
+        status: "inactive",
+        createdDate: "2024-05-15",
+        modifiedDate: "2024-09-20",
+        path: "\\Knowledge Base A\\Sales",
+        documents: [
+          { name: "Sales_Pitch_Deck.pptx", size: 5678000 },
+          { name: "Product_Comparison.xlsx", size: 234000 },
+          { name: "Training_Guide.pdf", size: 1890000 }
+        ]
+      },
+    ];
+
+    let currentKnowledgeBase = null;
+    let allFiles = [];
+
+    function getUrlParameter(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    function getFileIcon(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      const icons = {
+        pdf: '📕',
+        doc: '📘',
+        docx: '📘',
+        txt: '📄',
+        xlsx: '📊',
+        xls: '📊',
+        ppt: '📙',
+        pptx: '📙'
+      };
+      return icons[ext] || '📄';
+    }
+
+    function loadKnowledgeBaseDetails() {
+      console.log('Loading KB details...');
+      const kbId = parseInt(getUrlParameter('id'));
+      console.log('KB ID from URL:', kbId);
+      
+      if (!kbId || isNaN(kbId)) {
+        // If no ID provided, show first knowledge base for demo or redirect
+        console.log('No valid ID, using first KB');
+        currentKnowledgeBase = knowledgeBases[0];
+        // Uncomment below to redirect instead:
+        // window.location.href = 'Knowledge_Bases.html';
+        // return;
+      } else {
+        currentKnowledgeBase = knowledgeBases.find(kb => kb.id === kbId);
+        console.log('Found KB:', currentKnowledgeBase);
+      }
+
+      if (!currentKnowledgeBase) {
+        alert('Knowledge Base not found! Redirecting...');
+        window.location.href = 'Knowledge_Bases.html';
+        return;
+      }
+
+      console.log('Updating UI with KB data:', currentKnowledgeBase.name);
+
+      // Update page title
+      document.getElementById('kbDetailName').textContent = currentKnowledgeBase.name;
+
+      // Update details
+      document.getElementById('detailName').textContent = currentKnowledgeBase.name;
+      document.getElementById('detailDescription').textContent = currentKnowledgeBase.description || 'No description available';
+      
+      const tagElement = document.getElementById('detailTag').querySelector('.kb-card-category');
+      tagElement.textContent = currentKnowledgeBase.category;
+      
+      const statusElement = document.getElementById('detailStatus').querySelector('.kb-card-status');
+      statusElement.textContent = currentKnowledgeBase.status;
+      statusElement.className = `kb-card-status ${currentKnowledgeBase.status}`;
+      
+      // Update path with link
+      const pathElement = document.getElementById('detailPath');
+      const pathText = currentKnowledgeBase.path || '\\Knowledge Base\\Default';
+      pathElement.innerHTML = `<a href="https://apps.ricohsolution.com.hk:1443/Laserfiche/Browse.aspx?repo=Ricoh-BPA#?id=1" target="_blank" style="color: #0066cc; text-decoration: none;">${pathText}</a>`;
+      
+      document.getElementById('detailCreatedDate').textContent = formatDate(currentKnowledgeBase.createdDate);
+      document.getElementById('detailModifiedDate').textContent = formatDate(currentKnowledgeBase.modifiedDate);
+
+      // Load files
+      allFiles = currentKnowledgeBase.documents || [];
+      renderFiles(allFiles);
+
+      // Attach file search event listener
+      document.getElementById('fileSearch').addEventListener('input', handleFileSearch);
+      
+      console.log('KB details loaded successfully');
+    }
+
+    function renderFiles(files) {
+      const filesGrid = document.getElementById('filesGrid');
+
+      if (!files || files.length === 0) {
+        filesGrid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📄</div>
+            <div class="empty-state-text">No files found</div>
+            <div class="empty-state-subtext">Upload files to this knowledge base to get started</div>
+          </div>
+        `;
+        return;
+      }
+
+      filesGrid.innerHTML = files.map(file => `
+        <div class="file-card">
+          <div class="file-card-icon">${getFileIcon(file.name)}</div>
+          <div class="file-card-info">
+            <div class="file-card-name">${file.name}</div>
+            <div class="file-card-size">${formatFileSize(file.size)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function handleFileSearch(event) {
+      const searchTerm = event.target.value.toLowerCase();
+      
+      if (!searchTerm) {
+        renderFiles(allFiles);
+        return;
+      }
+
+      const filteredFiles = allFiles.filter(file => 
+        file.name.toLowerCase().includes(searchTerm)
+      );
+
+      renderFiles(filteredFiles);
+    }
+  </script>
+
+  <style>
+    /* Two Column Layout */
+    .kb-two-column-layout {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .kb-two-column-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Left Column - Details */
+    .kb-details-container {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 20px;
+    }
+
+    .kb-details-info {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .detail-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-row label {
+      font-weight: 600;
+      color: #333;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+      color: #666;
+      word-wrap: break-word;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .detail-value a {
+      color: #0066cc;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .detail-value a:hover {
+      color: #0052a3;
+      text-decoration: underline;
+    }
+
+    /* Right Column - Files */
+    .kb-files-container {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .kb-files-header {
+      margin-bottom: 20px;
+    }
+
+    .kb-files-header h2 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      color: #333;
+    }
+
+    .kb-files-header .kb-subtitle {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .kb-search-bar {
+      margin-bottom: 20px;
+    }
+
+    .kb-search-bar input[type="search"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .kb-search-bar input[type="search"]:focus {
+      outline: none;
+      border-color: #0066cc;
+    }
+
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .file-card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+      cursor: pointer;
+      border: 1px solid #e9ecef;
+    }
+
+    .file-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background: white;
+    }
+
+    .file-card-icon {
+      font-size: 40px;
+      flex-shrink: 0;
+    }
+
+    .file-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .file-card-name {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-card-size {
+      font-size: 12px;
+      color: #999;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .empty-state-text {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .empty-state-subtext {
+      font-size: 14px;
+    }
+
+    /* Dark mode styles */
+    .dark-mode .kb-details-container,
+    .dark-mode .kb-files-container {
+      background: #2a2a2a;
+    }
+
+    .dark-mode .file-card {
+      background: #333;
+      border-color: #444;
+    }
+
+    .dark-mode .file-card:hover {
+      background: #3a3a3a;
+    }
+
+    .dark-mode .detail-row {
+      border-bottom-color: #444;
+    }
+
+    .dark-mode .detail-row label {
+      color: #e0e0e0;
+    }
+
+    .dark-mode .detail-value {
+      color: #b0b0b0;
+    }
+
+    .dark-mode .detail-value a {
+      color: #4da6ff;
+    }
+
+    .dark-mode .detail-value a:hover {
+      color: #66b3ff;
+    }
+
+    .dark-mode .file-card-name {
+      color: #e0e0e0;
+    }
+
+    .dark-mode .kb-files-header h2 {
+      color: #e0e0e0;
+    }
+
+    .dark-mode .kb-search-bar input[type="search"] {
+      background: #333;
+      border-color: #444;
+      color: #e0e0e0;
+    }
+
+    .dark-mode .kb-search-bar input[type="search"]:focus {
+      border-color: #0088ff;
+    }
+  </style>
+</body>
+
+</html>

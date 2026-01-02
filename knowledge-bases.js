@@ -216,7 +216,7 @@ function renderKnowledgeBases(filter = '', sortBy = 'name') {
   }
   
   kbGrid.innerHTML = filtered.map(kb => `
-    <div class="kb-card" data-id="${kb.id}" onclick="window.location.href='knowledge_bases_details.html?id=${kb.id}'" style="cursor: pointer;">
+    <div class="kb-card" data-id="${kb.id}" onclick="window.location.href='Knowledge_Bases_Details.html?id=${kb.id}'" style="cursor: pointer;">
       <div class="kb-card-header">
         <div>
           <h3 class="kb-card-title">${kb.name}</h3>
