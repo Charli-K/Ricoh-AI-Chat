@@ -11,6 +11,33 @@ function toggleDarkMode() {
   }
 }
 
+function toggleMenu() {
+  const header = document.getElementById('mainHeader');
+  const toggleBtn = document.getElementById('menuToggleBtn');
+  
+  if (header && toggleBtn) {
+    header.classList.toggle('menu-collapsed');
+    toggleBtn.classList.toggle('menu-collapsed');
+    document.body.classList.toggle('menu-collapsed');
+    
+    // Save state to localStorage
+    const isCollapsed = header.classList.contains('menu-collapsed');
+    localStorage.setItem('menuCollapsed', isCollapsed ? 'true' : 'false');
+  }
+}
+
+function loadMenuState() {
+  const menuCollapsed = localStorage.getItem('menuCollapsed');
+  const header = document.getElementById('mainHeader');
+  const toggleBtn = document.getElementById('menuToggleBtn');
+  
+  if (menuCollapsed === 'true' && header && toggleBtn) {
+    header.classList.add('menu-collapsed');
+    toggleBtn.classList.add('menu-collapsed');
+    document.body.classList.add('menu-collapsed');
+  }
+}
+
 function loadDarkModePreference() {
   const darkMode = localStorage.getItem('darkMode');
   if (darkMode === 'enabled') {
@@ -950,5 +977,6 @@ document.addEventListener('keydown', (e) => {
 });
 
 loadDarkModePreference();
+loadMenuState();
 initializeProcessDropdowns();
 updateLineChart('2022-01-01', '2025-12-31');

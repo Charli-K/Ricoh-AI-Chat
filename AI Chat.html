@@ -11,11 +11,15 @@
 </head>
 
 <body>
-  <section class="logo"><a href="index.html" style="cursor: pointer;"><img src="Ricoh_Logo.png" alt="Ricoh Logo" /></a>
+  <section class="logo">
+    <button class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleMenu()" title="Toggle Menu">
+      <span class="menu-toggle-icon">☰</span>
+    </button>
+    <a href="index.html" style="cursor: pointer;"><img src="Ricoh_Logo.png" alt="Ricoh Logo" /></a>
   </section>
 
   <body>
-    <header class="header">
+    <header class="header" id="mainHeader">
       <nav class="nav-menu">
         <button class="nav-btn" onclick="window.location.href='index.html'" data-tooltip="Dashboard"><img
             src="dashboard.png" alt="Dashboard" width="30" /></button>

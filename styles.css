@@ -59,6 +59,13 @@ body {
   overflow-y: auto;
   overflow-x: visible;
   scrollbar-width: none;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.header.menu-collapsed {
+  transform: translateX(-120px);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .logo {
@@ -66,13 +73,65 @@ body {
   margin: 30px;
   position: sticky;
   width: 100%;
-   z-index: 1000;
-   margin-bottom: -10px;
+  z-index: 1000;
+  margin-bottom: -10px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .logo img {
   width: 150px;
   height: 50px;
+}
+
+.menu-toggle-btn {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+  flex-shrink: 0;
+}
+
+.menu-toggle-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.menu-toggle-icon {
+  font-size: 20px;
+  color: #333;
+  transition: transform 0.3s ease;
+}
+
+.menu-collapsed .menu-toggle-icon {
+  transform: rotate(90deg);
+}
+
+body.dark-mode .menu-toggle-btn {
+  background: rgba(42, 48, 60, 0.9);
+  border-color: rgba(102, 126, 234, 0.2);
+}
+
+body.dark-mode .menu-toggle-btn:hover {
+  background: rgba(42, 48, 60, 1);
+}
+
+body.dark-mode .menu-toggle-icon {
+  color: #fff;
 }
 
 .nav-menu {  
@@ -251,6 +310,11 @@ body.dark-mode .theme-toggle::before {
   min-height: 90vh;
   position: relative;
   margin-left: 120px;
+  transition: margin-left 0.3s ease;
+}
+
+body.menu-collapsed .container {
+  margin-left: 20px;
 }
 
 .main-content {

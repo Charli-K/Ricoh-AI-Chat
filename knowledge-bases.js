@@ -4,6 +4,33 @@ function toggleDarkMode() {
   localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
 }
 
+function toggleMenu() {
+  const header = document.getElementById('mainHeader');
+  const toggleBtn = document.getElementById('menuToggleBtn');
+  
+  if (header && toggleBtn) {
+    header.classList.toggle('menu-collapsed');
+    toggleBtn.classList.toggle('menu-collapsed');
+    document.body.classList.toggle('menu-collapsed');
+    
+    // Save state to localStorage
+    const isCollapsed = header.classList.contains('menu-collapsed');
+    localStorage.setItem('menuCollapsed', isCollapsed ? 'true' : 'false');
+  }
+}
+
+function loadMenuState() {
+  const menuCollapsed = localStorage.getItem('menuCollapsed');
+  const header = document.getElementById('mainHeader');
+  const toggleBtn = document.getElementById('menuToggleBtn');
+  
+  if (menuCollapsed === 'true' && header && toggleBtn) {
+    header.classList.add('menu-collapsed');
+    toggleBtn.classList.add('menu-collapsed');
+    document.body.classList.add('menu-collapsed');
+  }
+}
+
 function loadDarkModePreference() {
   const darkMode = localStorage.getItem('darkMode');
   if (darkMode === 'enabled') {
@@ -61,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 loadDarkModePreference();
+loadMenuState();
 
 let knowledgeBases = [
   {
@@ -188,7 +216,7 @@ function renderKnowledgeBases(filter = '', sortBy = 'name') {
   }
   
   kbGrid.innerHTML = filtered.map(kb => `
-    <div class="kb-card" data-id="${kb.id}" onclick="showKnowledgeBaseDetail(${kb.id})" style="cursor: pointer;">
+    <div class="kb-card" data-id="${kb.id}" onclick="window.location.href='knowledge_bases_details.html?id=${kb.id}'" style="cursor: pointer;">
       <div class="kb-card-header">
         <div>
           <h3 class="kb-card-title">${kb.name}</h3>
@@ -212,10 +240,6 @@ function renderKnowledgeBases(filter = '', sortBy = 'name') {
         <div class="kb-meta-item">
           <span class="kb-meta-label">Modified:</span>
           <span>${formatDate(kb.modifiedDate)}</span>
-        </div>
-        <div class="kb-meta-item">
-          <span class="kb-meta-label">Documents:</span>
-          <span>${kb.documents ? kb.documents.length : 0} files</span>
         </div>
       </div>
     </div>

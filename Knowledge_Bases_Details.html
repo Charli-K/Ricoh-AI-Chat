@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Knowledge Bases - Ricoh AI</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./knowledge-bases.css" />
+  <link rel="stylesheet" href="./dark-mode.css" />
+</head>
+
+<body>
+  <section class="logo">
+    <button class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleMenu()" title="Toggle Menu">
+      <span class="menu-toggle-icon">☰</span>
+    </button>
+    <a href="index.html" style="cursor: pointer;"><img src="Ricoh_Logo.png" alt="Ricoh Logo" /></a>
+  </section>
+  <header class="header" id="mainHeader">
+    <nav class="nav-menu">
+      <button class="nav-btn" onclick="window.location.href='index.html'" data-tooltip="Dashboard"><img
+          src="dashboard.png" alt="Dashboard" width="30" /></button>
+      </button>
+      <button class="nav-btn" onclick="window.location.href='Knowledge_Bases.html'" data-tooltip="Knowledge Bases"><img
+          src="book.png" alt="Knowledge Bases" width="30" /></button>
+      <button class="nav-btn" onclick="window.location.href='AI Chat.html'" data-tooltip="AI Chat"><img
+          src="chatbot.png" alt="AI Chat" width="30" /></button>
+      <button class="nav-btn" onclick="window.location.href='ocr.html'" data-tooltip="OCR"><img src="ocr.png" alt="OCR"
+          width="30" /></button>
+      <button class="nav-btn" data-tooltip="Configuration"><img src="setting.png" alt="Configuration"
+          width="30" /></button>
+      <button class="nav-btn" onclick="window.location.href='#'" data-tooltip="Report"><img src="report.png"
+          alt="Report" width="30" /></button>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()" data-tooltip="Toggle Light / Dark Mode">
+      <span class="theme-icon">🌙</span>
+    </button>
+    <div class="user-menu" data-tooltip="Profile"><img src="user.png" alt="User Profile" width="30" /></div>
+    <button class="nav-btn" onclick="window.location.href='#'" data-tooltip="Logout">Logout</button>
+    </button>
+  </header>
+
+  <div class="container">
+
+    <main class="main-content">
+      <div class="kb-header">
+        <div>
+          <h1>Knowledge Bases Details</h1>
+          <p class="kb-subtitle">Manage AI chat knowledge bases for intelligent responses</p>
+        </div>
+      </div>

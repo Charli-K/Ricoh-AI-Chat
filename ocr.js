@@ -8,12 +8,53 @@ let startX, startY;
 let canvasOffsetX = 0;
 let canvasOffsetY = 0;
 
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+}
+
+function toggleMenu() {
+    const header = document.getElementById('mainHeader');
+    const toggleBtn = document.getElementById('menuToggleBtn');
+    
+    if (header && toggleBtn) {
+        header.classList.toggle('menu-collapsed');
+        toggleBtn.classList.toggle('menu-collapsed');
+        document.body.classList.toggle('menu-collapsed');
+        
+        // Save state to localStorage
+        const isCollapsed = header.classList.contains('menu-collapsed');
+        localStorage.setItem('menuCollapsed', isCollapsed ? 'true' : 'false');
+    }
+}
+
+function loadMenuState() {
+    const menuCollapsed = localStorage.getItem('menuCollapsed');
+    const header = document.getElementById('mainHeader');
+    const toggleBtn = document.getElementById('menuToggleBtn');
+    
+    if (menuCollapsed === 'true' && header && toggleBtn) {
+        header.classList.add('menu-collapsed');
+        toggleBtn.classList.add('menu-collapsed');
+        document.body.classList.add('menu-collapsed');
+    }
+}
+
+function loadDarkModePreference() {
+    const darkMode = localStorage.getItem('darkMode');
+    if (darkMode === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
+}
+
 if (typeof pdfjsLib !== 'undefined') {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     loadDarkModePreference();
+    loadMenuState();
     setupEventListeners();
     
     document.addEventListener('click', function(e) {
