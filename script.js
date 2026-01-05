@@ -357,6 +357,20 @@ function pieConfig(data){
             font: { size: 11 } 
           },
         },
+        tooltip: {
+          callbacks: {
+            title: function() {
+              return '';
+            },
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.parsed || 0;
+              const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
+              const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+              return `${label}: ${value} (${percentage}%)`;
+            }
+          }
+        }
       },
     },
   };
