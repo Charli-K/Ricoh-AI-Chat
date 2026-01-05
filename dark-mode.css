@@ -506,6 +506,14 @@ body.dark-mode .kb-card-actions button:hover {
   border-color: rgba(102, 126, 234, 0.4);
 }
 
+body.dark-mode .kb-action-btn img {
+  filter: brightness(0) invert(1);
+}
+
+body.dark-mode .menu-toggle-btn img {
+  filter: brightness(0) invert(1);
+}
+
 body.dark-mode .kb-filter select {
   padding: 10px 12px;
   border-radius: 8px;

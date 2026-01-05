@@ -13,7 +13,6 @@ function toggleMenu() {
     toggleBtn.classList.toggle('menu-collapsed');
     document.body.classList.toggle('menu-collapsed');
     
-    // Save state to localStorage
     const isCollapsed = header.classList.contains('menu-collapsed');
     localStorage.setItem('menuCollapsed', isCollapsed ? 'true' : 'false');
   }
@@ -223,8 +222,8 @@ function renderKnowledgeBases(filter = '', sortBy = 'name') {
           <div class="kb-card-category">${kb.category}</div>
         </div>
         <div class="kb-card-actions">
-          <button class="kb-action-btn edit" onclick="event.stopPropagation(); editKnowledgeBase(${kb.id})" title="Edit">✏️</button>
-          <button class="kb-action-btn delete" onclick="event.stopPropagation(); deleteKnowledgeBase(${kb.id})" title="Delete">🗑️</button>
+          <button class="kb-action-btn edit" onclick="event.stopPropagation(); editKnowledgeBase(${kb.id})" title="Edit"><img src="edit.png" alt="Edit" width="20" /></button>
+          <button class="kb-action-btn delete" onclick="event.stopPropagation(); deleteKnowledgeBase(${kb.id})" title="Delete"><img src="delete.png" alt="Delete" width="20" /></button>
         </div>
       </div>
       <p class="kb-card-description">${kb.description || 'No description available'}</p>
