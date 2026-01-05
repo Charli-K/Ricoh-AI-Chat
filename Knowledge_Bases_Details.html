@@ -12,8 +12,8 @@
 
 <body>
   <section class="logo">
-    <button class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleMenu()" title="Toggle Menu">
-      <span class="menu-toggle-icon">☰</span>
+    <button class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleMenu()">
+      <span class="menu-toggle-icon"><img src="menu.png" style="width: 15px; height: auto;" /></span>
     </button>
     <a href="index.html" style="cursor: pointer;"><img src="Ricoh_Logo.png" alt="Ricoh Logo" /></a>
   </section>
@@ -135,12 +135,12 @@
     function toggleMenu() {
       const header = document.getElementById('mainHeader');
       const toggleBtn = document.getElementById('menuToggleBtn');
-      
+
       if (header && toggleBtn) {
         header.classList.toggle('menu-collapsed');
         toggleBtn.classList.toggle('menu-collapsed');
         document.body.classList.toggle('menu-collapsed');
-        
+
         const isCollapsed = header.classList.contains('menu-collapsed');
         localStorage.setItem('menuCollapsed', isCollapsed ? 'true' : 'false');
       }
@@ -150,7 +150,7 @@
       const menuCollapsed = localStorage.getItem('menuCollapsed');
       const header = document.getElementById('mainHeader');
       const toggleBtn = document.getElementById('menuToggleBtn');
-      
+
       if (menuCollapsed === 'true' && header && toggleBtn) {
         header.classList.add('menu-collapsed');
         toggleBtn.classList.add('menu-collapsed');
@@ -169,44 +169,44 @@
     loadMenuState();
 
     // Initialize everything after DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       console.log('DOM loaded, initializing...');
-      
+
       // Setup tooltips
       const tooltipElements = document.querySelectorAll('[data-tooltip]');
       let activeTooltip = null;
-      
+
       tooltipElements.forEach(element => {
-        element.addEventListener('mouseenter', function(e) {
+        element.addEventListener('mouseenter', function (e) {
           if (activeTooltip) {
             activeTooltip.tooltip.remove();
             activeTooltip.arrow.remove();
           }
-          
+
           const tooltipText = this.getAttribute('data-tooltip');
           const rect = this.getBoundingClientRect();
-          
+
           const tooltip = document.createElement('div');
           tooltip.className = 'custom-tooltip';
           tooltip.textContent = tooltipText;
-          
+
           const arrow = document.createElement('div');
           arrow.className = 'custom-tooltip-arrow';
-          
+
           document.body.appendChild(tooltip);
           document.body.appendChild(arrow);
-          
+
           const tooltipTop = rect.top + rect.height / 2;
           tooltip.style.top = `${tooltipTop}px`;
           tooltip.style.left = `${20 + 100 + 15}px`;
-          
+
           arrow.style.top = `${tooltipTop}px`;
           arrow.style.left = `${20 + 100 + 3}px`;
-          
+
           activeTooltip = { tooltip, arrow };
         });
-        
-        element.addEventListener('mouseleave', function() {
+
+        element.addEventListener('mouseleave', function () {
           if (activeTooltip) {
             activeTooltip.tooltip.remove();
             activeTooltip.arrow.remove();
@@ -214,7 +214,7 @@
           }
         });
       });
-      
+
       // Load knowledge base details
       loadKnowledgeBaseDetails();
     });
@@ -327,7 +327,7 @@
       console.log('Loading KB details...');
       const kbId = parseInt(getUrlParameter('id'));
       console.log('KB ID from URL:', kbId);
-      
+
       if (!kbId || isNaN(kbId)) {
         // If no ID provided, show first knowledge base for demo or redirect
         console.log('No valid ID, using first KB');
@@ -354,19 +354,19 @@
       // Update details
       document.getElementById('detailName').textContent = currentKnowledgeBase.name;
       document.getElementById('detailDescription').textContent = currentKnowledgeBase.description || 'No description available';
-      
+
       const tagElement = document.getElementById('detailTag').querySelector('.kb-card-category');
       tagElement.textContent = currentKnowledgeBase.category;
-      
+
       const statusElement = document.getElementById('detailStatus').querySelector('.kb-card-status');
       statusElement.textContent = currentKnowledgeBase.status;
       statusElement.className = `kb-card-status ${currentKnowledgeBase.status}`;
-      
+
       // Update path with link
       const pathElement = document.getElementById('detailPath');
       const pathText = currentKnowledgeBase.path || '\\Knowledge Base\\Default';
       pathElement.innerHTML = `<a href="https://apps.ricohsolution.com.hk:1443/Laserfiche/Browse.aspx?repo=Ricoh-BPA#?id=1" target="_blank" style="color: #0066cc; text-decoration: none;">${pathText}</a>`;
-      
+
       document.getElementById('detailCreatedDate').textContent = formatDate(currentKnowledgeBase.createdDate);
       document.getElementById('detailModifiedDate').textContent = formatDate(currentKnowledgeBase.modifiedDate);
 
@@ -376,7 +376,7 @@
 
       // Attach file search event listener
       document.getElementById('fileSearch').addEventListener('input', handleFileSearch);
-      
+
       console.log('KB details loaded successfully');
     }
 
@@ -407,13 +407,13 @@
 
     function handleFileSearch(event) {
       const searchTerm = event.target.value.toLowerCase();
-      
+
       if (!searchTerm) {
         renderFiles(allFiles);
         return;
       }
 
-      const filteredFiles = allFiles.filter(file => 
+      const filteredFiles = allFiles.filter(file =>
         file.name.toLowerCase().includes(searchTerm)
       );
 
