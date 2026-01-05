@@ -1,4 +1,3 @@
-// Dark mode and menu toggle functions (from knowledge-bases.js)
 function toggleDarkMode() {
   document.body.classList.toggle('dark-mode');
   const isDarkMode = document.body.classList.contains('dark-mode');
@@ -259,7 +258,6 @@ function renderFiles(files) {
   if (!files || files.length === 0) {
     filesGrid.innerHTML = `
       <div class="empty-state">
-        <div class="empty-state-icon">📄</div>
         <div class="empty-state-text">No files found</div>
         <div class="empty-state-subtext">Upload files to this knowledge base to get started</div>
       </div>

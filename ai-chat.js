@@ -7,13 +7,12 @@ function toggleDarkMode() {
 function toggleMenu() {
   const header = document.getElementById('mainHeader');
   const toggleBtn = document.getElementById('menuToggleBtn');
-  
+
   if (header && toggleBtn) {
     header.classList.toggle('menu-collapsed');
     toggleBtn.classList.toggle('menu-collapsed');
     document.body.classList.toggle('menu-collapsed');
-    
-    // Save state to localStorage
+
     const isCollapsed = header.classList.contains('menu-collapsed');
     localStorage.setItem('menuCollapsed', isCollapsed ? 'true' : 'false');
   }
@@ -23,7 +22,7 @@ function loadMenuState() {
   const menuCollapsed = localStorage.getItem('menuCollapsed');
   const header = document.getElementById('mainHeader');
   const toggleBtn = document.getElementById('menuToggleBtn');
-  
+
   if (menuCollapsed === 'true' && header && toggleBtn) {
     header.classList.add('menu-collapsed');
     toggleBtn.classList.add('menu-collapsed');
@@ -42,42 +41,40 @@ function loadDarkModePreference() {
 document.addEventListener('DOMContentLoaded', () => {
   const tooltipElements = document.querySelectorAll('[data-tooltip]');
   let activeTooltip = null;
-  
+
   tooltipElements.forEach(element => {
-    element.addEventListener('mouseenter', function(e) {
+    element.addEventListener('mouseenter', function (e) {
       // Remove any existing tooltip
       if (activeTooltip) {
         activeTooltip.tooltip.remove();
         activeTooltip.arrow.remove();
       }
-      
+
       const tooltipText = this.getAttribute('data-tooltip');
       const rect = this.getBoundingClientRect();
-      
+
       // Create tooltip container
       const tooltip = document.createElement('div');
       tooltip.className = 'custom-tooltip';
       tooltip.textContent = tooltipText;
-      
-      // Create arrow
+
       const arrow = document.createElement('div');
       arrow.className = 'custom-tooltip-arrow';
-      
+
       document.body.appendChild(tooltip);
       document.body.appendChild(arrow);
-      
-      // Position tooltip
+
       const tooltipTop = rect.top + rect.height / 2;
       tooltip.style.top = `${tooltipTop}px`;
       tooltip.style.left = `${20 + 100 + 15}px`;
-      
+
       arrow.style.top = `${tooltipTop}px`;
       arrow.style.left = `${20 + 100 + 3}px`;
-      
+
       activeTooltip = { tooltip, arrow };
     });
-    
-    element.addEventListener('mouseleave', function() {
+
+    element.addEventListener('mouseleave', function () {
       if (activeTooltip) {
         activeTooltip.tooltip.remove();
         activeTooltip.arrow.remove();
@@ -168,9 +165,9 @@ function addMessage(text, isUser = false) {
   const chatMessagesContainer = document.getElementById('chatMessages');
   const messageDiv = document.createElement('div');
   messageDiv.className = `message ${isUser ? 'user-message' : 'assistant-message'}`;
-  
+
   const avatar = isUser ? '👤' : '🤖';
-  
+
   messageDiv.innerHTML = `
     <div class="message-avatar">${avatar}</div>
     <div class="message-content">
@@ -180,11 +177,11 @@ function addMessage(text, isUser = false) {
       <div class="message-time">${getCurrentTime()}</div>
     </div>
   `;
-  
+
   chatMessagesContainer.appendChild(messageDiv);
-  
+
   chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
-  
+
   chatMessages.push({
     text,
     isUser,
@@ -195,30 +192,30 @@ function addMessage(text, isUser = false) {
 function sendMessage() {
   const input = document.getElementById('messageInput');
   const text = input.value.trim();
-  
+
   if (!text && attachedFiles.length === 0) return;
-  
+
   if (!acceptedPolicy) {
     alert('Please accept or reject the privacy policy first.');
     return;
   }
-  
+
   if (text) {
     addMessage(text, true);
   }
-  
+
   if (attachedFiles.length > 0) {
     const fileNames = attachedFiles.map(f => f.name).join(', ');
     addMessage(`📎 Attached files: ${fileNames}`, true);
   }
-  
+
   input.value = '';
   input.style.height = 'auto';
-  
+
   clearAttachedFiles();
-  
+
   showTypingIndicator();
-  
+
   setTimeout(() => {
     hideTypingIndicator();
     generateAIResponse(text);
@@ -230,7 +227,7 @@ function showTypingIndicator() {
   const typingDiv = document.createElement('div');
   typingDiv.className = 'message assistant-message';
   typingDiv.id = 'typingIndicator';
-  
+
   typingDiv.innerHTML = `
     <div class="message-avatar">🤖</div>
     <div class="message-content">
@@ -243,7 +240,7 @@ function showTypingIndicator() {
       </div>
     </div>
   `;
-  
+
   chatMessagesContainer.appendChild(typingDiv);
   chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
 }
@@ -258,7 +255,7 @@ function hideTypingIndicator() {
 function generateAIResponse(userMessage) {
   const lowerMessage = userMessage.toLowerCase();
   let response = '';
-  
+
   if (lowerMessage.includes('document') || lowerMessage.includes('summarize')) {
     response = 'I can help you summarize documents. Based on the recent documents in the system, there are 7 items including application forms, contracts, and project documents. Would you like me to provide details about specific documents?';
   } else if (lowerMessage.includes('pending') || lowerMessage.includes('approval')) {
@@ -272,19 +269,19 @@ function generateAIResponse(userMessage) {
   } else {
     response = 'I understand your question. I\'m here to help with document management, form analysis, and system navigation. Could you provide more details about what you\'d like to know?';
   }
-  
+
   addMessage(response, false);
 }
 
 function handleKeyDown(event) {
   const input = event.target;
-  
+
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     sendMessage();
     return;
   }
-  
+
   setTimeout(() => {
     input.style.height = 'auto';
     input.style.height = Math.min(input.scrollHeight, 120) + 'px';
@@ -295,7 +292,7 @@ function acceptPolicy() {
   acceptedPolicy = true;
   const welcomeMessage = document.querySelector('.assistant-message');
   if (welcomeMessage) {
-    welcomeMessage.querySelector('.message-actions').innerHTML = 
+    welcomeMessage.querySelector('.message-actions').innerHTML =
       '<p style="color: #4caf50; font-weight: 600; margin: 0;">✓ Policy Accepted</p>';
   }
   addMessage('Thank you for accepting the privacy policy. How can I assist you today?', false);
@@ -304,7 +301,7 @@ function acceptPolicy() {
 function rejectPolicy() {
   const welcomeMessage = document.querySelector('.assistant-message');
   if (welcomeMessage) {
-    welcomeMessage.querySelector('.message-actions').innerHTML = 
+    welcomeMessage.querySelector('.message-actions').innerHTML =
       '<p style="color: #f44336; font-weight: 600; margin: 0;">✗ Policy Rejected - Chat functionality is limited</p>';
   }
   addMessage('You have chosen to reject the privacy policy. Please note that chat functionality will be limited. You can still view information but cannot interact with the AI assistant.', false);
@@ -316,7 +313,7 @@ function clearChat() {
     chatMessagesContainer.innerHTML = '';
     chatMessages = [];
     acceptedPolicy = false;
-    
+
     location.reload();
   }
 }
@@ -326,12 +323,12 @@ function exportChat() {
     alert('No messages to export.');
     return;
   }
-  
+
   const chatText = chatMessages.map(msg => {
     const sender = msg.isUser ? 'User' : 'AI Assistant';
     return `[${new Date(msg.timestamp).toLocaleString()}] ${sender}: ${msg.text}`;
   }).join('\n\n');
-  
+
   const blob = new Blob([chatText], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -349,26 +346,26 @@ function insertQuickMessage(message) {
 
 function handleFileUpload(event) {
   const files = Array.from(event.target.files);
-  
+
   files.forEach(file => {
     if (!attachedFiles.find(f => f.name === file.name)) {
       attachedFiles.push(file);
     }
   });
-  
+
   updateFilePreview();
   event.target.value = '';
 }
 
 function updateFilePreview() {
   const filePreviewArea = document.getElementById('filePreviewArea');
-  
+
   if (attachedFiles.length === 0) {
     filePreviewArea.style.display = 'none';
     filePreviewArea.innerHTML = '';
     return;
   }
-  
+
   filePreviewArea.style.display = 'flex';
   filePreviewArea.innerHTML = attachedFiles.map((file, index) => `
     <div class="file-preview-item">
@@ -397,7 +394,7 @@ function toggleEmojiPicker() {
 function openKnowledgeBaseModal() {
   const modal = document.getElementById('kbSelectionModal');
   const listContainer = document.getElementById('kbSelectionList');
-  
+
   // Render knowledge bases
   if (knowledgeBases.length === 0) {
     listContainer.innerHTML = '<div class="kb-empty-state">No knowledge bases available</div>';
@@ -418,7 +415,7 @@ function openKnowledgeBaseModal() {
       </div>
     `).join('');
   }
-  
+
   modal.classList.add('active');
 }
 
@@ -430,14 +427,14 @@ function closeKnowledgeBaseModal() {
 function toggleKnowledgeBase(kbId) {
   const kb = knowledgeBases.find(k => k.id === kbId);
   if (!kb || kb.status !== 'active') return;
-  
+
   const index = selectedKnowledgeBases.indexOf(kbId);
   if (index > -1) {
     selectedKnowledgeBases.splice(index, 1);
   } else {
     selectedKnowledgeBases.push(kbId);
   }
-  
+
   // Update UI
   const item = document.querySelector(`.kb-selection-item[data-kb-id="${kbId}"]`);
   if (item) {
@@ -449,13 +446,13 @@ function saveKnowledgeBaseSelection() {
   const selectedNames = knowledgeBases
     .filter(kb => selectedKnowledgeBases.includes(kb.id))
     .map(kb => kb.name);
-  
+
   if (selectedNames.length > 0) {
     addMessage(`Selected knowledge bases: ${selectedNames.join(', ')}`, false);
   } else {
     addMessage('No knowledge bases selected. AI will respond with general knowledge.', false);
   }
-  
+
   closeKnowledgeBaseModal();
 }
 

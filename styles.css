@@ -989,6 +989,7 @@ body.dark-mode .stat-subtext {
   display: inline-block;
   box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset;
   letter-spacing: .2px;
+  white-space: nowrap;
 }
 .status-badge.pending { background: rgb(255, 191, 0); color:#ffffff;}
 .status-badge.complete { background: rgb(0, 168, 31); color:#ffffff;}
