@@ -522,6 +522,10 @@ body.dark-mode .btn-send img{
   filter: brightness(0) invert(1);
 }
 
+body.dark-mode .custom-tooltip, body.dark-mode .custom-tooltip-arrow {
+  filter: brightness() invert(1);
+}
+
 body.dark-mode .kb-filter select {
   padding: 10px 12px;
   border-radius: 8px;
