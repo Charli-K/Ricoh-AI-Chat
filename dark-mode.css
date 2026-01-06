@@ -514,6 +514,14 @@ body.dark-mode .menu-toggle-btn img {
   filter: brightness(0) invert(1);
 }
 
+body.dark-mode .btn-icon img{
+  filter: brightness(0) invert(1);
+}
+
+body.dark-mode .btn-send img{
+  filter: brightness(0) invert(1);
+}
+
 body.dark-mode .kb-filter select {
   padding: 10px 12px;
   border-radius: 8px;
