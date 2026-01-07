@@ -8,8 +8,9 @@
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./dark-mode.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-</head> 
+  <script
+    src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+</head>
 <section class="logo">
   <button class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleMenu()">
     <span class="menu-toggle-icon"><img src="assets/menu.png" style="width: 15px; height: auto;" /></span>
@@ -27,8 +28,8 @@
           src="assets/book.png" alt="Knowledge Bases" width="30" /></button>
       <button class="nav-btn" onclick="window.location.href='AI Chat.html'" data-tooltip="AI Chat"><img
           src="assets/chatbot.png" alt="AI Chat" width="30" /></button>
-      <button class="nav-btn" onclick="window.location.href='ocr.html'" data-tooltip="OCR"><img src="assets/ocr.png" alt="OCR"
-          width="30" /></button>
+      <button class="nav-btn" onclick="window.location.href='ocr.html'" data-tooltip="OCR"><img src="assets/ocr.png"
+          alt="OCR" width="30" /></button>
       <button class="nav-btn" data-tooltip="Configuration"><img src="assets/setting.png" alt="Configuration"
           width="30" /></button>
       <button class="nav-btn" onclick="window.location.href='#'" data-tooltip="Report"><img src="assets/report.png"
@@ -76,35 +77,40 @@
           <div class="chart-card">
             <select class="process-selector-dropdown" data-chart-index="0">
             </select>
-            <button class="expand-btn" data-chart="chartProcess0" title="Expand"><img src="expand.png" alt="Expand" width="20" /></button>
+            <button class="expand-btn" data-chart="chartProcess0" title="Expand"><img src="assets/expand.png"
+                alt="Expand" width="20" /></button>
             <h3 id="chartTitle0">Loading...</h3>
             <div class="chart-wrap"><canvas id="chartProcess0"></canvas></div>
           </div>
           <div class="chart-card">
             <select class="process-selector-dropdown" data-chart-index="1">
             </select>
-            <button class="expand-btn" data-chart="chartProcess1" title="Expand"><img src="expand.png" alt="Expand" width="20" /></button>
+            <button class="expand-btn" data-chart="chartProcess1" title="Expand"><img src="assets/expand.png"
+                alt="Expand" width="20" /></button>
             <h3 id="chartTitle1">Loading...</h3>
             <div class="chart-wrap"><canvas id="chartProcess1"></canvas></div>
           </div>
           <div class="chart-card">
             <select class="process-selector-dropdown" data-chart-index="2">
             </select>
-            <button class="expand-btn" data-chart="chartProcess2" title="Expand"><img src="expand.png" alt="Expand" width="20" /></button>
+            <button class="expand-btn" data-chart="chartProcess2" title="Expand"><img src="assets/expand.png"
+                alt="Expand" width="20" /></button>
             <h3 id="chartTitle2">Loading...</h3>
             <div class="chart-wrap"><canvas id="chartProcess2"></canvas></div>
           </div>
           <div class="chart-card">
             <select class="process-selector-dropdown" data-chart-index="3">
             </select>
-            <button class="expand-btn" data-chart="chartProcess3" title="Expand"><img src="expand.png" alt="Expand" width="20" /></button>
+            <button class="expand-btn" data-chart="chartProcess3" title="Expand"><img src="assets/expand.png"
+                alt="Expand" width="20" /></button>
             <h3 id="chartTitle3">Loading...</h3>
             <div class="chart-wrap"><canvas id="chartProcess3"></canvas></div>
           </div>
         </div>
 
         <div class="line-chart-container">
-          <button class="expand-btn" data-chart="lineChart" title="Expand"><img src="expand.png" alt="Expand" width="20" /></button>
+          <button class="expand-btn" data-chart="lineChart" title="Expand"><img src="assets/expand.png" alt="Expand"
+              width="20" /></button>
           <h3>Overall Status Trend</h3>
           <div class="line-chart-wrap"><canvas id="lineChart" height="140"></canvas></div>
         </div>
