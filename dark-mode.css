@@ -530,6 +530,10 @@ body.dark-mode .expand-btn{
   filter: brightness() invert(0.8);
 }
 
+body.dark-mode .modal-close img {
+  filter: brightness(0) invert(1);
+}
+
 body.dark-mode .kb-filter select {
   padding: 10px 12px;
   border-radius: 8px;
