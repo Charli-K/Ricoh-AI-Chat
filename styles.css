@@ -295,6 +295,7 @@ body.dark-mode .theme-toggle::before {
   height: 45px;
   width: 45px;
   position: relative;
+  text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
