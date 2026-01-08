@@ -245,8 +245,8 @@ body.dark-mode .menu-toggle-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   padding: 0;
   font-size: 18px;
   position: relative;
@@ -273,8 +273,8 @@ body.dark-mode .menu-toggle-icon {
 }
 
 body.dark-mode .theme-toggle {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
 }
 
 body.dark-mode .theme-toggle .theme-icon {
@@ -292,8 +292,8 @@ body.dark-mode .theme-toggle::before {
 }
 
 .user-menu {
-  height: 40px;
-  width: 40px;
+  height: 45px;
+  width: 45px;
   position: relative;
   display: flex;
   align-items: center;
