@@ -56,13 +56,13 @@
 }
 
 .detail-value a {
-  color: #0066cc;
-  text-decoration: none;
+  color: #00a2ff;
+  text-decoration: underline;
   transition: color 0.2s;
 }
 
 .detail-value a:hover {
-  color: #0052a3;
+  color: #00a2ff;
   text-decoration: underline;
 }
 

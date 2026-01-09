@@ -142,6 +142,10 @@ body.dark-mode .menu-toggle-icon {
   width: 100%;
 }
 
+.nav-menu:hover {
+  scrollbar-width: thin;
+}
+
 .nav-dropdown {
   position: relative;
   display: inline-block;

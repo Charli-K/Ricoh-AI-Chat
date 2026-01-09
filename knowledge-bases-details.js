@@ -237,7 +237,7 @@ function loadKnowledgeBaseDetails() {
   // Update path with link
   const pathElement = document.getElementById('detailPath');
   const pathText = currentKnowledgeBase.path || '\\Knowledge Base\\Default';
-  pathElement.innerHTML = `<a href="https://apps.ricohsolution.com.hk:1443/Laserfiche/Browse.aspx?repo=Ricoh-BPA#?id=1" target="_blank" style="color: #0066cc; text-decoration: none;">${pathText}</a>`;
+  pathElement.innerHTML = `<a href="https://apps.ricohsolution.com.hk:1443/Laserfiche/Browse.aspx?repo=Ricoh-BPA#?id=1" target="_blank" style="color: #00a2ff; text-decoration: underline;">${pathText}</a>`;
 
   document.getElementById('detailCreatedDate').textContent = formatDate(currentKnowledgeBase.createdDate);
   document.getElementById('detailModifiedDate').textContent = formatDate(currentKnowledgeBase.modifiedDate);
