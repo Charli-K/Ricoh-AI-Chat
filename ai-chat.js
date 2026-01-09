@@ -37,53 +37,6 @@ function loadDarkModePreference() {
   }
 }
 
-// Tooltip functionality
-document.addEventListener('DOMContentLoaded', () => {
-  const tooltipElements = document.querySelectorAll('[data-tooltip]');
-  let activeTooltip = null;
-
-  tooltipElements.forEach(element => {
-    element.addEventListener('mouseenter', function (e) {
-      // Remove any existing tooltip
-      if (activeTooltip) {
-        activeTooltip.tooltip.remove();
-        activeTooltip.arrow.remove();
-      }
-
-      const tooltipText = this.getAttribute('data-tooltip');
-      const rect = this.getBoundingClientRect();
-
-      // Create tooltip container
-      const tooltip = document.createElement('div');
-      tooltip.className = 'custom-tooltip';
-      tooltip.textContent = tooltipText;
-
-      const arrow = document.createElement('div');
-      arrow.className = 'custom-tooltip-arrow';
-
-      document.body.appendChild(tooltip);
-      document.body.appendChild(arrow);
-
-      const tooltipTop = rect.top + rect.height / 2;
-      tooltip.style.top = `${tooltipTop}px`;
-      tooltip.style.left = `${20 + 100 + 15}px`;
-
-      arrow.style.top = `${tooltipTop}px`;
-      arrow.style.left = `${20 + 100 + 3}px`;
-
-      activeTooltip = { tooltip, arrow };
-    });
-
-    element.addEventListener('mouseleave', function () {
-      if (activeTooltip) {
-        activeTooltip.tooltip.remove();
-        activeTooltip.arrow.remove();
-        activeTooltip = null;
-      }
-    });
-  });
-});
-
 loadDarkModePreference();
 loadMenuState();
 

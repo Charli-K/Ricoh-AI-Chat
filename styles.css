@@ -59,7 +59,12 @@ body {
   overflow-y: auto;
   overflow-x: visible;
   scrollbar-width: none;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition: width 0.3s ease, border-radius 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+}
+
+.header:hover {
+  width: 240px;
+  border-radius: 30px;
 }
 
 .header.menu-collapsed {
@@ -158,16 +163,37 @@ body.dark-mode .menu-toggle-icon {
   padding: 10px 16px;
   cursor: pointer;
   border-radius: 8px;
-  transition: background 0.2s, transform 0.15s, border-color 0.2s;
-  white-space: normal;
+  transition: background 0.2s, transform 0.15s, border-color 0.2s, width 0.3s ease;
+  white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
   width: 100%;
-  text-align: center;
+  text-align: left;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 12px;
   position: relative;
+}
+
+.nav-btn img {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+}
+
+.nav-text {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, width 0.3s ease;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.header:hover .nav-text {
+  opacity: 1;
+  width: auto;
 }
 
 .nav-btn:hover {
@@ -177,31 +203,6 @@ body.dark-mode .menu-toggle-icon {
 
 .nav-btn.active {
   font-weight: 600;
-}
-
-.custom-tooltip {
-  position: fixed;
-  background: rgba(0, 0, 0, 0.85);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  white-space: nowrap;
-  z-index: 9999;
-  pointer-events: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  transform: translateY(-50%);
-}
-
-.custom-tooltip-arrow {
-  position: fixed;
-  width: 0;
-  height: 0;
-  border: 6px solid transparent;
-  border-right-color: rgba(0, 0, 0, 0.85);
-  z-index: 9999;
-  pointer-events: none;
-  transform: translateY(-50%);
 }
 
 .dropdown-content {
@@ -248,17 +249,51 @@ body.dark-mode .menu-toggle-icon {
 .theme-toggle {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 45px;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
   height: 45px;
-  padding: 0;
-  font-size: 18px;
+  padding: 8px 12px;
+  font-size: 14px;
   position: relative;
+  background: transparent;
+  color: var(--text);
+  border: 0px solid rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.15s, border-color 0.2s;
+}
+
+.theme-toggle .theme-icon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle .theme-icon img {
+  width: 20px;
+  height: 20px;
+}
+
+.theme-toggle .nav-text {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, width 0.3s ease;
+  white-space: nowrap;
+}
+
+.header:hover .theme-toggle .nav-text {
+  opacity: 1;
+  width: auto;
 }
 
 .theme-toggle:hover {
   background: var(--hover);
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .theme-toggle:active {
@@ -276,19 +311,19 @@ body.dark-mode .menu-toggle-icon {
   transform: rotate(20deg);
 }
 
-body.dark-mode .theme-toggle {
-  width: 45px;
-  height: 45px;
-}
-
 body.dark-mode .theme-toggle .theme-icon {
   display: none;
 }
 
+body.dark-mode .theme-toggle {
+  position: relative;
+}
+
 body.dark-mode .theme-toggle::before {
   content: '';
-  width: 100%;
-  height: 100%;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
   background-image: url('assets/contrast.png');
   background-repeat: no-repeat;
   background-size: contain;
@@ -297,23 +332,38 @@ body.dark-mode .theme-toggle::before {
 
 .user-menu {
   height: 45px;
-  width: 45px;
+  width: 100%;
   position: relative;
-  text-align: center;
   display: flex;
   align-items: center;
-  justify-content: center;
-}
-
-.user-menu, .theme-toggle {
+  justify-content: flex-start;
+  gap: 12px;
   background: transparent;
   color: var(--text);
-  border: 1px solid rgba(0, 0, 0, 0.18);
   padding: 8px 12px;
   cursor: pointer;
   border-radius: 8px;
   transition: background 0.2s, transform 0.15s, border-color 0.2s;
+}
+
+.user-menu img {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+}
+
+.user-menu .nav-text {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, width 0.3s ease;
   white-space: nowrap;
+  font-size: 14px;
+}
+
+.header:hover .user-menu .nav-text {
+  opacity: 1;
+  width: auto;
 }
 
 .user-menu:hover {

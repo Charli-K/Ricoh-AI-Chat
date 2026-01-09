@@ -12,32 +12,43 @@
 
 <body>
   <section class="logo">
-    <button class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleMenu()">
-      <span class="menu-toggle-icon"><img src="assets/menu.png" style="width: 15px; height: auto;" /></span>
-    </button>
-    <a href="index.html" style="cursor: pointer;"><img src="assets/Ricoh_Logo.png" alt="Ricoh Logo" /></a>
-  </section>
-
+      <a href="index.html" style="cursor: pointer;"><img src="assets/Ricoh_Logo.png" alt="Ricoh Logo" /></a>
   <body>
     <header class="header" id="mainHeader">
       <nav class="nav-menu">
-        <button class="nav-btn" onclick="window.location.href='index.html'" data-tooltip="Dashboard"><img
-            src="assets/dashboard.png" alt="Dashboard" width="30" /></button>
+        <button class="nav-btn" onclick="window.location.href='index.html'">
+          <img src="assets/dashboard.png" alt="Dashboard" width="30" />
+          <span class="nav-text">Dashboard</span>
         </button>
-        <button class="nav-btn" onclick="window.location.href='Knowledge_Bases.html'"
-          data-tooltip="Knowledge Bases"><img src="assets/book.png" alt="Knowledge Bases" width="30" /></button>
-        <button class="nav-btn" onclick="window.location.href='AI Chat.html'" data-tooltip="AI Chat"><img
-            src="assets/chatbot.png" alt="AI Chat" width="30" /></button>
-        <button class="nav-btn" data-tooltip="Configuration"><img src="assets/setting.png" alt="Configuration"
-            width="30" /></button>
-        <button class="nav-btn" onclick="window.location.href='#'" data-tooltip="Report"><img src="assets/file.png"
-            alt="Report" width="30" /></button>
+        <button class="nav-btn" onclick="window.location.href='Knowledge_Bases.html'">
+          <img src="assets/book.png" alt="Knowledge Bases" width="30" />
+          <span class="nav-text">Knowledge Bases</span>
+        </button>
+        <button class="nav-btn" onclick="window.location.href='AI Chat.html'">
+          <img src="assets/chatbot.png" alt="AI Chat" width="30" />
+          <span class="nav-text">AI Chat</span>
+        </button>
+        <button class="nav-btn">
+          <img src="assets/setting.png" alt="Configuration" width="30" />
+          <span class="nav-text">Configuration</span>
+        </button>
+        <button class="nav-btn" onclick="window.location.href='#'">
+          <img src="assets/file.png" alt="Report" width="30" />
+          <span class="nav-text">Report</span>
+        </button>
       </nav>
-      <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()" data-tooltip="Toggle Light / Dark Mode">
+      <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()">
         <span class="theme-icon"><img src="assets/crescent-moon.png" alt="Toggle Theme" width="20" /></span>
+        <span class="nav-text">Toggle Theme</span>
       </button>
-      <div class="user-menu" data-tooltip="Profile"><img src="assets/user.png" alt="User Profile" width="30" /></div>
-      <button class="nav-btn" onclick="window.location.href='#'" data-tooltip="Logout">Logout</button>
+      <div class="user-menu">
+        <img src="assets/user.png" alt="User Profile" width="30" />
+        <span class="nav-text">Profile</span>
+      </div>
+      <button class="nav-btn" onclick="window.location.href='#'">
+        <img src="assets/book.png" alt="Logout" width="30" />
+        <span class="nav-text">Logout</span>
+      </button>
       </button>
     </header>
 
