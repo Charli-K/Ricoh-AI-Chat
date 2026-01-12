@@ -84,6 +84,9 @@ function updatePaginationButtons(totalPages) {
 
 const pageSizeSelect = document.getElementById('pageSize');
 if (pageSizeSelect) {
+  // Set initial value
+  rowsPerPage = parseInt(pageSizeSelect.value) || 10;
+  
   pageSizeSelect.addEventListener('change', (e) => {
     rowsPerPage = parseInt(e.target.value);
     currentPage = 1;

@@ -134,17 +134,11 @@
 
           <div class="process-filter">
             <select id="processFilter" class="process-dropdown">
-              <option value="">All Processes</option>
+              <option value="">Select Processes</option>
               <option value="Card / Loan Application">Card / Loan Application</option>
               <option value="Budget Review">Budget Review</option>
               <option value="Sales Report">Sales Report</option>
-              <option value="Training Program">Training Program</option>
-              <option value="Infrastructure Upgrade">Infrastructure Upgrade</option>
-              <option value="Marketing Campaign">Marketing Campaign</option>
               <option value="Client Survey">Client Survey</option>
-              <option value="Security Audit">Security Audit</option>
-              <option value="Product Launch">Product Launch</option>
-              <option value="Contract Review">Contract Review</option>
             </select>
           </div>
 
@@ -152,53 +146,31 @@
             <button class="btn-column-manager" id="columnManagerBtn" title="Manage Columns"> Columns</button>
             <div class="column-manager-dropdown" id="columnManagerDropdown" style="display: none;">
               <div class="column-option">
-                <input type="checkbox" id="col-process" checked data-column="0">
+                <input type="checkbox" id="col-process" checked disabled data-column="0">
                 <label for="col-process">Process</label>
               </div>
               <div class="column-option">
-                <input type="checkbox" id="col-instance" checked data-column="1">
+                <input type="checkbox" id="col-instance" checked disabled data-column="1">
                 <label for="col-instance">Instance</label>
               </div>
               <div class="column-option">
-                <input type="checkbox" id="col-status" checked data-column="2">
-                <label for="col-status">Status</label>
+                <input type="checkbox" id="col-created-date" checked disabled data-column="2">
+                <label for="col-created-date">Created Date</label>
               </div>
               <div class="column-option">
-                <input type="checkbox" id="col-started" checked data-column="3">
-                <label for="col-started">Started by</label>
-              </div>
-              <div class="column-option">
-                <input type="checkbox" id="col-updated" checked data-column="4">
-                <label for="col-updated">Last updated</label>
-              </div>
-              <div class="column-option">
-                <input type="checkbox" id="col-current-step" checked data-column="5">
-                <label for="col-current-step">Current step</label>
-              </div>
-              <div class="column-option">
-                <input type="checkbox" id="col-step-date" checked data-column="6">
-                <label for="col-step-date">Current step start date</label>
-              </div>
-              <div class="column-option">
-                <input type="checkbox" id="col-assigned" checked data-column="7">
-                <label for="col-assigned">Assigned to</label>
-              </div>
-              <div class="column-option">
-                <input type="checkbox" id="col-amount" data-column="8">
-                <label for="col-amount">Total amount</label>
-              </div>
-              <div class="column-option">
-                <input type="checkbox" id="col-priority" data-column="9">
-                <label for="col-priority">Priority</label>
-              </div>
-              <div class="column-option">
-                <input type="checkbox" id="col-department" data-column="10">
+                <input type="checkbox" id="col-department" checked disabled data-column="3">
                 <label for="col-department">Department</label>
               </div>
               <div class="column-option">
-                <input type="checkbox" id="col-due-date" data-column="11">
-                <label for="col-due-date">Due date</label>
+                <input type="checkbox" id="col-status" checked disabled data-column="4">
+                <label for="col-status">Status</label>
               </div>
+              <div class="column-option">
+                <input type="checkbox" id="col-assigned" checked disabled data-column="5">
+                <label for="col-assigned">Assigned To</label>
+              </div>
+              <hr style="margin: 8px 0;">
+              <div id="dynamicColumns"></div>
             </div>
           </div>
         </div>
@@ -207,522 +179,35 @@
           <table class="data-table" id="dataTable">
             <thead>
               <tr id="tableHeader">
-                <th draggable="true" data-column="0">Process</th>
-                <th draggable="true" data-column="1">Instance</th>
-                <th draggable="true" data-column="2">Status</th>
-                <th draggable="true" data-column="3">Started by</th>
-                <th draggable="true" data-column="4">Last updated</th>
-                <th draggable="true" data-column="5">Current step</th>
-                <th draggable="true" data-column="6">Current step start date</th>
-                <th draggable="true" data-column="7">Assigned to</th>
-                <th draggable="true" data-column="8">Total amount</th>
-                <th draggable="true" data-column="9">Priority</th>
-                <th draggable="true" data-column="10">Department</th>
-                <th draggable="true" data-column="11">Due date</th>
+                <th draggable="true" data-column="0" class="common-column">Process</th>
+                <th draggable="true" data-column="1" class="common-column">Instance</th>
+                <th draggable="true" data-column="2" class="common-column">Created Date</th>
+                <th draggable="true" data-column="3" class="common-column">Department</th>
+                <th draggable="true" data-column="4" class="common-column">Status</th>
+                <th draggable="true" data-column="5" class="common-column">Assigned To</th>
+                <th draggable="true" data-column="6" class="process-specific-column" data-process="Card / Loan Application" style="display:none;">Applicant Name</th>
+                <th draggable="true" data-column="7" class="process-specific-column" data-process="Card / Loan Application" style="display:none;">ID / Account Number</th>
+                <th draggable="true" data-column="8" class="process-specific-column" data-process="Card / Loan Application" style="display:none;">Loan Amount / Credit Limit</th>
+                <th draggable="true" data-column="9" class="process-specific-column" data-process="Card / Loan Application" style="display:none;">Interest Rate</th>
+                <th draggable="true" data-column="10" class="process-specific-column" data-process="Card / Loan Application" style="display:none;">Approval Date</th>
+                <th draggable="true" data-column="11" class="process-specific-column" data-process="Card / Loan Application" style="display:none;">Supporting Documents</th>
+                <th draggable="true" data-column="12" class="process-specific-column" data-process="Budget Review" style="display:none;">Budget Period</th>
+                <th draggable="true" data-column="13" class="process-specific-column" data-process="Budget Review" style="display:none;">Requested Amount</th>
+                <th draggable="true" data-column="14" class="process-specific-column" data-process="Budget Review" style="display:none;">Approved Amount</th>
+                <th draggable="true" data-column="15" class="process-specific-column" data-process="Budget Review" style="display:none;">Cost Center</th>
+                <th draggable="true" data-column="16" class="process-specific-column" data-process="Budget Review" style="display:none;">Reviewer</th>
+                <th draggable="true" data-column="17" class="process-specific-column" data-process="Budget Review" style="display:none;">Justification</th>
+                <th draggable="true" data-column="18" class="process-specific-column" data-process="Sales Report" style="display:none;">Report Period</th>
+                <th draggable="true" data-column="19" class="process-specific-column" data-process="Sales Report" style="display:none;">Region / Market</th>
+                <th draggable="true" data-column="20" class="process-specific-column" data-process="Sales Report" style="display:none;">Sales Amount</th>
+                <th draggable="true" data-column="21" class="process-specific-column" data-process="Sales Report" style="display:none;">Product Category</th>
+                <th draggable="true" data-column="22" class="process-specific-column" data-process="Client Survey" style="display:none;">Client Name</th>
+                <th draggable="true" data-column="23" class="process-specific-column" data-process="Client Survey" style="display:none;">Survey Date</th>
+                <th draggable="true" data-column="24" class="process-specific-column" data-process="Client Survey" style="display:none;">Survey Type</th>
+                <th draggable="true" data-column="25" class="process-specific-column" data-process="Client Survey" style="display:none;">Score / Rating</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>Budget Review</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000030 - Annual Budget Review
-                    2025</a></td>
-                <td><span class="status-badge inprogress">In Progress</span></td>
-                <td>Workflow</td>
-                <td>11/20/2025 3:45 PM</td>
-                <td>Obtain Rule Engi...</td>
-                <td>11/20/2025 3:45 PM</td>
-                <td>Test Account</td>
-                <td>$125,000.00</td>
-                <td>High</td>
-                <td>Finance</td>
-                <td>12/31/2025</td>
-              </tr>
-              <tr>
-                <td>Sales Report</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank" 
-                  style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000029 - Q4 Sales Report</a></td>
-                <td><span class="status-badge approve">Approve</span></td>
-                <td>Workflow</td>
-                <td>11/18/2025 10:20 AM</td>
-                <td>Virtual Instant C...</td>
-                <td>11/18/2025 10:20 AM</td>
-                <td>Test Account</td>
-                <td>$45,600.00</td>
-                <td>Medium</td>
-                <td>Sales</td>
-                <td>12/15/2025</td>
-              </tr>
-              <tr>
-                <td>Training Program</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000028 - Employee Training
-                    Program</a></td>
-                <td><span class="status-badge complete">Complete</span></td>
-                <td>Workflow</td>
-                <td>11/19/2025 4:00 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>11/19/2025 4:00 PM</td>
-                <td>Test Account</td>
-                <td>$28,400.00</td>
-                <td>Low</td>
-                <td>HR</td>
-                <td>11/30/2025</td>
-              </tr>
-              <tr>
-                <td>Infrastructure Upgrade</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000027 - IT Infrastructure
-                    none;>SPCA MASTERCARD - 20000027 - IT Infrastructure
-                    Upgrade</a></td>
-                <td><span class="status-badge inprogress">In Progress</span></td>
-                <td>Workflow</td>
-                <td>11/17/2025 2:30 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>11/17/2025 2:30 PM</td>
-                <td>Test Account</td>
-                <td>$350,000.00</td>
-                <td>High</td>
-                <td>IT</td>
-                <td>01/31/2026</td>
-              </tr>
-              <tr>
-                <td>Marketing Campaign</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000026 - Marketing Campaign
-                    none;>SPCA MASTERCARD - 20000026 - Marketing Campaign
-                    Analysis</a></td>
-                <td><span class="status-badge approve">Approve</span></td>
-                <td>Workflow</td>
-                <td>11/16/2025 11:15 AM</td>
-                <td>Virtual Instant C...</td>
-                <td>11/16/2025 11:15 AM</td>
-                <td>Test Account</td>
-                <td>$67,800.00</td>
-                <td>Medium</td>
-                <td>Marketing</td>
-                <td>12/01/2025</td>
-              </tr>
-              <tr>
-                <td>Client Survey</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000025 - Client Feedback
-                    none;>SPCA MASTERCARD - 20000025 - Client Feedback
-                    Survey</a></td>
-                <td><span class="status-badge complete">Complete</span></td>
-                <td>Workflow</td>
-                <td>11/14/2025 9:50 AM</td>
-                <td>Virtual Instant C...</td>
-                <td>11/14/2025 9:50 AM</td>
-                <td>Test Account</td>
-                <td>$15,200.00</td>
-                <td>Low</td>
-                <td>Operations</td>
-                <td>11/30/2025</td>
-              </tr>
-              <tr>
-                <td>Security Audit</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000024 - Security Audit
-                    Report</a></td>
-                <td><span class="status-badge pending">Pending</span></td>
-                <td>Workflow</td>
-                <td>11/12/2025 4:30 PM</td>
-                <td>Obtain Rule Engi...</td>
-                <td>11/12/2025 4:30 PM</td>
-                <td>Test Account</td>
-                <td>$89,500.00</td>
-                <td>High</td>
-                <td>IT</td>
-                <td>12/10/2025</td>
-              </tr>
-              <tr>
-                <td>Product Launch</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" tarrget="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000023 - Product Launch
-                    Strategy</a></td>
-                <td><span class="status-badge inprogress">In Progress</span></td>
-                <td>Workflow</td>
-                <td>11/10/2025 1:20 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>11/10/2025 1:20 PM</td>
-                <td>Test Account</td>
-                <td>$234,000.00</td>
-                <td>High</td>
-                <td>Marketing</td>
-                <td>12/20/2025</td>
-              </tr>
-              <tr>
-                <td>Contract Review</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000022 - Vendor Contract
-                    Review</a></td>
-                <td><span class="status-badge approve">Approve</span></td>
-                <td>Workflow</td>
-                <td>11/8/2025 10:15 AM</td>
-                <td>Virtual Instant C...</td>
-                <td>11/8/2025 10:15 AM</td>
-                <td>Test Account</td>
-                <td>$156,700.00</td>
-                <td>Medium</td>
-                <td>Legal</td>
-                <td>11/30/2025</td>
-              </tr>
-              <tr>
-                <td>Card / Loan Application</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000021 - Quarterly Financial
-                    none;>SPCA MASTERCARD - 20000021 - Quarterly Financial
-                    Statement</a></td>
-                <td><span class="status-badge complete">Complete</span></td>
-                <td>Workflow</td>
-                <td>11/5/2025 3:45 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>11/5/2025 3:45 PM</td>
-                <td>Test Account</td>
-                <td>$98,700.00</td>
-                <td>Medium</td>
-                <td>Finance</td>
-                <td>11/15/2025</td>
-              </tr>
-              <tr>
-                <td>Card / Loan Application</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000020 - Customer Service
-                    none;>SPCA MASTERCARD - 20000020 - Customer Service
-                    Guidelines</a></td>
-                <td><span class="status-badge approve">Approve</span></td>
-                <td>Workflow</td>
-                <td>11/2/2025 2:10 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>11/2/2025 2:10 PM</td>
-                <td>Test Account</td>
-                <td>$39,111.00</td>
-                <td>Medium</td>
-                <td>Marketing</td>
-                <td>12/01/2025</td>
-              </tr>
-              <tr>
-                <td>Infrastructure Upgrade</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000019 - Data Migration
-                    Project</a></td>
-                <td><span class="status-badge inprogress">In Progress</span></td>
-                <td>Workflow</td>
-                <td>10/30/2025 4:50 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>10/30/2025 4:50 PM</td>
-                <td>Test Account</td>
-                <td>$55,125.10</td>
-                <td>Low</td>
-                <td>IT</td>
-                <td>11/25/2025</td>
-              </tr>
-              <tr>
-                <td>Card / Loan Application</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000018 - Employee Benefits
-                    Review</a></td>
-                <td><span class="status-badge complete">Complete</span></td>
-                <td>Workflow</td>
-                <td>10/28/2025 11:30 AM</td>
-                <td>Virtual Instant C...</td>
-                <td>10/28/2025 11:30 AM</td>
-                <td>Test Account</td>
-                <td>$14,510.60</td>
-                <td>High</td>
-                <td>Sales</td>
-                <td>11/11/2025</td>
-              </tr>
-              <tr>
-                <td>Security Audit</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000017 - Compliance Audit
-                    Documentation</a></td>
-                <td><span class="status-badge pending">Pending</span></td>
-                <td>Workflow</td>
-                <td>10/25/2025 1:45 PM</td>
-                <td>Obtain Rule Engi...</td>
-                <td>10/25/2025 1:45 PM</td>
-                <td>Test Account</td>
-                <td>$26,752.60</td>
-                <td>Medium</td>
-                <td>Finance</td>
-                <td>11/29/2025</td>
-              </tr>
-              <tr>
-                <td>Marketing Campaign</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000016 - Social Media Strategy
-                    Plan</a></td>
-                <td><span class="status-badge approve">Approve</span></td>
-                <td>Workflow</td>
-                <td>10/22/2025 3:15 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>10/22/2025 3:15 PM</td>
-                <td>Test Account</td>
-                <td>$9,180.20</td>
-                <td>High</td>
-                <td>Sales</td>
-                <td>10/30/2025</td>
-              </tr>
-              <tr>
-                <td>Card / Loan Application</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000015 - Office Renovation
-                    Proposal</a></td>
-                <td><span class="status-badge inprogress">In Progress</span></td>
-                <td>Workflow</td>
-                <td>10/20/2025 5:00 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>10/20/2025 5:00 PM</td>
-                <td>Test Account</td>
-                <td>$42,350.80</td>
-                <td>Medium</td>
-                <td>Operations</td>
-                <td>11/15/2025</td>
-              </tr>
-              <tr>
-                <td>Contract Review</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000014 - Supplier Evaluation
-                    Report</a></td>
-                <td><span class="status-badge complete">Complete</span></td>
-                <td>Workflow</td>
-                <td>10/18/2025 10:40 AM</td>
-                <td>Virtual Instant C...</td>
-                <td>10/18/2025 10:40 AM</td>
-                <td>Test Account</td>
-                <td>$78,920.50</td>
-                <td>High</td>
-                <td>Operations</td>
-                <td>11/10/2025</td>
-              </tr>
-              <tr>
-                <td>Card / Loan Application</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000013 - Risk Assessment
-                    Analysis</a></td>
-                <td><span class="status-badge approve">Approve</span></td>
-                <td>Workflow</td>
-                <td>10/15/2025 2:30 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>10/15/2025 2:30 PM</td>
-                <td>Test Account</td>
-                <td>$125,640.00</td>
-                <td>High</td>
-                <td>Finance</td>
-                <td>11/05/2025</td>
-              </tr>
-              <tr>
-                <td>Training Program</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000012 - Performance Review
-                    Template</a></td>
-                <td><span class="status-badge complete">Complete</span></td>
-                <td>Workflow</td>
-                <td>10/12/2025 4:20 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>10/12/2025 4:20 PM</td>
-                <td>Test Account</td>
-                <td>$18,750.00</td>
-                <td>Low</td>
-                <td>HR</td>
-                <td>11/01/2025</td>
-              </tr>
-              <tr>
-                <td>Security Audit</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000011 - Network Security
-                    Update</a></td>
-                <td><span class="status-badge inprogress">In Progress</span></td>
-                <td>Workflow</td>
-                <td>10/10/2025 11:45 AM</td>
-                <td>Virtual Instant C...</td>
-                <td>10/10/2025 11:45 AM</td>
-                <td>Test Account</td>
-                <td>$215,480.00</td>
-                <td>High</td>
-                <td>IT</td>
-                <td>11/20/2025</td>
-              </tr>
-              <tr>
-                <td>Marketing Campaign</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000010 - Brand Identity
-                    Guidelines</a></td>
-                <td><span class="status-badge approve">Approve</span></td>
-                <td>Workflow</td>
-                <td>10/8/2025 1:10 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>10/8/2025 1:10 PM</td>
-                <td>Test Account</td>
-                <td>$52,300.00</td>
-                <td>Medium</td>
-                <td>Marketing</td>
-                <td>10/28/2025</td>
-              </tr>
-              <tr>
-                <td>Sales Report</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000009 - Customer Retention
-                    Strategy</a></td>
-                <td><span class="status-badge pending">Pending</span></td>
-                <td>Workflow</td>
-                <td>10/5/2025 3:30 PM</td>
-                <td>Obtain Rule Engi...</td>
-                <td>10/5/2025 3:30 PM</td>
-                <td>Test Account</td>
-                <td>$68,450.00</td>
-                <td>High</td>
-                <td>Sales</td>
-                <td>10/25/2025</td>
-              </tr>
-              <tr>
-                <td>Training Program</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000008 - Training Module
-                    Development</a></td>
-                <td><span class="status-badge complete">Complete</span></td>
-                <td>Workflow</td>
-                <td>10/2/2025 5:15 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>10/2/2025 5:15 PM</td>
-                <td>Test Account</td>
-                <td>$31,200.00</td>
-                <td>Medium</td>
-                <td>HR</td>
-                <td>10/22/2025</td>
-              </tr>
-              <tr>
-                <td>Budget Review</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000007 - Budget Allocation
-                    none;>SPCA MASTERCARD - 20000007 - Budget Allocation
-                    Plan</a></td>
-                <td><span class="status-badge approve">Approve</span></td>
-                <td>Workflow</td>
-                <td>9/30/2025 2:45 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>9/30/2025 2:45 PM</td>
-                <td>Test Account</td>
-                <td>$185,900.00</td>
-                <td>High</td>
-                <td>Finance</td>
-                <td>10/15/2025</td>
-              </tr>
-              <tr>
-                <td>Card / Loan Application</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000006 - vfdwR6s </a>
-                <td><span class="status-badge pending">Pending</span></td>
-                <td>Workflow</td>
-                <td>11/3/2025 11:54 AM</td>
-                <td>Obtain Rule Engi...</td>
-                <td>11/3/2025 11:54 AM</td>
-                <td>Test Account</td>
-                <td>$95,500.00</td>
-                <td>Medium</td>
-                <td>Finance</td>
-                <td>11/23/2025</td>
-              </tr>
-              <tr>
-                <td>Card / Loan Application</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000005 - Application Form</a>
-                </td>
-                <td><span class="status-badge cancel">Cancel</span></td>
-                <td>Workflow</td>
-                <td>11/16/2025 12:01 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>11/16/2025 12:01 PM</td>
-                <td>Test Account</td>
-                <td>$25,800.00</td>
-                <td>Low</td>
-                <td>Finance</td>
-                <td>12/05/2025</td>
-              </tr>
-              <tr>
-                <td>Budget Review</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000004 - Energise 1 - Costing
-                    none;>SPCA MASTERCARD - 20000004 - Energise 1 - Costing
-                    Phase</a></td>
-                <td><span class="status-badge complete">Complete</span></td>
-                <td>Workflow</td>
-                <td>10/13/2025 4:06 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>10/13/2025 4:06 PM</td>
-                <td>Test Account</td>
-                <td>$320,150.00</td>
-                <td>High</td>
-                <td>Finance</td>
-                <td>11/02/2025</td>
-              </tr>
-              <tr>
-                <td>Infrastructure Upgrade</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000004 - New Invention &
-                    Facility</a></td>
-                <td><span class="status-badge approve">Approve</span></td>
-                <td>Workflow</td>
-                <td>8/1/2025 12:07 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>8/1/2025 12:07 PM</td>
-                <td>Test Account</td>
-                <td>$450,000.00</td>
-                <td>High</td>
-                <td>IT</td>
-                <td>09/15/2025</td>
-              </tr>
-              <tr>
-                <td>Contract Review</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000003 - Conditions of
-                    Contract</a></td>
-                <td><span class="status-badge cancel">Cancel</span></td>
-                <td>Workflow</td>
-                <td>11/15/2025 2:00 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>11/15/2025 2:00 PM</td>
-                <td>Test Account</td>
-                <td>$88,200.00</td>
-                <td>Medium</td>
-                <td>Legal</td>
-                <td>12/10/2025</td>
-              </tr>
-              <tr>
-                <td>Card / Loan Application</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000002 -
-                    Partners_Certific.Local</a></td>
-                <td><span class="status-badge pending">Pending</span></td>
-                <td>Workflow</td>
-                <td>8/21/2025 9:24 PM</td>
-                <td>Obtain Rule Engi...</td>
-                <td>8/21/2025 9:24 PM</td>
-                <td>Test Account</td>
-                <td>$62,450.00</td>
-                <td>Low</td>
-                <td>Finance</td>
-                <td>09/10/2025</td>
-              </tr>
-              <tr>
-                <td>Card / Loan Application</td>
-                <td><a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank"
-                    style="color: #00a2ff; text-decoration: underline;">SPCA MASTERCARD - 20000001 - Reallocation_Loan
-                    Acquisition...</a></td>
-                <td><span class="status-badge approve">Approve</span></td>
-                <td>Workflow</td>
-                <td>7/17/2025 11:22 PM</td>
-                <td>Virtual Instant C...</td>
-                <td>7/17/2025 11:22 PM</td>
-                <td>Test Account</td>
-                <td>$175,300.00</td>
-                <td>High</td>
-                <td>Finance</td>
-                <td>08/30/2025</td>
-              </tr>
+            <tbody id="tableBody">
             </tbody>
           </table>
         </div>
@@ -741,9 +226,9 @@
           <div class="pagination-info">
             <span>Show</span>
             <select id="pageSize">
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
+              <option value="10" selected>10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
             </select>
           </div>
         </div>

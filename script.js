@@ -1,13 +1,18 @@
+let processData = [];
+
 function toggleDarkMode() {
   document.body.classList.toggle('dark-mode');
   const isDarkMode = document.body.classList.contains('dark-mode');
   localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
   
-  if (typeof renderLineChart === 'function') {
-    renderLineChart();
-  }
+  // Update charts when switching dark mode
   if (typeof renderProcessCharts === 'function') {
     renderProcessCharts();
+  }
+  if (typeof updateLineChart === 'function' && lineChartInstance) {
+    const dateFrom = document.getElementById('dateFrom');
+    const dateTo = document.getElementById('dateTo');
+    updateLineChart(dateFrom?.value || '2022-01-01', dateTo?.value || '2025-12-31');
   }
 }
 
@@ -61,45 +66,38 @@ Chart.defaults.plugins.datalabels = {
 };
 
 function getProcessDataFromTable() {
-  const rows = document.querySelectorAll("#dataTable tbody tr");
-  const processData = {};
+  const processCounts = {};
   
-  rows.forEach(row => {
-    const cells = row.cells;
-    if (cells.length >= 3) {
-      const process = cells[0].innerText.trim();
-      const statusElement = cells[2].querySelector('.status-badge');
-      
-      if (statusElement && process) {
-        if (!processData[process]) {
-          processData[process] = {
-            pending: 0,
-            inProgress: 0,
-            approve: 0,
-            completed: 0,
-            cancel: 0
-          };
-        }
-        
-        const statusClass = statusElement.classList[1];
-        if (statusClass === 'pending') processData[process].pending++;
-        else if (statusClass === 'inprogress') processData[process].inProgress++;
-        else if (statusClass === 'approve') processData[process].approve++;
-        else if (statusClass === 'complete') processData[process].completed++;
-        else if (statusClass === 'cancel') processData[process].cancel++;
-      }
+  processData.forEach(item => {
+    const process = item.process;
+    const status = item.status;
+    
+    if (!processCounts[process]) {
+      processCounts[process] = {
+        pending: 0,
+        inProgress: 0,
+        approve: 0,
+        completed: 0,
+        cancel: 0
+      };
     }
+    
+    if (status === 'Pending') processCounts[process].pending++;
+    else if (status === 'In Progress') processCounts[process].inProgress++;
+    else if (status === 'Approve') processCounts[process].approve++;
+    else if (status === 'Complete') processCounts[process].completed++;
+    else if (status === 'Cancel') processCounts[process].cancel++;
   });
   
-  return processData;
+  return processCounts;
 }
 
 let pieCharts = {};
 let selectedProcesses = ['', '', '', '']; 
 
 function initializeProcessDropdowns() {
-  const processData = getProcessDataFromTable();
-  const processes = Object.keys(processData).sort();
+  const processCounts = getProcessDataFromTable();
+  const processes = Object.keys(processCounts).sort();
   
   selectedProcesses = [
     processes[0] || '',
@@ -132,7 +130,7 @@ function initializeProcessDropdowns() {
 }
 
 function updateChart(chartIndex, processName) {
-  const processData = getProcessDataFromTable();
+  const processCounts = getProcessDataFromTable();
   const chartId = `chartProcess${chartIndex}`;
   const titleId = `chartTitle${chartIndex}`;
   
@@ -146,13 +144,13 @@ function updateChart(chartIndex, processName) {
   }
   
   const canvas = document.getElementById(chartId);
-  if (canvas && processData[processName]) {
-    pieCharts[chartId] = new Chart(canvas, pieConfig(processData[processName]));
+  if (canvas && processCounts[processName]) {
+    pieCharts[chartId] = new Chart(canvas, pieConfig(processCounts[processName]));
   }
 }
 
 function renderAllProcessCharts() {
-  const processData = getProcessDataFromTable();
+  const processCounts = getProcessDataFromTable();
   
   selectedProcesses.forEach((processName, index) => {
     if (processName) {
@@ -349,24 +347,24 @@ function renderProcessCharts() {
 let lineChartInstance = null;
 
 function getTableData() {
-  const rows = document.querySelectorAll("#dataTable tbody tr");
   const data = [];
   
-  rows.forEach(row => {
-    const cells = row.cells;
-    if (cells.length >= 5) {
-      const lastUpdated = cells[4].innerText.trim(); 
-      const statusElement = cells[2].querySelector('.status-badge'); 
-      const status = statusElement ? statusElement.classList[1] : '';
-      
-      const parsedDate = parseDate(lastUpdated);
-      if (parsedDate) {
-        data.push({
-          date: parsedDate,
-          dateStr: lastUpdated,
-          status: status
-        });
-      }
+  processData.forEach(item => {
+    const parsedDate = parseDate(item.createdDate);
+    const statusMap = {
+      'Pending': 'pending',
+      'In Progress': 'inprogress',
+      'Approve': 'approve',
+      'Complete': 'complete',
+      'Cancel': 'cancel'
+    };
+    
+    if (parsedDate) {
+      data.push({
+        date: parsedDate,
+        dateStr: item.createdDate,
+        status: statusMap[item.status] || item.status.toLowerCase()
+      });
     }
   });
   
@@ -609,6 +607,8 @@ if (tableSearch) {
 
 if (processFilter) {
   processFilter.addEventListener("change", () => {
+    const selectedProcess = processFilter.value;
+    updateDynamicColumns(selectedProcess);
     applyTableFilters();
   });
 }
@@ -951,5 +951,369 @@ document.addEventListener('keydown', (e) => {
 
 loadDarkModePreference();
 loadMenuState();
-initializeProcessDropdowns();
-updateLineChart('2022-01-01', '2025-12-31');
+// Chart initialization moved to loadProcessData() after data is loaded
+
+// Process-specific column definitions
+const processColumns = {
+  "Card / Loan Application": [
+    { id: 6, name: "Applicant Name" },
+    { id: 7, name: "ID / Account Number" },
+    { id: 8, name: "Loan Amount / Credit Limit" },
+    { id: 9, name: "Interest Rate" },
+    { id: 10, name: "Approval Date" },
+    { id: 11, name: "Supporting Documents" }
+  ],
+  "Budget Review": [
+    { id: 12, name: "Budget Period" },
+    { id: 13, name: "Requested Amount" },
+    { id: 14, name: "Approved Amount" },
+    { id: 15, name: "Cost Center" },
+    { id: 16, name: "Reviewer" },
+    { id: 17, name: "Justification" }
+  ],
+  "Sales Report": [
+    { id: 18, name: "Report Period" },
+    { id: 19, name: "Region / Market" },
+    { id: 20, name: "Sales Amount" },
+    { id: 21, name: "Product Category" }
+  ],
+  "Client Survey": [
+    { id: 22, name: "Client Name" },
+    { id: 23, name: "Survey Date" },
+    { id: 24, name: "Survey Type" },
+    { id: 25, name: "Score / Rating" }
+  ]
+};
+
+// Update dynamic columns based on selected process
+function updateDynamicColumns(selectedProcess) {
+  const dynamicColumnsContainer = document.getElementById('dynamicColumns');
+  if (!dynamicColumnsContainer) return;
+  
+  // Clear existing dynamic columns
+  dynamicColumnsContainer.innerHTML = '';
+  
+  // Hide all process-specific columns in table
+  document.querySelectorAll('.process-specific-column').forEach(th => {
+    th.style.display = 'none';
+  });
+  
+  // Hide all process-specific cells in tbody
+  const tbody = document.querySelector('#dataTable tbody');
+  if (tbody) {
+    tbody.querySelectorAll('tr').forEach(row => {
+      for (let i = 6; i <= 25; i++) {
+        if (row.cells[i]) {
+          row.cells[i].style.display = 'none';
+        }
+      }
+    });
+  }
+  
+  // If a process is selected, show its specific columns
+  if (selectedProcess && processColumns[selectedProcess]) {
+    const columns = processColumns[selectedProcess];
+    
+    columns.forEach(col => {
+      // Add to column manager
+      const option = document.createElement('div');
+      option.className = 'column-option';
+      option.innerHTML = `
+        <input type="checkbox" id="col-${col.id}" checked data-column="${col.id}">
+        <label for="col-${col.id}">${col.name}</label>
+      `;
+      dynamicColumnsContainer.appendChild(option);
+      
+      // Show corresponding table header
+      const th = document.querySelector(`th[data-column="${col.id}"][data-process="${selectedProcess}"]`);
+      if (th) {
+        th.style.display = '';
+      }
+      
+      // Show corresponding table cells
+      if (tbody) {
+        tbody.querySelectorAll('tr').forEach(row => {
+          if (row.cells[col.id]) {
+            row.cells[col.id].style.display = '';
+          }
+        });
+      }
+      
+      // Add event listener to checkbox
+      const checkbox = option.querySelector('input');
+      checkbox.addEventListener('change', (e) => {
+        const columnIndex = parseInt(e.target.getAttribute('data-column'));
+        const isChecked = e.target.checked;
+        
+        const th = document.querySelector(`th[data-column="${columnIndex}"]`);
+        if (th) {
+          th.classList.toggle('hidden', !isChecked);
+        }
+        
+        tbody.querySelectorAll('tr').forEach(row => {
+          const td = row.cells[columnIndex];
+          if (td) {
+            td.classList.toggle('hidden', !isChecked);
+          }
+        });
+      });
+    });
+  }
+}
+
+// Show message when no process is selected
+function showNoProcessMessage() {
+  const tbody = document.querySelector('#dataTable tbody');
+  if (!tbody) return;
+  
+  // Remove existing message if any
+  const existingMessage = tbody.querySelector('.no-process-message');
+  if (existingMessage) {
+    existingMessage.remove();
+  }
+  
+  // Create message row
+  const messageRow = document.createElement('tr');
+  messageRow.className = 'no-process-message';
+  const messageCell = document.createElement('td');
+  messageCell.colSpan = 100;
+  messageCell.style.textAlign = 'center';
+  messageCell.style.padding = '40px 20px';
+  messageCell.style.fontSize = '16px';
+  messageCell.style.color = '#888';
+  messageCell.innerHTML = 'Please select a process from the dropdown above to view data';
+  messageRow.appendChild(messageCell);
+  
+  // Hide all data rows
+  tbody.querySelectorAll('tr:not(.no-process-message)').forEach(row => {
+    row.style.display = 'none';
+  });
+  
+  // Add message row at the beginning
+  tbody.insertBefore(messageRow, tbody.firstChild);
+}
+
+function hideNoProcessMessage() {
+  const tbody = document.querySelector('#dataTable tbody');
+  if (!tbody) return;
+  
+  const messageRow = tbody.querySelector('.no-process-message');
+  if (messageRow) {
+    messageRow.remove();
+  }
+  
+  // Show all data rows (filtering will be applied by applyTableFilters)
+  tbody.querySelectorAll('tr').forEach(row => {
+    row.style.display = '';
+  });
+}
+
+// Initialize table display (show message when no process is selected)
+function initializeTableDisplay() {
+  const processFilter = document.getElementById("processFilter");
+  
+  if (processFilter) {
+    // Check if a process is already selected
+    if (!processFilter.value) {
+      showNoProcessMessage();
+    } else {
+      hideNoProcessMessage();
+      updateDynamicColumns(processFilter.value);
+    }
+  }
+}
+
+// Load JSON data and render table
+async function loadProcessData() {
+  try {
+    const response = await fetch('data/processes.json');
+    processData = await response.json();
+    renderTableData();
+    initializeTableDisplay();
+    
+    // Initialize charts after data is loaded
+    if (typeof initializeProcessDropdowns === 'function') {
+      initializeProcessDropdowns();
+    }
+    if (typeof updateLineChart === 'function') {
+      updateLineChart('2022-01-01', '2025-12-31');
+    }
+    
+    // Initialize pagination after data is loaded
+    if (typeof initPagination === 'function') {
+      setTimeout(() => initPagination(), 100);
+    }
+  } catch (error) {
+    console.error('Error loading process data:', error);
+  }
+}
+
+// Render table rows from JSON data
+function renderTableData(filterProcess = '') {
+  const tbody = document.querySelector('#dataTable tbody');
+  if (!tbody) return;
+  
+  tbody.innerHTML = '';
+  
+  // Filter data if process is selected
+  const filteredData = filterProcess ? processData.filter(item => item.process === filterProcess) : processData;
+  
+  filteredData.forEach(item => {
+    const row = document.createElement('tr');
+    
+    // Create status badge HTML
+    const statusClass = item.status.toLowerCase().replace(' ', '');
+    const statusBadge = `<span class=\"status-badge ${statusClass}\">${item.status}</span>`;
+    
+    // Create instance link
+    const instanceLink = `<a href=\"https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1\" target=\"_blank\" style=\"color: #00a2ff; text-decoration: underline;\">${item.instance}</a>`;
+    
+    // Common columns (0-5)
+    row.innerHTML = `
+      <td>${item.process}</td>
+      <td>${instanceLink}</td>
+      <td>${item.createdDate}</td>
+      <td>${item.department}</td>
+      <td>${statusBadge}</td>
+      <td>${item.assignedTo}</td>
+    `;
+    
+    // Process-specific columns (6-25)
+    if (item.process === 'Card / Loan Application') {
+      row.innerHTML += `
+        <td>${item.applicantName || ''}</td>
+        <td>${item.idAccountNumber || ''}</td>
+        <td>${item.loanAmountCreditLimit || ''}</td>
+        <td>${item.interestRate || ''}</td>
+        <td>${item.approvalDate || ''}</td>
+        <td>${item.supportingDocuments || ''}</td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+      `;
+    } else if (item.process === 'Budget Review') {
+      row.innerHTML += `
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td>${item.budgetPeriod || ''}</td>
+        <td>${item.requestedAmount || ''}</td>
+        <td>${item.approvedAmount || ''}</td>
+        <td>${item.costCenter || ''}</td>
+        <td>${item.reviewer || ''}</td>
+        <td>${item.justification || ''}</td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+      `;
+    } else if (item.process === 'Sales Report') {
+      row.innerHTML += `
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td>${item.reportPeriod || ''}</td>
+        <td>${item.regionMarket || ''}</td>
+        <td>${item.salesAmount || ''}</td>
+        <td>${item.productCategory || ''}</td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+      `;
+    } else if (item.process === 'Client Survey') {
+      row.innerHTML += `
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td style=\"display:none;\"></td>
+        <td>${item.clientName || ''}</td>
+        <td>${item.surveyDate || ''}</td>
+        <td>${item.surveyType || ''}</td>
+        <td>${item.scoreRating || ''}</td>
+      `;
+    } else {
+      // Empty columns for unknown process types
+      for (let i = 0; i < 20; i++) {
+        row.innerHTML += `<td style=\"display:none;\"></td>`;
+      }
+    }
+    
+    tbody.appendChild(row);
+  });
+  
+  // Apply current column visibility based on selected process
+  const processFilter = document.getElementById('processFilter');
+  if (processFilter && processFilter.value) {
+    updateDynamicColumns(processFilter.value);
+  }
+  
+  // Update pagination after rendering table data
+  if (typeof currentPage !== 'undefined') {
+    currentPage = 1;
+  }
+  if (typeof updatePagination === 'function') {
+    setTimeout(() => updatePagination(), 50);
+  }
+}
+
+// Update applyTableFilters to handle table visibility
+const originalApplyTableFilters = applyTableFilters;
+applyTableFilters = function() {
+  const processFilter = document.getElementById("processFilter");
+  
+  if (processFilter) {
+    if (!processFilter.value) {
+      showNoProcessMessage();
+      return;
+    } else {
+      hideNoProcessMessage();
+    }
+  }
+  
+  originalApplyTableFilters();
+};
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  loadProcessData();
+});
