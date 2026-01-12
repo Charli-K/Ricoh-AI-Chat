@@ -725,6 +725,10 @@ body.dark-mode .message-avatar {
   border-color: rgba(102, 126, 234, 0.3);
 }
 
+body.dark-mode .message-avatar img {
+  filter: brightness(0) invert(1);
+}
+
 body.dark-mode .assistant-message .message-text {
   background: rgba(42, 48, 60, 0.8);
   border-color: rgba(102, 126, 234, 0.2);

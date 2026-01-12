@@ -119,7 +119,7 @@ function addMessage(text, isUser = false) {
   const messageDiv = document.createElement('div');
   messageDiv.className = `message ${isUser ? 'user-message' : 'assistant-message'}`;
 
-  const avatar = isUser ? '👤' : '🤖';
+  const avatar = isUser ? '<img src="assets/user-svgrepo-com.svg" alt="User" width="30" />' : '<img src="assets/bot-svgrepo-com.svg" alt="Assistant" width="30" />';
 
   messageDiv.innerHTML = `
     <div class="message-avatar">${avatar}</div>

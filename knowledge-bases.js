@@ -173,8 +173,8 @@ function renderKnowledgeBases(filter = '', sortBy = 'name') {
           <div class="kb-card-category">${kb.category}</div>
         </div>
         <div class="kb-card-actions">
-          <button class="kb-action-btn edit" onclick="event.stopPropagation(); editKnowledgeBase(${kb.id})" title="Edit"><img src="assets/edit.png" alt="Edit" width="20" /></button>
-          <button class="kb-action-btn delete" onclick="event.stopPropagation(); deleteKnowledgeBase(${kb.id})" title="Delete"><img src="assets/delete.png" alt="Delete" width="20" /></button>
+          <button class="kb-action-btn edit" onclick="event.stopPropagation(); editKnowledgeBase(${kb.id})" title="Edit"><img src="assets/edit-svgrepo-com.svg" alt="Edit" width="20" /></button>
+          <button class="kb-action-btn delete" onclick="event.stopPropagation(); deleteKnowledgeBase(${kb.id})" title="Delete"><img src="assets/delete-cross-fill-svgrepo-com.svg" alt="Delete" width="20" /></button>
         </div>
       </div>
       <p class="kb-card-description">${kb.description || 'No description available'}</p>
