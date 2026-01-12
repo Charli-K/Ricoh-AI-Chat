@@ -3,6 +3,11 @@ body {
   height: 100vh;
 }
 
+.container {
+  padding-top: 0;
+  margin-top: 0;
+}
+
 .nav-menu button.active {
   background: rgba(0, 0, 0, 0.1);
   font-weight: 600;
@@ -14,9 +19,9 @@ body {
   flex-direction: column;
   background: #ffffff;
   overflow: hidden;
-  min-height:50px;
-
-
+  min-height: 30px;
+  height: calc(100vh - 70px);
+  margin-top: 0;
 }
 
 body.dark-mode .chat-main-content {
@@ -69,16 +74,14 @@ body.dark-mode .chat-main-content {
 
 .chat-messages {
   flex: 1;
-  height: 100%;
-  min-height: 100px;
-  max-height: 700px;
+  min-height: 200px;
   padding: 24px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
   gap: 20px;
-  scrollbar-width: none;
+  scrollbar-width: thin;
 }
 
 body.dark-mode .chat-messages {

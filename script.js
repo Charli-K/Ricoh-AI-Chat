@@ -1079,9 +1079,10 @@ function showNoProcessMessage() {
   messageCell.colSpan = 100;
   messageCell.style.textAlign = 'center';
   messageCell.style.padding = '40px 20px';
-  messageCell.style.fontSize = '16px';
+  messageCell.style.fontSize = '24px';
+  messageCell.style.fontWeight = '600';
   messageCell.style.color = '#888';
-  messageCell.innerHTML = 'Please select a process from the dropdown above to view data';
+  messageCell.innerHTML = 'Please select a process from the dropdown above to view data' ;
   messageRow.appendChild(messageCell);
   
   // Hide all data rows
@@ -1315,5 +1316,15 @@ applyTableFilters = function() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
+  // Set dateTo to today's date
+  const dateToInput = document.getElementById('dateTo');
+  if (dateToInput) {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    dateToInput.value = `${year}-${month}-${day}`;
+  }
+  
   loadProcessData();
 });

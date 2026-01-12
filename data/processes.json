@@ -1298,5 +1298,17 @@
     "surveyDate": "06/15/2025",
     "surveyType": "Annual Survey",
     "scoreRating": "4.7/5.0"
+  },
+    {
+    "process": "Client Survey",
+    "instance": "SPCA MASTERCARD - 20000280 - Annual Satisfaction Survey",
+    "createdDate": "01/20/2026 4:00 AM",
+    "department": "Operations",
+    "status": "Cancel",
+    "assignedTo": "Test Account",
+    "clientName": "Enterprise Global",
+    "surveyDate": "01/12/2026",
+    "surveyType": "Annual Survey",
+    "scoreRating": "4.7/5.0"
   }
 ]
