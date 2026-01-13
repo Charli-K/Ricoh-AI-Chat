@@ -40,17 +40,12 @@ function loadDarkModePreference() {
 loadDarkModePreference();
 loadMenuState();
 
-// Initialize everything after DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {
   console.log('DOM loaded, initializing...');
   
-  // Load knowledge base details
   loadKnowledgeBaseDetails();
 });
 
-// Knowledge Bases Details Page Script
-
-// Default knowledge bases data
 const defaultKnowledgeBases = [
   {
     id: 1,
@@ -180,16 +175,16 @@ function formatFileSize(bytes) {
 function getFileIcon(filename) {
   const ext = filename.split('.').pop().toLowerCase();
   const icons = {
-    pdf: '📕',
-    doc: '📘',
-    docx: '📘',
-    txt: '📄',
-    xlsx: '📊',
-    xls: '📊',
-    ppt: '📙',
-    pptx: '📙'
+    pdf: '',
+    doc: '',
+    docx: '',
+    txt: '',
+    xlsx: '',
+    xls: '',
+    ppt: '',
+    pptx: ''
   };
-  return icons[ext] || '📄';
+  return icons[ext] || '';
 }
 
 function loadKnowledgeBaseDetails() {
@@ -241,26 +236,6 @@ function loadKnowledgeBaseDetails() {
 
   // Load files
   allFiles = currentKnowledgeBase.documents || [];
-  
-  // If no documents with pages, add sample documents for demo purposes
-  if (allFiles.length === 0 || !allFiles.some(f => f.pages && f.pages.length > 0)) {
-    allFiles = [
-      { 
-        name: "Sample_CV_1.pdf", 
-        size: 234000,
-        pages: [
-          { page: 1, content: "Jane A. Smith 456 Oak Avenue, Springfield, IL 62701 | (217) 555-1234 | jane.smith@email.com | linkedin.com/in/janesmith Professional Summary Results-oriented Human Resources professional with over 6 years of experience in talent acquisition, employee engagement, and HR policy development. Proficient in fostering inclusive workplace cultures and driving strategic HR initiatives. Skilled in leveraging HR analytics to improve retention and streamline processes. Passionate about aligning HR practices with organizational objectives to support business growth." },
-        ]
-      },
-      { 
-        name: "Sample_CV_4.pdf", 
-        size: 267000,
-        pages: [
-          { page: 1, content: "Michael T. Lee 654 Cedar Lane, Denver, CO 80203 | (303) 555-3210 | michael.lee@email.com | linkedin.com/in/michaeltlee Professional Summary Accomplished Human Resources professional with 7 years of experience in recruitment, employee engagement, and HR policy development. Skilled in leveraging HR analytics to optimize workforce planning and enhance organizational performance. Proficient in fostering collaborative workplace cultures and ensuring compliance with labor regulations. Dedicated to driving strategic HR solutions that align with business objectives." },
-        ]
-      }
-    ];
-  }
   
   // Build document pages index for search
   allDocumentPages = [];
@@ -366,11 +341,11 @@ function getHighlightedSnippet(content, searchTerm) {
   const lowerSearchTerm = searchTerm.toLowerCase();
   const index = lowerContent.indexOf(lowerSearchTerm);
   
-  if (index === -1) return content.substring(0, 300) + '...';
+  if (index === -1) return content.substring(0, 500) + '...';
   
   // Get context around the search term - show more characters
-  const start = Math.max(0, index - 150);
-  const end = Math.min(content.length, index + searchTerm.length + 300);
+  const start = Math.max(0, index - 500);
+  const end = Math.min(content.length, index + searchTerm.length + 500);
   let snippet = content.substring(start, end);
   
   // Add ellipsis if needed

@@ -482,10 +482,33 @@ function setupFileUpload() {
 function handleFiles(files) {
   Array.from(files).forEach(file => {
     if (!uploadedFiles.some(f => f.name === file.name)) {
-      uploadedFiles.push({
+      const fileData = {
         name: file.name,
         size: file.size
-      });
+      };
+      
+      // Add sample pages content for PDF files to enable search functionality
+      if (file.name.toLowerCase().endsWith('.pdf')) {
+        // Check if it's a CV file and add appropriate content
+        if (file.name.toLowerCase().includes('cv') || file.name.toLowerCase().includes('resume')) {
+          fileData.pages = [
+            { 
+              page: 1, 
+              content: "Jane A. Smith 456 Oak Avenue, Springfield, IL 62701 | (217) 555-1234 | jane.smith@email.com | linkedin.com/in/janesmith Professional Summary Results-oriented Human Resources professional with over 6 years of experience in talent acquisition, employee engagement, and HR policy development. Proficient in fostering inclusive workplace cultures and driving strategic HR initiatives. Skilled in leveraging HR analytics to improve retention and streamline processes. Passionate about aligning HR practices with organizational objectives to support business growth. Work Experience Human Resources Manager Horizon Enterprises, Springfield, IL June 2020 - Present Managed recruitment for 65+ roles annually, achieving a 92% offer acceptance rate. Designed and implemented employee engagement programs, increasing retention by 18%. Administered payroll and benefits, resolving 96% of inquiries within 24 hours." 
+            }
+          ];
+        } else {
+          // Generic PDF content
+          fileData.pages = [
+            { 
+              page: 1, 
+              content: `Document: ${file.name}. This is a sample document that contains various information and data. You can search for keywords within this document to find relevant content.` 
+            }
+          ];
+        }
+      }
+      
+      uploadedFiles.push(fileData);
     }
   });
   renderUploadedFiles();
@@ -519,16 +542,16 @@ function removeFile(index) {
 function getFileIcon(filename) {
   const ext = filename.split('.').pop().toLowerCase();
   const icons = {
-    pdf: '📕',
-    doc: '📘',
-    docx: '📘',
-    txt: '📄',
-    xlsx: '📊',
-    xls: '📊',
-    ppt: '📙',
-    pptx: '📙'
+    pdf: '',
+    doc: '',
+    docx: '',
+    txt: '',
+    xlsx: '',
+    xls: '',
+    ppt: '',
+    pptx: ''
   };
-  return icons[ext] || '📄';
+  return icons[ext] || '';
 }
 
 function formatFileSize(bytes) {

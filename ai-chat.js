@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Show welcome message from assistant
     setTimeout(() => {
-      addMessage(`I'm now using the "${selectedKBName}" knowledge base.`, false);
+      addMessage(`I'm now using the "${selectedKBName}" Knowledge Base.`, false);
     }, 500);
   }
 });

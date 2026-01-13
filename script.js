@@ -5,7 +5,6 @@ function toggleDarkMode() {
   const isDarkMode = document.body.classList.contains('dark-mode');
   localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
   
-  // Update charts when switching dark mode
   if (typeof renderProcessCharts === 'function') {
     renderProcessCharts();
   }
@@ -951,9 +950,6 @@ document.addEventListener('keydown', (e) => {
 
 loadDarkModePreference();
 loadMenuState();
-// Chart initialization moved to loadProcessData() after data is loaded
-
-// Process-specific column definitions
 const processColumns = {
   "Card / Loan Application": [
     { id: 6, name: "Applicant Name" },
