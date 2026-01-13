@@ -87,7 +87,7 @@
 
         <div class="chat-input-container">
           <div class="chat-input-wrapper">
-            <button class="btn-icon" onclick="document.getElementById('fileUpload').click()" title="Upload File">
+            <button class="btn-icon" onclick="openFileSelectionModal()" title="Upload File">
               <img src="assets/upload-svgrepo-com.svg" alt="Upload File" width="20" />
             </button>
             <input type="file" id="fileUpload" style="display: none;" onchange="handleFileUpload(event)" multiple />
@@ -123,6 +123,28 @@
         <div class="kb-modal-footer">
           <button class="btn-secondary" onclick="closeKnowledgeBaseModal()">Cancel</button>
           <button class="btn-primary" onclick="saveKnowledgeBaseSelection()">Apply Selection</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="kb-modal" id="fileSelectionModal">
+      <div class="kb-modal-overlay" onclick="closeFileSelectionModal()"></div>
+      <div class="kb-modal-content">
+        <div class="kb-modal-header">
+          <h2>Select Files from Knowledge Bases</h2>
+          <button class="kb-modal-close" onclick="closeFileSelectionModal()">×</button>
+        </div>
+        <div class="kb-modal-body">
+          <p class="kb-modal-subtitle">Select files from your knowledge bases to attach to the chat</p>
+          <div class="file-selection-list" id="fileSelectionList">
+            <div class="empty-state">
+              <div class="empty-state-text">Loading files...</div>
+            </div>
+          </div>
+        </div>
+        <div class="kb-modal-footer">
+          <button class="btn-secondary" onclick="closeFileSelectionModal()">Cancel</button>
+          <button class="btn-primary" onclick="attachSelectedFiles()">Attach Selected Files</button>
         </div>
       </div>
     </div>

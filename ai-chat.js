@@ -182,7 +182,7 @@ function showTypingIndicator() {
   typingDiv.id = 'typingIndicator';
 
   typingDiv.innerHTML = `
-    <div class="message-avatar">🤖</div>
+    <div class="message-avatar"><img src="assets/bot-svgrepo-com.svg" alt="Assistant" width="30" /></div>
     <div class="message-content">
       <div class="message-text">
         <div class="typing-indicator">
@@ -320,13 +320,23 @@ function updateFilePreview() {
   }
 
   filePreviewArea.style.display = 'flex';
-  filePreviewArea.innerHTML = attachedFiles.map((file, index) => `
-    <div class="file-preview-item">
-      <span class="file-icon">📄</span>
-      <span class="file-name">${file.name}</span>
-      <button class="file-remove" onclick="removeFile(${index})">×</button>
-    </div>
-  `).join('');
+  filePreviewArea.innerHTML = attachedFiles.map((file, index) => {
+    const fileName = file.name || file.fileName;
+    const fileSize = file.size ? formatFileSize(file.size) : (file.fileSize ? formatFileSize(file.fileSize) : '');
+    const source = file.source ? `<span class="file-source">${file.source}</span>` : '';
+    
+    return `
+      <div class="file-preview-item">
+        <span class="file-icon">📄</span>
+        <div class="file-info">
+          <span class="file-name">${fileName}</span>
+          ${source}
+          ${fileSize ? `<span class="file-size">${fileSize}</span>` : ''}
+        </div>
+        <button class="file-remove" onclick="removeFile(${index})">×</button>
+      </div>
+    `;
+  }).join('');
 }
 
 function removeFile(index) {
@@ -438,3 +448,108 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 500);
   }
 });
+
+// File Selection Modal Functions
+function openFileSelectionModal() {
+  const modal = document.getElementById('fileSelectionModal');
+  const fileList = document.getElementById('fileSelectionList');
+  
+  // Load knowledge bases from localStorage
+  const knowledgeBases = loadKnowledgeBasesFromStorage();
+  
+  // Collect all files from all knowledge bases
+  let allFiles = [];
+  knowledgeBases.forEach(kb => {
+    if (kb.documents && kb.documents.length > 0) {
+      kb.documents.forEach(doc => {
+        allFiles.push({
+          kbName: kb.name,
+          kbId: kb.id,
+          fileName: doc.name,
+          fileSize: doc.size,
+          fileData: doc
+        });
+      });
+    }
+  });
+  
+  // Render file list
+  if (allFiles.length === 0) {
+    fileList.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-text">No files available</div>
+        <div class="empty-state-subtext">Upload files to your knowledge bases first</div>
+      </div>
+    `;
+  } else {
+    fileList.innerHTML = allFiles.map((file, index) => `
+      <div class="file-selection-item" onclick="toggleFileSelection(${index})">
+        <input type="checkbox" id="file-${index}" class="file-checkbox" />
+        <div class="file-selection-info">
+          <div class="file-selection-name">${file.fileName}</div>
+          <div class="file-selection-meta">
+            <span class="file-selection-kb">${file.kbName}</span>
+            <span class="file-selection-size">${formatFileSize(file.fileSize)}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  // Store files data for later use
+  window.availableFiles = allFiles;
+  
+  modal.classList.add('active');
+}
+
+function closeFileSelectionModal() {
+  const modal = document.getElementById('fileSelectionModal');
+  modal.classList.remove('active');
+}
+
+function toggleFileSelection(index) {
+  const checkbox = document.getElementById(`file-${index}`);
+  checkbox.checked = !checkbox.checked;
+}
+
+function attachSelectedFiles() {
+  const checkboxes = document.querySelectorAll('.file-checkbox:checked');
+  
+  checkboxes.forEach(checkbox => {
+    const index = parseInt(checkbox.id.split('-')[1]);
+    const file = window.availableFiles[index];
+    
+    // Add to attached files if not already attached
+    if (!attachedFiles.some(f => f.name === file.fileName)) {
+      attachedFiles.push({
+        name: file.fileName,
+        size: file.fileSize,
+        source: `Knowledge Base: ${file.kbName}`
+      });
+    }
+  });
+  
+  updateFilePreview();
+  closeFileSelectionModal();
+}
+
+function loadKnowledgeBasesFromStorage() {
+  const stored = localStorage.getItem('knowledgeBases');
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      console.error('Error parsing knowledge bases:', e);
+      return [];
+    }
+  }
+  return [];
+}
+
+function formatFileSize(bytes) {
+  if (!bytes || bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+}

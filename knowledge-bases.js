@@ -489,20 +489,35 @@ function handleFiles(files) {
       
       // Add sample pages content for PDF files to enable search functionality
       if (file.name.toLowerCase().endsWith('.pdf')) {
-        // Check if it's a CV file and add appropriate content
-        if (file.name.toLowerCase().includes('cv') || file.name.toLowerCase().includes('resume')) {
+        // Check for specific known sample files
+        if (file.name === 'Sample CV 1.pdf' || file.name === 'Sample_CV_1.pdf') {
           fileData.pages = [
             { 
               page: 1, 
-              content: "Jane A. Smith 456 Oak Avenue, Springfield, IL 62701 | (217) 555-1234 | jane.smith@email.com | linkedin.com/in/janesmith Professional Summary Results-oriented Human Resources professional with over 6 years of experience in talent acquisition, employee engagement, and HR policy development. Proficient in fostering inclusive workplace cultures and driving strategic HR initiatives. Skilled in leveraging HR analytics to improve retention and streamline processes. Passionate about aligning HR practices with organizational objectives to support business growth. Work Experience Human Resources Manager Horizon Enterprises, Springfield, IL June 2020 - Present Managed recruitment for 65+ roles annually, achieving a 92% offer acceptance rate. Designed and implemented employee engagement programs, increasing retention by 18%. Administered payroll and benefits, resolving 96% of inquiries within 24 hours." 
+              content: "Jane A. Smith 456 Oak Avenue, Springfield, IL 62701 | (217) 555-1234 | jane.smith@email.com | linkedin.com/in/janesmith Professional Summary Results-oriented Human Resources professional with over 6 years of experience in talent acquisition, employee engagement, and HR policy development. Proficient in fostering inclusive workplace cultures and driving strategic HR initiatives. Skilled in leveraging HR analytics to improve retention and streamline processes. Passionate about aligning HR practices with organizational objectives to support business growth. Work Experience Human Resources Manager Horizon Enterprises, Springfield, IL June 2020 - Present Managed recruitment for 65+ roles annually, achieving a 92% offer acceptance rate. Designed and implemented employee engagement programs, increasing retention by 18%. Administered payroll and benefits, resolving 96% of inquiries within 24 hours. Conducted compliance audits for HRIS data, reducing errors by 15%." 
+            }
+          ];
+        } else if (file.name === 'Sample CV 4.pdf' || file.name === 'Sample_CV_4.pdf') {
+          fileData.pages = [
+            { 
+              page: 1, 
+              content: "Michael T. Lee 654 Cedar Lane, Denver, CO 80203 | (303) 555-3210 | michael.lee@email.com | linkedin.com/in/michaeltlee Professional Summary Accomplished Human Resources professional with 7 years of experience in recruitment, employee engagement, and HR policy development. Skilled in leveraging HR analytics to optimize workforce planning and enhance organizational performance. Proficient in fostering collaborative workplace cultures and ensuring compliance with labor regulations. Dedicated to driving strategic HR solutions that align with business objectives. Work Experience Human Resources Manager Summit Peak Consulting Group, Boulder, CO August 2017 May 2019 Oversaw performance management for 280+ employees, implementing a goal-setting framework that increased productivity by 12%." 
+            }
+          ];
+        } else if (file.name.toLowerCase().includes('cv') || file.name.toLowerCase().includes('resume')) {
+          // Generic CV content for other CV files
+          fileData.pages = [
+            { 
+              page: 1, 
+              content: "Professional Summary Experienced professional with extensive background in business development, project management, and strategic planning. Skilled in leading cross-functional teams and driving organizational growth. Work Experience Senior Manager ABC Corporation 2018 - Present Led multiple high-impact projects resulting in 25% revenue growth. Managed team of 15+ professionals across various departments. Education Master of Business Administration University 2016" 
             }
           ];
         } else {
-          // Generic PDF content
+          // Generic PDF content for non-CV files
           fileData.pages = [
             { 
               page: 1, 
-              content: `Document: ${file.name}. This is a sample document that contains various information and data. You can search for keywords within this document to find relevant content.` 
+              content: `${file.name.replace('.pdf', '')} - This document contains detailed information about various topics including business processes, technical specifications, and operational guidelines. Key areas covered include implementation strategies, best practices, performance metrics, and compliance requirements. For more information, please refer to the complete document.` 
             }
           ];
         }

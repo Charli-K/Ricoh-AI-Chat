@@ -31,14 +31,13 @@
   gap: 16px;
 }
 
-/* Chat with KB Button */
 .btn-chat-with-kb {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 14px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #008680;
   color: white;
   border: none;
   border-radius: 8px;
