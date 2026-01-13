@@ -40,7 +40,8 @@ function loadDarkModePreference() {
 loadDarkModePreference();
 loadMenuState();
 
-let knowledgeBases = [
+// Default knowledge bases data
+const defaultKnowledgeBases = [
   {
     id: 1,
     name: "Product Documentation",
@@ -105,9 +106,87 @@ let knowledgeBases = [
       { name: "Training_Guide.pdf", size: 1890000 }
     ]
   },
+  {
+    id: 6,
+    name: "CVs",
+    description: "Sample CVs and resumes for HR reference.",
+    category: "general",
+    status: "active",
+    createdDate: "2024-05-15",
+    modifiedDate: "2026-01-13",
+    path: "\\Knowledge Base\\Default",
+    documents: [
+      { 
+        name: "Sample_CV_1.pdf", 
+        size: 234000,
+        pages: [
+          { page: 1, content: "Jane A. Smith 456 Oak Avenue, Springfield, IL 62701 | (217) 555-1234 | jane.smith@email.com | linkedin.com/in/janesmith Professional Summary Results-oriented Human Resources professional with over 6 years of experience in talent acquisition, employee engagement, and HR policy development. Proficient in fostering inclusive workplace cultures and driving strategic HR initiatives. Skilled in leveraging HR analytics to improve retention and streamline processes. Passionate about aligning HR practices with organizational objectives to support business growth." },
+        ]
+      },
+      { 
+        name: "Sample_CV_2.pdf", 
+        size: 189000,
+        pages: [
+          { page: 1, content: "Alex R. Johnson 789 Pine Road, Austin, TX 78701 | (512) 555-9876 | alex.johnson@email.com | linkedin.com/in/alexjohnson Professional Summary Dynamic Human Resources professional with 7 years of experience in talent management, employee relations, and organizational development. Expert in designing recruitment strategies and fostering positive workplace environments. Proficient in HR analytics to drive data-informed decisions and enhance employee satisfaction. Committed to supporting business objectives through strategic HR initiatives." },
+        ]
+      },
+      { 
+        name: "Sample_CV_4.pdf", 
+        size: 267000,
+        pages: [
+          { page: 1, content: "Michael T. Lee 654 Cedar Lane, Denver, CO 80203 | (303) 555-3210 | michael.lee@email.com | linkedin.com/in/michaeltlee Professional Summary Accomplished Human Resources professional with 7 years of experience in recruitment, employee engagement, and HR policy development. Skilled in leveraging HR analytics to optimize workforce planning and enhance organizational performance. Proficient in fostering collaborative workplace cultures and ensuring compliance with labor regulations. Dedicated to driving strategic HR solutions that align with business objectives." },
+          { page: 2, content: "Work Experience Human Resources Manager Summit Peak Consulting Group, Boulder, CO August 2017 May 2019 Oversaw performance management for 280+ employees, implementing a goal-setting framework that increased productivity by 12. Designed training modules on workplace ethics, achieving 98% completion rate. Managed recruitment for 65+ roles annually, achieving a 92% offer acceptance rate." },
+          { page: 3, content: "HR Generalist Peak Consulting Group, Boulder, CO August 2017 May 2019 Managed recruitment for 65+ roles annually, achieving a 92% completion rate. Administered payroll and benefits, resolving 96% of inquiries within 24 hours. Conducted compliance audits for HRIS data, reducing errors by 15%." },
+          { page: 4, content: "Administered payroll and benefits, resolving 96% of inquiries within 24 hours. Conducted compliance audits for HRIS data, reducing errors by 15%. Supported policy development to align with Colorado employment laws, minimizing legal risks. Education Bachelor of Science in Human Resource Management University of Colorado, Denver Graduated May 2015" }
+        ]
+      }
+    ]
+  },
 ];
 
-let nextId = 6;
+// Load knowledge bases from localStorage or use default
+function loadKnowledgeBases() {
+  const stored = localStorage.getItem('knowledgeBases');
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      console.error('Error parsing stored knowledge bases:', e);
+      return [...defaultKnowledgeBases];
+    }
+  }
+  return [...defaultKnowledgeBases];
+}
+
+// Save knowledge bases to localStorage
+function saveKnowledgeBases() {
+  try {
+    localStorage.setItem('knowledgeBases', JSON.stringify(knowledgeBases));
+  } catch (e) {
+    console.error('Error saving knowledge bases to localStorage:', e);
+  }
+}
+
+// Load next ID from localStorage or calculate from existing data
+function loadNextId() {
+  const stored = localStorage.getItem('knowledgeBasesNextId');
+  if (stored) {
+    return parseInt(stored);
+  }
+  // Calculate from existing data
+  if (knowledgeBases.length > 0) {
+    return Math.max(...knowledgeBases.map(kb => kb.id)) + 1;
+  }
+  return 7;
+}
+
+// Save next ID to localStorage
+function saveNextId() {
+  localStorage.setItem('knowledgeBasesNextId', nextId.toString());
+}
+
+let knowledgeBases = loadKnowledgeBases();
+let nextId = loadNextId();
 let currentEditId = null;
 let currentDeleteId = null;
 let uploadedFiles = [];
@@ -290,8 +369,10 @@ function saveKnowledgeBase(e) {
       modifiedDate: new Date().toISOString().split('T')[0],
       documents: [...uploadedFiles]
     });
+    saveNextId();
   }
   
+  saveKnowledgeBases();
   closeModal();
   renderKnowledgeBases(kbSearch.value, kbSort.value);
 }
@@ -309,6 +390,7 @@ function deleteKnowledgeBase(id) {
 function confirmDelete() {
   if (currentDeleteId) {
     knowledgeBases = knowledgeBases.filter(kb => kb.id !== currentDeleteId);
+    saveKnowledgeBases();
     currentDeleteId = null;
     closeDeleteModal();
     renderKnowledgeBases(kbSearch.value, kbSort.value);

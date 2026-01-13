@@ -422,4 +422,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (input) {
     input.focus();
   }
+  
+  // Check if user came from a knowledge base details page
+  const selectedKBId = localStorage.getItem('selectedKnowledgeBaseId');
+  const selectedKBName = localStorage.getItem('selectedKnowledgeBaseName');
+  
+  if (selectedKBId && selectedKBName) {
+    // Clear the stored values
+    localStorage.removeItem('selectedKnowledgeBaseId');
+    localStorage.removeItem('selectedKnowledgeBaseName');
+    
+    // Show welcome message from assistant
+    setTimeout(() => {
+      addMessage(`I'm now using the "${selectedKBName}" knowledge base.`, false);
+    }, 500);
+  }
 });

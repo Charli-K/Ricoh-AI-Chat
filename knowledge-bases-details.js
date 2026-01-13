@@ -49,7 +49,9 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Knowledge Bases Details Page Script
-let knowledgeBases = [
+
+// Default knowledge bases data
+const defaultKnowledgeBases = [
   {
     id: 1,
     name: "Product Documentation",
@@ -101,23 +103,61 @@ let knowledgeBases = [
   },
   {
     id: 5,
-    name: "Sales Training Materials",
-    description: "Training materials and resources for sales team including pitch decks and product comparisons.",
+    name: "CVs",
+    description: "Sample CVs and resumes for HR reference.",
     category: "general",
-    status: "inactive",
+    status: "active",
     createdDate: "2024-05-15",
     modifiedDate: "2024-09-20",
-    path: "\\Knowledge Base A\\Sales",
+    path: "\\Knowledge Base A\\HR\\CVs",
     documents: [
-      { name: "Sales_Pitch_Deck.pptx", size: 5678000 },
-      { name: "Product_Comparison.xlsx", size: 234000 },
-      { name: "Training_Guide.pdf", size: 1890000 }
+      { 
+        name: "Sample_CV_1.pdf", 
+        size: 234000,
+        pages: [
+          { page: 1, content: "Jane A. Smith 456 Oak Avenue, Springfield, IL 62701 | (217) 555-1234 | jane.smith@email.com | linkedin.com/in/janesmith Professional Summary Results-oriented Human Resources professional with over 6 years of experience in talent acquisition, employee engagement, and HR policy development. Proficient in fostering inclusive workplace cultures and driving strategic HR initiatives. Skilled in leveraging HR analytics to improve retention and streamline processes. Passionate about aligning HR practices with organizational objectives to support business growth." },
+        ]
+      },
+      { 
+        name: "Sample_CV_2.pdf", 
+        size: 189000,
+        pages: [
+          { page: 1, content: "Alex R. Johnson 789 Pine Road, Austin, TX 78701 | (512) 555-9876 | alex.johnson@email.com | linkedin.com/in/alexjohnson Professional Summary Dynamic Human Resources professional with 7 years of experience in talent management, employee relations, and organizational development. Expert in designing recruitment strategies and fostering positive workplace environments. Proficient in HR analytics to drive data-informed decisions and enhance employee satisfaction. Committed to supporting business objectives through strategic HR initiatives." },
+        ]
+      },
+      { 
+        name: "Sample_CV_4.pdf", 
+        size: 267000,
+        pages: [
+          { page: 1, content: "Michael T. Lee 654 Cedar Lane, Denver, CO 80203 | (303) 555-3210 | michael.lee@email.com | linkedin.com/in/michaeltlee Professional Summary Accomplished Human Resources professional with 7 years of experience in recruitment, employee engagement, and HR policy development. Skilled in leveraging HR analytics to optimize workforce planning and enhance organizational performance. Proficient in fostering collaborative workplace cultures and ensuring compliance with labor regulations. Dedicated to driving strategic HR solutions that align with business objectives." },
+          { page: 2, content: "Work Experience Human Resources Manager Summit Peak Consulting Group, Boulder, CO August 2017 May 2019 Oversaw performance management for 280+ employees, implementing a goal-setting framework that increased productivity by 12. Designed training modules on workplace ethics, achieving 98% completion rate. Managed recruitment for 65+ roles annually, achieving a 92% offer acceptance rate." },
+          { page: 3, content: "HR Generalist Peak Consulting Group, Boulder, CO August 2017 May 2019 Managed recruitment for 65+ roles annually, achieving a 92% completion rate. Administered payroll and benefits, resolving 96% of inquiries within 24 hours. Conducted compliance audits for HRIS data, reducing errors by 15%." },
+          { page: 4, content: "Administered payroll and benefits, resolving 96% of inquiries within 24 hours. Conducted compliance audits for HRIS data, reducing errors by 15%. Supported policy development to align with Colorado employment laws, minimizing legal risks. Education Bachelor of Science in Human Resource Management University of Colorado, Denver Graduated May 2015" }
+        ]
+      }
     ]
   },
 ];
 
+// Load knowledge bases from localStorage or use default
+function loadKnowledgeBasesData() {
+  const stored = localStorage.getItem('knowledgeBases');
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      console.error('Error parsing stored knowledge bases:', e);
+      return [...defaultKnowledgeBases];
+    }
+  }
+  return [...defaultKnowledgeBases];
+}
+
+let knowledgeBases = loadKnowledgeBasesData();
+
 let currentKnowledgeBase = null;
 let allFiles = [];
+let allDocumentPages = [];
 
 function getUrlParameter(name) {
   const urlParams = new URLSearchParams(window.location.search);
@@ -201,6 +241,41 @@ function loadKnowledgeBaseDetails() {
 
   // Load files
   allFiles = currentKnowledgeBase.documents || [];
+  
+  // If no documents with pages, add sample documents for demo purposes
+  if (allFiles.length === 0 || !allFiles.some(f => f.pages && f.pages.length > 0)) {
+    allFiles = [
+      { 
+        name: "Sample_CV_1.pdf", 
+        size: 234000,
+        pages: [
+          { page: 1, content: "Jane A. Smith 456 Oak Avenue, Springfield, IL 62701 | (217) 555-1234 | jane.smith@email.com | linkedin.com/in/janesmith Professional Summary Results-oriented Human Resources professional with over 6 years of experience in talent acquisition, employee engagement, and HR policy development. Proficient in fostering inclusive workplace cultures and driving strategic HR initiatives. Skilled in leveraging HR analytics to improve retention and streamline processes. Passionate about aligning HR practices with organizational objectives to support business growth." },
+        ]
+      },
+      { 
+        name: "Sample_CV_4.pdf", 
+        size: 267000,
+        pages: [
+          { page: 1, content: "Michael T. Lee 654 Cedar Lane, Denver, CO 80203 | (303) 555-3210 | michael.lee@email.com | linkedin.com/in/michaeltlee Professional Summary Accomplished Human Resources professional with 7 years of experience in recruitment, employee engagement, and HR policy development. Skilled in leveraging HR analytics to optimize workforce planning and enhance organizational performance. Proficient in fostering collaborative workplace cultures and ensuring compliance with labor regulations. Dedicated to driving strategic HR solutions that align with business objectives." },
+        ]
+      }
+    ];
+  }
+  
+  // Build document pages index for search
+  allDocumentPages = [];
+  allFiles.forEach(file => {
+    if (file.pages && file.pages.length > 0) {
+      file.pages.forEach(page => {
+        allDocumentPages.push({
+          fileName: file.name,
+          page: page.page,
+          content: page.content
+        });
+      });
+    }
+  });
+  
   renderFiles(allFiles);
 
   // Attach file search event listener
@@ -209,14 +284,26 @@ function loadKnowledgeBaseDetails() {
   console.log('KB details loaded successfully');
 }
 
+// Chat with Knowledge Base function
+function chatWithKnowledgeBase() {
+  if (currentKnowledgeBase) {
+    // Store the selected KB ID in localStorage
+    localStorage.setItem('selectedKnowledgeBaseId', currentKnowledgeBase.id);
+    localStorage.setItem('selectedKnowledgeBaseName', currentKnowledgeBase.name);
+    
+    // Redirect to AI Chat page
+    window.location.href = 'AI Chat.html';
+  }
+}
+
 function renderFiles(files) {
-  const filesGrid = document.getElementById('filesGrid');
+  const filesGrid = document.getElementById('searchResults');
 
   if (!files || files.length === 0) {
     filesGrid.innerHTML = `
       <div class="empty-state">
-        <div class="empty-state-text">No files found</div>
-        <div class="empty-state-subtext">Upload files to this knowledge base to get started</div>
+        <div class="empty-state-text">No documents found</div>
+        <div class="empty-state-subtext">This knowledge base has no documents yet</div>
       </div>
     `;
     return;
@@ -234,16 +321,80 @@ function renderFiles(files) {
 }
 
 function handleFileSearch(event) {
-  const searchTerm = event.target.value.toLowerCase();
+  const searchTerm = event.target.value.toLowerCase().trim();
+  const searchResults = document.getElementById('searchResults');
 
   if (!searchTerm) {
     renderFiles(allFiles);
     return;
   }
 
-  const filteredFiles = allFiles.filter(file =>
-    file.name.toLowerCase().includes(searchTerm)
+  // Search in document pages
+  const results = allDocumentPages.filter(pageData => 
+    pageData.content.toLowerCase().includes(searchTerm)
   );
 
-  renderFiles(filteredFiles);
+  if (results.length === 0) {
+    searchResults.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-text">No results found</div>
+        <div class="empty-state-subtext">Try different keywords or check your spelling</div>
+      </div>
+    `;
+    return;
+  }
+
+  // Render search results
+  searchResults.innerHTML = results.map(result => {
+    const contentSnippet = getHighlightedSnippet(result.content, searchTerm);
+    const documentTitle = `${result.fileName.replace('.pdf', '')} (page ${result.page})`;
+    
+    return `
+      <div class="search-result-item" onclick="viewDocumentPage('${result.fileName}', ${result.page})">
+        <div class="search-result-header">
+          <h3 class="search-result-title">${documentTitle}</h3>
+          <span class="search-result-arrow">→</span>
+        </div>
+        <p class="search-result-content">${contentSnippet}</p>
+      </div>
+    `;
+  }).join('');
+}
+
+function getHighlightedSnippet(content, searchTerm) {
+  const lowerContent = content.toLowerCase();
+  const lowerSearchTerm = searchTerm.toLowerCase();
+  const index = lowerContent.indexOf(lowerSearchTerm);
+  
+  if (index === -1) return content.substring(0, 300) + '...';
+  
+  // Get context around the search term - show more characters
+  const start = Math.max(0, index - 150);
+  const end = Math.min(content.length, index + searchTerm.length + 300);
+  let snippet = content.substring(start, end);
+  
+  // Add ellipsis if needed
+  if (start > 0) snippet = '...' + snippet;
+  if (end < content.length) snippet = snippet + '...';
+  
+  // Highlight the search term
+  const regex = new RegExp(`(${searchTerm})`, 'gi');
+  snippet = snippet.replace(regex, '<span class="search-result-highlight">$1</span>');
+  
+  return snippet;
+}
+
+function viewDocumentPage(fileName, pageNumber) {
+  // Get the path from current knowledge base
+  const path = currentKnowledgeBase?.path || '\\Knowledge Base\\Default';
+  
+  // In production, this would open the actual document in Laserfiche or document viewer
+  // For demo, we'll open the Laserfiche URL with the document reference
+  const laserficheUrl = `https://apps.ricohsolution.com.hk:1443/Laserfiche/Browse.aspx?repo=Ricoh-BPA#?id=1&page=${pageNumber}`;
+  
+  // Open in new tab
+  window.open(laserficheUrl, '_blank');
+  
+  // Alternative: If you have a local PDF viewer page
+  // window.open(`document-viewer.html?file=${encodeURIComponent(fileName)}&page=${pageNumber}`, '_blank');
 }

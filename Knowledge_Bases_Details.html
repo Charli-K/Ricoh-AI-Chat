@@ -109,19 +109,24 @@
               <div id="detailModifiedDate" class="detail-value">-</div>
             </div>
           </div>
+          
+          <button class="btn-chat-with-kb" id="chatWithKBBtn" onclick="chatWithKnowledgeBase()">
+            <img src="assets/chat-text-fill-svgrepo-com.svg" alt="Chat" width="20" />
+            <span>Chat with this Knowledge Base</span>
+          </button>
         </div>
 
         <div class="kb-files-container">
           <div class="kb-files-header">
-            <h2>Files</h2>
-            <p class="kb-subtitle">Search and manage files in this knowledge base</p>
+            <h2>Document Search</h2>
+            <p class="kb-subtitle">Search across all documents and pages in this knowledge base</p>
           </div>
 
           <div class="kb-search-bar">
-            <input type="search" id="fileSearch" placeholder="Search files..." />
+            <input type="search" id="fileSearch" placeholder="Search in documents..." />
           </div>
 
-          <div class="files-grid" id="filesGrid">
+          <div class="files-grid" id="searchResults">
             <div class="empty-state">
               <div class="empty-state-text">No files found</div>
               <div class="empty-state-subtext">Upload files to this knowledge base to get started</div>
