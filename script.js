@@ -248,8 +248,6 @@ function updateTokenDisplay(fromDate, toDate) {
   }
 }
 
-updateTokenDisplay('2022-01-01', '2025-12-31');
-
 const departmentGrid = document.getElementById('departmentTokensGrid');
 if (departmentGrid) {
   let isDown = false;
@@ -1562,6 +1560,8 @@ function updateSortIndicators(columnIndex) {
 document.addEventListener('DOMContentLoaded', function() {
   // Set dateTo to today's date
   const dateToInput = document.getElementById('dateTo');
+  const dateFromInput = document.getElementById('dateFrom');
+  
   if (dateToInput) {
     const today = new Date();
     const year = today.getFullYear();
@@ -1569,6 +1569,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const day = String(today.getDate()).padStart(2, '0');
     dateToInput.value = `${year}-${month}-${day}`;
   }
+  
+  // Initialize Token Display with default date range
+  const fromDate = dateFromInput?.value || '2022-01-01';
+  const toDate = dateToInput?.value || '2025-12-31';
+  updateTokenDisplay(fromDate, toDate);
   
   loadProcessData();
 });
