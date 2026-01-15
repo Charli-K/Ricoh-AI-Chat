@@ -538,12 +538,13 @@ body.dark-mode .file-preview-item .file-remove:hover {
   border-radius: 16px;
   width: 90%;
   max-width: 600px;
-  max-height: 80vh;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: modalSlideIn 0.3s ease-out;
   scrollbar-width: none;
+  overflow: hidden;
 }
 
 @keyframes modalSlideIn {
@@ -594,8 +595,26 @@ body.dark-mode .file-preview-item .file-remove:hover {
 .kb-modal-body {
   padding: 24px;
   overflow-y: auto;
-  scrollbar-width: none;
   flex: 1;
+  min-height: 0;
+}
+
+.kb-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.kb-modal-body::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.kb-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.kb-modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .kb-modal-subtitle {
@@ -749,30 +768,101 @@ body.dark-mode .kb-modal-header h2{
   color: var(--text);
 }
 
-/* File Selection Modal Styles */
 .file-selection-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 400px;
-  overflow-y: auto;
+  gap: 8px;
+}
+
+.file-selection-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.file-selection-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.file-selection-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.file-selection-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.kb-folder {
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  border-radius: 8px;
+  -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.kb-folder-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(248, 249, 250, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s;
+}
+
+.kb-folder-header:hover {
+  background: rgba(233, 236, 239, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.kb-folder-icon {
+  font-size: 12px;
+  color: #000000;
+  width: 16px;
+  display: inline-block;
+  transition: transform 0.2s;
+}
+
+.kb-folder-name {
+  flex: 1;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.kb-folder-count {
+  font-size: 12px;
+  color: #999;
+  font-weight: 400;
+}
+
+.kb-folder-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
 }
 
 .file-selection-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: #f8f9fa;
+  gap: 16px;
+  padding: 10px 12px;
+  background: #f8f9fa53;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s, border-color 0.2s;
 }
 
 .file-selection-item:hover {
   background: #e9ecef;
-  border-color: #667eea;
+  border-color: #42475f;
 }
 
 .file-checkbox {
@@ -793,6 +883,7 @@ body.dark-mode .kb-modal-header h2{
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 13px;
 }
 
 .file-selection-meta {
@@ -802,13 +893,39 @@ body.dark-mode .kb-modal-header h2{
   color: #666;
 }
 
-.file-selection-kb {
-  color: #667eea;
-  font-weight: 500;
-}
-
 .file-selection-size {
   color: #999;
+}
+
+body.dark-mode .kb-folder {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .kb-folder-header {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+body.dark-mode .kb-folder-header:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .kb-folder-name,
+body.dark-mode .file-selection-name {
+  color: var(--text);
+}
+
+body.dark-mode .file-selection-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .file-selection-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #667eea;
+}
+body.dark-mode .kb-folder-icon {
+  filter : invert(1);
 }
 
 @media (max-width: 768px) {

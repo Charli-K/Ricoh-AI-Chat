@@ -344,7 +344,7 @@ function getHighlightedSnippet(content, searchTerm) {
   if (index === -1) return content.substring(0, 500) + '...';
   
   // Get context around the search term - show more characters
-  const start = Math.max(0, index - 150);
+  const start = Math.max(0, index - 500);
   const end = Math.min(content.length, index + searchTerm.length + 500);
   let snippet = content.substring(start, end);
   
@@ -367,5 +367,9 @@ function viewDocumentPage(fileName, pageNumber) {
   // For demo, we'll open the Laserfiche URL with the document reference
   const laserficheUrl = `https://apps.ricohsolution.com.hk:1443/Laserfiche/Browse.aspx?repo=Ricoh-BPA#?id=1&page=${pageNumber}`;
   
+  // Open in new tab
   window.open(laserficheUrl, '_blank');
+  
+  // Alternative: If you have a local PDF viewer page
+  // window.open(`document-viewer.html?file=${encodeURIComponent(fileName)}&page=${pageNumber}`, '_blank');
 }

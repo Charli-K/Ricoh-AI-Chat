@@ -45,67 +45,10 @@ let acceptedPolicy = false;
 let attachedFiles = [];
 let selectedKnowledgeBases = [];
 
-const knowledgeBases = [
-  {
-    id: 1,
-    name: "Product Documentation",
-    description: "Comprehensive product documentation including user manuals, technical specifications, and troubleshooting guides for all Ricoh products.",
-    category: "product",
-    status: "active",
-    createdDate: "2024-01-15",
-    modifiedDate: "2024-12-10",
-    documents: [
-      { name: "Product_Manual_2024.pdf", size: 2458000 },
-      { name: "Technical_Specs.docx", size: 856000 }
-    ]
-  },
-  {
-    id: 2,
-    name: "Customer Support FAQs",
-    description: "Frequently asked questions and answers for common customer support inquiries.",
-    category: "support",
-    status: "active",
-    createdDate: "2024-02-20",
-    modifiedDate: "2024-12-08",
-    documents: [
-      { name: "FAQ_Database.xlsx", size: 345000 }
-    ]
-  },
-  {
-    id: 3,
-    name: "Technical Troubleshooting",
-    description: "Technical troubleshooting procedures and solutions for complex issues.",
-    category: "technical",
-    status: "active",
-    createdDate: "2024-03-10",
-    modifiedDate: "2024-11-28",
-    documents: []
-  },
-  {
-    id: 4,
-    name: "Company Policies",
-    description: "Internal policies, procedures, and guidelines for employees and contractors.",
-    category: "policy",
-    status: "draft",
-    createdDate: "2024-11-01",
-    modifiedDate: "2024-12-05",
-    documents: []
-  },
-  {
-    id: 5,
-    name: "Sales Training Materials",
-    description: "Training materials and resources for sales team including pitch decks and product comparisons.",
-    category: "general",
-    status: "inactive",
-    createdDate: "2024-05-15",
-    modifiedDate: "2024-09-20",
-    documents: [
-      { name: "Sales_Pitch_Deck.pptx", size: 5678000 },
-      { name: "Product_Comparison.xlsx", size: 234000 },
-      { name: "Training_Guide.pdf", size: 1890000 }
-    ]
-  }
-];
+// Load knowledge bases from localStorage dynamically
+function getKnowledgeBases() {
+  return loadKnowledgeBasesFromStorage();
+}
 
 function getCurrentTime() {
   const now = new Date();
@@ -159,7 +102,7 @@ function sendMessage() {
 
   if (attachedFiles.length > 0) {
     const fileNames = attachedFiles.map(f => f.name).join(', ');
-    addMessage(`📎 Attached files: ${fileNames}`, true);
+    addMessage(`Attached files: ${fileNames}`, true);
   }
 
   input.value = '';
@@ -327,7 +270,6 @@ function updateFilePreview() {
     
     return `
       <div class="file-preview-item">
-        <span class="file-icon">📄</span>
         <div class="file-info">
           <span class="file-name">${fileName}</span>
           ${source}
@@ -357,6 +299,24 @@ function toggleEmojiPicker() {
 function openKnowledgeBaseModal() {
   const modal = document.getElementById('kbSelectionModal');
   const listContainer = document.getElementById('kbSelectionList');
+
+  // Load latest knowledge bases from localStorage
+  let knowledgeBases = getKnowledgeBases();
+
+  // Sort by status (active > draft > inactive) then by modified date (newest first)
+  knowledgeBases = knowledgeBases.sort((a, b) => {
+    const statusOrder = { 'active': 1, 'draft': 2, 'inactive': 3 };
+    const statusCompare = (statusOrder[a.status] || 999) - (statusOrder[b.status] || 999);
+    
+    if (statusCompare !== 0) {
+      return statusCompare;
+    }
+    
+    // If status is the same, sort by modified date (newest first)
+    const dateA = new Date(a.modifiedDate || a.createdDate || 0);
+    const dateB = new Date(b.modifiedDate || b.createdDate || 0);
+    return dateB - dateA;
+  });
 
   // Render knowledge bases
   if (knowledgeBases.length === 0) {
@@ -388,6 +348,7 @@ function closeKnowledgeBaseModal() {
 }
 
 function toggleKnowledgeBase(kbId) {
+  const knowledgeBases = getKnowledgeBases();
   const kb = knowledgeBases.find(k => k.id === kbId);
   if (!kb || kb.status !== 'active') return;
 
@@ -406,6 +367,7 @@ function toggleKnowledgeBase(kbId) {
 }
 
 function saveKnowledgeBaseSelection() {
+  const knowledgeBases = getKnowledgeBases();
   const selectedNames = knowledgeBases
     .filter(kb => selectedKnowledgeBases.includes(kb.id))
     .map(kb => kb.name);
@@ -457,24 +419,11 @@ function openFileSelectionModal() {
   // Load knowledge bases from localStorage
   const knowledgeBases = loadKnowledgeBasesFromStorage();
   
-  // Collect all files from all knowledge bases
+  // Collect all files organized by knowledge base
   let allFiles = [];
-  knowledgeBases.forEach(kb => {
-    if (kb.documents && kb.documents.length > 0) {
-      kb.documents.forEach(doc => {
-        allFiles.push({
-          kbName: kb.name,
-          kbId: kb.id,
-          fileName: doc.name,
-          fileSize: doc.size,
-          fileData: doc
-        });
-      });
-    }
-  });
+  let fileIndex = 0;
   
-  // Render file list
-  if (allFiles.length === 0) {
+  if (knowledgeBases.length === 0 || !knowledgeBases.some(kb => kb.documents && kb.documents.length > 0)) {
     fileList.innerHTML = `
       <div class="empty-state">
         <div class="empty-state-text">No files available</div>
@@ -482,24 +431,70 @@ function openFileSelectionModal() {
       </div>
     `;
   } else {
-    fileList.innerHTML = allFiles.map((file, index) => `
-      <div class="file-selection-item" onclick="toggleFileSelection(${index})">
-        <input type="checkbox" id="file-${index}" class="file-checkbox" />
-        <div class="file-selection-info">
-          <div class="file-selection-name">${file.fileName}</div>
-          <div class="file-selection-meta">
-            <span class="file-selection-kb">${file.kbName}</span>
-            <span class="file-selection-size">${formatFileSize(file.fileSize)}</span>
+    let html = '';
+    
+    knowledgeBases.forEach(kb => {
+      if (kb.documents && kb.documents.length > 0) {
+        html += `
+          <div class="kb-folder">
+            <div class="kb-folder-header" onclick="toggleKBFolder('${kb.id}')">
+              <span class="kb-folder-icon" id="icon-${kb.id}">▶</span>
+              <span class="kb-folder-name">${kb.name}</span>
+              <span class="kb-folder-count">(${kb.documents.length} files)</span>
+            </div>
+            <div class="kb-folder-content" id="folder-${kb.id}" style="display: none;">
+        `;
+        
+        kb.documents.forEach(doc => {
+          allFiles.push({
+            kbName: kb.name,
+            kbId: kb.id,
+            fileName: doc.name,
+            fileSize: doc.size,
+            fileData: doc
+          });
+          
+          html += `
+            <div class="file-selection-item" onclick="toggleFileSelection(${fileIndex})">
+              <input type="checkbox" id="file-${fileIndex}" class="file-checkbox" />
+              <div class="file-selection-info">
+                <div class="file-selection-name">${doc.name}</div>
+                <div class="file-selection-meta">
+                  <span class="file-selection-size">${formatFileSize(doc.size)}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          fileIndex++;
+        });
+        
+        html += `
+            </div>
           </div>
-        </div>
-      </div>
-    `).join('');
+        `;
+      }
+    });
+    
+    fileList.innerHTML = html;
   }
   
   // Store files data for later use
   window.availableFiles = allFiles;
   
   modal.classList.add('active');
+}
+
+function toggleKBFolder(kbId) {
+  const folderContent = document.getElementById(`folder-${kbId}`);
+  const folderIcon = document.getElementById(`icon-${kbId}`);
+  
+  if (folderContent.style.display === 'none') {
+    folderContent.style.display = 'block';
+    folderIcon.textContent = '▼';
+  } else {
+    folderContent.style.display = 'none';
+    folderIcon.textContent = '▶';
+  }
 }
 
 function closeFileSelectionModal() {
