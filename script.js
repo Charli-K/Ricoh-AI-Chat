@@ -1319,6 +1319,7 @@ function initTableSorting() {
   const headers = document.querySelectorAll('#dataTable th');
   headers.forEach((header, index) => {
     header.classList.add('sortable');
+    header.setAttribute('data-sort-order', 'none'); // Track individual column sort order
     header.addEventListener('click', (e) => {
       // Don't sort if dragging
       if (e.target.classList.contains('dragging')) return;
@@ -1331,14 +1332,22 @@ function initTableSorting() {
 function sortTableByColumn(columnIndex) {
   const processFilter = document.getElementById('processFilter');
   const filterProcess = processFilter ? processFilter.value : '';
+  const headers = document.querySelectorAll('#dataTable th');
+  const clickedHeader = headers[columnIndex];
   
-  // Toggle sort order if clicking the same column
-  if (currentSortColumn === columnIndex) {
-    currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+  // Get current sort order for this specific column
+  const currentOrder = clickedHeader.getAttribute('data-sort-order') || 'none';
+  
+  // Determine next sort order for this column
+  let nextOrder;
+  if (currentOrder === 'none' || currentOrder === 'desc') {
+    nextOrder = 'asc';
   } else {
-    currentSortColumn = columnIndex;
-    currentSortOrder = 'asc';
+    nextOrder = 'desc';
   }
+  
+  // Update this column's sort order
+  clickedHeader.setAttribute('data-sort-order', nextOrder);
   
   // Filter data if process is selected
   let filteredData = filterProcess ? processData.filter(item => item.process === filterProcess) : processData;
@@ -1381,16 +1390,16 @@ function sortTableByColumn(columnIndex) {
       valB = valB.toString().toLowerCase();
     }
     
-    if (valA < valB) return currentSortOrder === 'asc' ? -1 : 1;
-    if (valA > valB) return currentSortOrder === 'asc' ? 1 : -1;
+    if (valA < valB) return nextOrder === 'asc' ? -1 : 1;
+    if (valA > valB) return nextOrder === 'asc' ? 1 : -1;
     return 0;
   });
   
   // Re-render table with sorted data
   renderSortedTableData(filteredData, filterProcess);
   
-  // Update header styling
-  updateSortIndicators(columnIndex);
+  // Update header styling for this column only
+  updateSortIndicators(columnIndex, nextOrder);
 }
 
 function renderSortedTableData(sortedData, filterProcess) {
@@ -1542,17 +1551,17 @@ function renderSortedTableData(sortedData, filterProcess) {
   }
 }
 
-function updateSortIndicators(columnIndex) {
-  // Remove all sort classes
+function updateSortIndicators(columnIndex, sortOrder) {
+  // Remove sort classes only from the clicked column
   const headers = document.querySelectorAll('#dataTable th');
-  headers.forEach(header => {
-    header.classList.remove('sort-asc', 'sort-desc');
-  });
-  
-  // Add sort class to current column
   const currentHeader = headers[columnIndex];
+  
   if (currentHeader) {
-    currentHeader.classList.add(currentSortOrder === 'asc' ? 'sort-asc' : 'sort-desc');
+    // Remove existing sort classes from this column
+    currentHeader.classList.remove('sort-asc', 'sort-desc');
+    
+    // Add new sort class based on current order
+    currentHeader.classList.add(sortOrder === 'asc' ? 'sort-asc' : 'sort-desc');
   }
 }
 
