@@ -8,7 +8,8 @@
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./dark-mode.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 </head>
 <section class="logo">
   <a href="index.html" style="cursor: pointer;"><img src="assets/Ricoh_Logo.svg" alt="Ricoh Logo" /></a>
@@ -39,7 +40,8 @@
       </button>
     </nav>
     <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()">
-      <span class="theme-icon"><img src="assets/moon-night-svgrepo-com.svg" alt="Toggle Light / Dark Mode" width="30" /></span>
+      <span class="theme-icon"><img src="assets/moon-night-svgrepo-com.svg" alt="Toggle Light / Dark Mode"
+          width="30" /></span>
       <span class="nav-text">Toggle Theme</span>
     </button>
     <div class="user-menu">
@@ -86,40 +88,40 @@
           <div class="chart-card">
             <select class="process-selector-dropdown" data-chart-index="0">
             </select>
-            <button class="expand-btn" data-chart="chartProcess0" title="Expand"><img src="assets/maximize-svgrepo-com.svg"
-                alt="Expand" width="20" /></button>
+            <button class="expand-btn" data-chart="chartProcess0" title="Expand"><img
+                src="assets/maximize-svgrepo-com.svg" alt="Expand" width="20" /></button>
             <h3 id="chartTitle0">Loading...</h3>
             <div class="chart-wrap"><canvas id="chartProcess0"></canvas></div>
           </div>
           <div class="chart-card">
             <select class="process-selector-dropdown" data-chart-index="1">
             </select>
-            <button class="expand-btn" data-chart="chartProcess1" title="Expand"><img src="assets/maximize-svgrepo-com.svg  "
-                alt="Expand" width="20" /></button>
+            <button class="expand-btn" data-chart="chartProcess1" title="Expand"><img
+                src="assets/maximize-svgrepo-com.svg  " alt="Expand" width="20" /></button>
             <h3 id="chartTitle1">Loading...</h3>
             <div class="chart-wrap"><canvas id="chartProcess1"></canvas></div>
           </div>
           <div class="chart-card">
             <select class="process-selector-dropdown" data-chart-index="2">
             </select>
-            <button class="expand-btn" data-chart="chartProcess2" title="Expand"><img src="assets/maximize-svgrepo-com.svg"
-                alt="Expand" width="20" /></button>
+            <button class="expand-btn" data-chart="chartProcess2" title="Expand"><img
+                src="assets/maximize-svgrepo-com.svg" alt="Expand" width="20" /></button>
             <h3 id="chartTitle2">Loading...</h3>
             <div class="chart-wrap"><canvas id="chartProcess2"></canvas></div>
           </div>
           <div class="chart-card">
             <select class="process-selector-dropdown" data-chart-index="3">
             </select>
-            <button class="expand-btn" data-chart="chartProcess3" title="Expand"><img src="assets/maximize-svgrepo-com.svg"
-                alt="Expand" width="20" /></button>
+            <button class="expand-btn" data-chart="chartProcess3" title="Expand"><img
+                src="assets/maximize-svgrepo-com.svg" alt="Expand" width="20" /></button>
             <h3 id="chartTitle3">Loading...</h3>
             <div class="chart-wrap"><canvas id="chartProcess3"></canvas></div>
           </div>
         </div>
 
         <div class="line-chart-container">
-          <button class="expand-btn" data-chart="lineChart" title="Expand"><img src="assets/maximize-svgrepo-com.svg" alt="Expand"
-              width="20" /></button>
+          <button class="expand-btn" data-chart="lineChart" title="Expand"><img src="assets/maximize-svgrepo-com.svg"
+              alt="Expand" width="20" /></button>
           <h3>Overall Status Trend</h3>
           <div class="line-chart-wrap"><canvas id="lineChart" height="140"></canvas></div>
         </div>
@@ -185,26 +187,46 @@
                 <th draggable="true" data-column="3" class="common-column">Department</th>
                 <th draggable="true" data-column="4" class="common-column">Status</th>
                 <th draggable="true" data-column="5" class="common-column">Assigned To</th>
-                <th draggable="true" data-column="6" class="process-specific-column" data-process="Card / Loan Application" style="display:none;">Applicant Name</th>
-                <th draggable="true" data-column="7" class="process-specific-column" data-process="Card / Loan Application" style="display:none;">ID / Account Number</th>
-                <th draggable="true" data-column="8" class="process-specific-column" data-process="Card / Loan Application" style="display:none;">Loan Amount / Credit Limit</th>
-                <th draggable="true" data-column="9" class="process-specific-column" data-process="Card / Loan Application" style="display:none;">Interest Rate</th>
-                <th draggable="true" data-column="10" class="process-specific-column" data-process="Card / Loan Application" style="display:none;">Approval Date</th>
-                <th draggable="true" data-column="11" class="process-specific-column" data-process="Card / Loan Application" style="display:none;">Supporting Documents</th>
-                <th draggable="true" data-column="12" class="process-specific-column" data-process="Budget Review" style="display:none;">Budget Period</th>
-                <th draggable="true" data-column="13" class="process-specific-column" data-process="Budget Review" style="display:none;">Requested Amount</th>
-                <th draggable="true" data-column="14" class="process-specific-column" data-process="Budget Review" style="display:none;">Approved Amount</th>
-                <th draggable="true" data-column="15" class="process-specific-column" data-process="Budget Review" style="display:none;">Cost Center</th>
-                <th draggable="true" data-column="16" class="process-specific-column" data-process="Budget Review" style="display:none;">Reviewer</th>
-                <th draggable="true" data-column="17" class="process-specific-column" data-process="Budget Review" style="display:none;">Justification</th>
-                <th draggable="true" data-column="18" class="process-specific-column" data-process="Sales Report" style="display:none;">Report Period</th>
-                <th draggable="true" data-column="19" class="process-specific-column" data-process="Sales Report" style="display:none;">Region / Market</th>
-                <th draggable="true" data-column="20" class="process-specific-column" data-process="Sales Report" style="display:none;">Sales Amount</th>
-                <th draggable="true" data-column="21" class="process-specific-column" data-process="Sales Report" style="display:none;">Product Category</th>
-                <th draggable="true" data-column="22" class="process-specific-column" data-process="Client Survey" style="display:none;">Client Name</th>
-                <th draggable="true" data-column="23" class="process-specific-column" data-process="Client Survey" style="display:none;">Survey Date</th>
-                <th draggable="true" data-column="24" class="process-specific-column" data-process="Client Survey" style="display:none;">Survey Type</th>
-                <th draggable="true" data-column="25" class="process-specific-column" data-process="Client Survey" style="display:none;">Score / Rating</th>
+                <th draggable="true" data-column="6" class="process-specific-column"
+                  data-process="Card / Loan Application" style="display:none;">Applicant Name</th>
+                <th draggable="true" data-column="7" class="process-specific-column"
+                  data-process="Card / Loan Application" style="display:none;">ID / Account Number</th>
+                <th draggable="true" data-column="8" class="process-specific-column"
+                  data-process="Card / Loan Application" style="display:none;">Loan Amount / Credit Limit</th>
+                <th draggable="true" data-column="9" class="process-specific-column"
+                  data-process="Card / Loan Application" style="display:none;">Interest Rate</th>
+                <th draggable="true" data-column="10" class="process-specific-column"
+                  data-process="Card / Loan Application" style="display:none;">Approval Date</th>
+                <th draggable="true" data-column="11" class="process-specific-column"
+                  data-process="Card / Loan Application" style="display:none;">Supporting Documents</th>
+                <th draggable="true" data-column="12" class="process-specific-column" data-process="Budget Review"
+                  style="display:none;">Budget Period</th>
+                <th draggable="true" data-column="13" class="process-specific-column" data-process="Budget Review"
+                  style="display:none;">Requested Amount</th>
+                <th draggable="true" data-column="14" class="process-specific-column" data-process="Budget Review"
+                  style="display:none;">Approved Amount</th>
+                <th draggable="true" data-column="15" class="process-specific-column" data-process="Budget Review"
+                  style="display:none;">Cost Center</th>
+                <th draggable="true" data-column="16" class="process-specific-column" data-process="Budget Review"
+                  style="display:none;">Reviewer</th>
+                <th draggable="true" data-column="17" class="process-specific-column" data-process="Budget Review"
+                  style="display:none;">Justification</th>
+                <th draggable="true" data-column="18" class="process-specific-column" data-process="Sales Report"
+                  style="display:none;">Report Period</th>
+                <th draggable="true" data-column="19" class="process-specific-column" data-process="Sales Report"
+                  style="display:none;">Region / Market</th>
+                <th draggable="true" data-column="20" class="process-specific-column" data-process="Sales Report"
+                  style="display:none;">Sales Amount</th>
+                <th draggable="true" data-column="21" class="process-specific-column" data-process="Sales Report"
+                  style="display:none;">Product Category</th>
+                <th draggable="true" data-column="22" class="process-specific-column" data-process="Client Survey"
+                  style="display:none;">Client Name</th>
+                <th draggable="true" data-column="23" class="process-specific-column" data-process="Client Survey"
+                  style="display:none;">Survey Date</th>
+                <th draggable="true" data-column="24" class="process-specific-column" data-process="Client Survey"
+                  style="display:none;">Survey Type</th>
+                <th draggable="true" data-column="25" class="process-specific-column" data-process="Client Survey"
+                  style="display:none;">Score / Rating</th>
               </tr>
             </thead>
             <tbody id="tableBody">

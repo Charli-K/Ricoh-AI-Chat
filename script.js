@@ -1411,14 +1411,11 @@ function renderSortedTableData(sortedData, filterProcess) {
   sortedData.forEach(item => {
     const row = document.createElement('tr');
     
-    // Create status badge HTML
     const statusClass = item.status.toLowerCase().replace(' ', '');
     const statusBadge = `<span class="status-badge ${statusClass}">${item.status}</span>`;
     
-    // Create instance link
     const instanceLink = `<a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank" style="color: #00a2ff; text-decoration: underline;">${item.instance}</a>`;
     
-    // Common columns (0-5)
     row.innerHTML = `
       <td>${item.process}</td>
       <td>${instanceLink}</td>
@@ -1428,7 +1425,6 @@ function renderSortedTableData(sortedData, filterProcess) {
       <td>${item.assignedTo}</td>
     `;
     
-    // If no process is selected, only show common columns
     if (!filterProcess) {
       for (let i = 0; i < 20; i++) {
         row.innerHTML += `<td style="display:none;"></td>`;
@@ -1437,7 +1433,6 @@ function renderSortedTableData(sortedData, filterProcess) {
       return;
     }
     
-    // Process-specific columns (6-25)
     if (item.process === 'Card / Loan Application') {
       row.innerHTML += `
         <td>${item.applicantName || ''}</td>
