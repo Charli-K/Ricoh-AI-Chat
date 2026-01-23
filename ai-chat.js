@@ -275,7 +275,7 @@ function updateFilePreview() {
           ${source}
           ${fileSize ? `<span class="file-size">${fileSize}</span>` : ''}
         </div>
-        <button class="file-remove" onclick="removeFile(${index})">×</button>
+        <button class="file-remove" onclick="removeFile(${index})"><img src="assets/wrong-svgrepo-com.svg" alt="Remove File" width="10" style="filter: brightness(0) saturate(100%) invert(26%) sepia(89%) saturate(1583%) hue-rotate(338deg) brightness(95%) contrast(93%);" /></button>
       </div>
     `;
   }).join('');

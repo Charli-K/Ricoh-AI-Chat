@@ -293,7 +293,7 @@ body.dark-mode .btn-send:hover {
 }
 
 body.dark-mode .btn-accept {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: rgba(102, 187, 106, 0.2);
 }
 
 body.dark-mode .btn-reject {
