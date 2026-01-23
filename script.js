@@ -657,21 +657,32 @@ if (columnManagerBtn && columnManagerDropdown) {
 
 function initializeColumnVisibility() {
   document.querySelectorAll('.column-option input[type="checkbox"]').forEach(checkbox => {
-    const columnIndex = parseInt(checkbox.getAttribute('data-column'));
+    const originalColumnIndex = parseInt(checkbox.getAttribute('data-column'));
     const table = document.getElementById('dataTable');
     const isChecked = checkbox.checked;
     
-    const th = table.querySelector(`thead th[data-column="${columnIndex}"]`);
-    if (th) {
-      th.classList.toggle('hidden', !isChecked);
-    }
-    
-    table.querySelectorAll('tbody tr').forEach(row => {
-      const td = row.cells[columnIndex];
-      if (td) {
-        td.classList.toggle('hidden', !isChecked);
+    // Find the actual position of the column with this data-column attribute
+    const headers = table.querySelectorAll('thead th');
+    let actualPosition = -1;
+    headers.forEach((th, index) => {
+      if (parseInt(th.getAttribute('data-column')) === originalColumnIndex) {
+        actualPosition = index;
       }
     });
+    
+    if (actualPosition !== -1) {
+      const th = headers[actualPosition];
+      if (th) {
+        th.classList.toggle('hidden', !isChecked);
+      }
+      
+      table.querySelectorAll('tbody tr').forEach(row => {
+        const td = row.cells[actualPosition];
+        if (td) {
+          td.classList.toggle('hidden', !isChecked);
+        }
+      });
+    }
   });
 }
 
@@ -679,21 +690,32 @@ initializeColumnVisibility();
 
 document.querySelectorAll('.column-option input[type="checkbox"]').forEach(checkbox => {
   checkbox.addEventListener('change', (e) => {
-    const columnIndex = parseInt(e.target.getAttribute('data-column'));
+    const originalColumnIndex = parseInt(e.target.getAttribute('data-column'));
     const table = document.getElementById('dataTable');
     const isChecked = e.target.checked;
     
-    const th = table.querySelector(`thead th[data-column="${columnIndex}"]`);
-    if (th) {
-      th.classList.toggle('hidden', !isChecked);
-    }
-    
-    table.querySelectorAll('tbody tr').forEach(row => {
-      const td = row.cells[columnIndex];
-      if (td) {
-        td.classList.toggle('hidden', !isChecked);
+    // Find the actual position of the column with this data-column attribute
+    const headers = table.querySelectorAll('thead th');
+    let actualPosition = -1;
+    headers.forEach((th, index) => {
+      if (parseInt(th.getAttribute('data-column')) === originalColumnIndex) {
+        actualPosition = index;
       }
     });
+    
+    if (actualPosition !== -1) {
+      const th = headers[actualPosition];
+      if (th) {
+        th.classList.toggle('hidden', !isChecked);
+      }
+      
+      table.querySelectorAll('tbody tr').forEach(row => {
+        const td = row.cells[actualPosition];
+        if (td) {
+          td.classList.toggle('hidden', !isChecked);
+        }
+      });
+    }
   });
 });
 
@@ -733,37 +755,50 @@ document.querySelectorAll('#tableHeader th').forEach(th => {
   });
 });
 
-function swapColumns(col1, col2) {
+function swapColumns(fromDataCol, toDataCol) {
   const table = document.getElementById('dataTable');
-  const rows = table.querySelectorAll('tr');
+  const headers = table.querySelectorAll('thead th');
   
+  // Find actual positions of the columns to swap
+  let fromPos = -1, toPos = -1;
+  headers.forEach((th, index) => {
+    const dataCol = parseInt(th.getAttribute('data-column'));
+    if (dataCol === fromDataCol) fromPos = index;
+    if (dataCol === toDataCol) toPos = index;
+  });
+  
+  if (fromPos === -1 || toPos === -1 || fromPos === toPos) return;
+  
+  // Swap columns in all rows (including header and body)
+  const rows = table.querySelectorAll('tr');
   rows.forEach(row => {
     const cells = Array.from(row.cells);
-    if (cells[col1] && cells[col2]) {
-      const temp = cells[col1].outerHTML;
-      cells[col1].outerHTML = cells[col2].outerHTML;
-      cells[col2].outerHTML = temp;
+    if (cells[fromPos] && cells[toPos]) {
+      // Clone cells to preserve all attributes and event listeners
+      const tempCell = cells[fromPos].cloneNode(true);
+      const cell2Clone = cells[toPos].cloneNode(true);
       
-      const newCells = Array.from(row.cells);
-      if (newCells[col1].hasAttribute('data-column')) {
-        newCells[col1].setAttribute('data-column', col1);
-      }
-      if (newCells[col2].hasAttribute('data-column')) {
-        newCells[col2].setAttribute('data-column', col2);
-      }
+      // Replace cells
+      row.replaceChild(cell2Clone, cells[fromPos]);
+      row.replaceChild(tempCell, row.cells[toPos]);
     }
   });
   
-  rebindDragEvents();
+  rebindAllHeaderEvents();
 }
 
-function rebindDragEvents() {
-  document.querySelectorAll('#tableHeader th').forEach(th => {
-    const newTh = th.cloneNode(true);
-    th.parentNode.replaceChild(newTh, th);
+function rebindAllHeaderEvents() {
+  // Clone all headers to remove old event listeners
+  const headers = document.querySelectorAll('#dataTable th');
+  headers.forEach(header => {
+    const newHeader = header.cloneNode(true);
+    header.parentNode.replaceChild(newHeader, header);
   });
   
-  document.querySelectorAll('#tableHeader th').forEach(th => {
+  // Re-bind both drag and sort events
+  const newHeaders = document.querySelectorAll('#dataTable th');
+  newHeaders.forEach((th, index) => {
+    // Add drag events
     th.addEventListener('dragstart', (e) => {
       draggedColumn = parseInt(e.target.getAttribute('data-column'));
       e.target.classList.add('dragging');
@@ -795,7 +830,28 @@ function rebindDragEvents() {
       
       e.target.classList.remove('drag-over');
     });
+    
+    // Add sort event
+    th.classList.add('sortable');
+    if (!th.hasAttribute('data-sort-order')) {
+      th.setAttribute('data-sort-order', 'none');
+    }
+    th.addEventListener('click', (e) => {
+      // Don't sort if dragging
+      if (e.target.classList.contains('dragging')) return;
+      sortTableByColumn(index);
+    });
   });
+}
+
+function rebindSortEvents() {
+  // This function is kept for compatibility but now calls rebindAllHeaderEvents
+  rebindAllHeaderEvents();
+}
+
+function rebindDragEvents() {
+  // This function is kept for compatibility but now calls rebindAllHeaderEvents
+  rebindAllHeaderEvents();
 }
 
 document.addEventListener('click', () => {
@@ -1302,6 +1358,9 @@ function renderTableData(filterProcess = '') {
     updateDynamicColumns(processFilter.value);
   }
   
+  // Re-apply user's column visibility preferences from checkboxes
+  applyColumnVisibilityState();
+  
   // Update pagination after rendering table data
   if (typeof currentPage !== 'undefined') {
     currentPage = 1;
@@ -1352,7 +1411,7 @@ function sortTableByColumn(columnIndex) {
   // Filter data if process is selected
   let filteredData = filterProcess ? processData.filter(item => item.process === filterProcess) : processData;
   
-  // Get column name for sorting
+  // Get column name for sorting based on the original data-column attribute
   const columnMap = [
     'process', 'instance', 'createdDate', 'department', 'status', 'assignedTo',
     'applicantName', 'idAccountNumber', 'loanAmountCreditLimit', 'interestRate', 'approvalDate', 'supportingDocuments',
@@ -1361,7 +1420,9 @@ function sortTableByColumn(columnIndex) {
     'clientName', 'surveyDate', 'surveyType', 'scoreRating'
   ];
   
-  const sortKey = columnMap[columnIndex];
+  // Use the data-column attribute to get the original column index
+  const originalColumnIndex = parseInt(clickedHeader.getAttribute('data-column'));
+  const sortKey = columnMap[originalColumnIndex];
   
   // Sort the data
   filteredData.sort((a, b) => {
@@ -1540,10 +1601,45 @@ function renderSortedTableData(sortedData, filterProcess) {
     updateDynamicColumns(processFilter.value);
   }
   
+  // Re-apply user's column visibility preferences from checkboxes
+  applyColumnVisibilityState();
+  
   // Update pagination
   if (typeof initPagination === 'function') {
     setTimeout(() => initPagination(), 50);
   }
+}
+
+function applyColumnVisibilityState() {
+  // Re-apply the visibility state based on the checkboxes
+  document.querySelectorAll('.column-option input[type="checkbox"]').forEach(checkbox => {
+    const originalColumnIndex = parseInt(checkbox.getAttribute('data-column'));
+    const table = document.getElementById('dataTable');
+    const isChecked = checkbox.checked;
+    
+    // Find the actual position of the column with this data-column attribute
+    const headers = table.querySelectorAll('thead th');
+    let actualPosition = -1;
+    headers.forEach((th, index) => {
+      if (parseInt(th.getAttribute('data-column')) === originalColumnIndex) {
+        actualPosition = index;
+      }
+    });
+    
+    if (actualPosition !== -1) {
+      const th = headers[actualPosition];
+      if (th) {
+        th.classList.toggle('hidden', !isChecked);
+      }
+      
+      table.querySelectorAll('tbody tr').forEach(row => {
+        const td = row.cells[actualPosition];
+        if (td) {
+          td.classList.toggle('hidden', !isChecked);
+        }
+      });
+    }
+  });
 }
 
 function updateSortIndicators(columnIndex, sortOrder) {
