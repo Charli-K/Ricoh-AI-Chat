@@ -189,7 +189,7 @@ function acceptPolicy() {
   const welcomeMessage = document.querySelector('.assistant-message');
   if (welcomeMessage) {
     welcomeMessage.querySelector('.message-actions').innerHTML =
-      '<p style="color: #4caf50; font-weight: 600; margin: 0;">✓ Policy Accepted</p>';
+      '<p style="color: #4caf50; font-weight: 600; margin: 0;"><img src="assets/tick-svgrepo-com.svg" alt="Checkmark" style="width:16px; height:16px; vertical-align:middle; filter: brightness(0) saturate(100%) invert(58%) sepia(77%) saturate(471%) hue-rotate(75deg) brightness(96%) contrast(89%);"> Policy Accepted</p>';
   }
   addMessage('Thank you for accepting the privacy policy. How can I assist you today?', false);
 }
@@ -198,7 +198,7 @@ function rejectPolicy() {
   const welcomeMessage = document.querySelector('.assistant-message');
   if (welcomeMessage) {
     welcomeMessage.querySelector('.message-actions').innerHTML =
-      '<p style="color: #f44336; font-weight: 600; margin: 0;">✗ Policy Rejected - Chat functionality is limited</p>';
+      '<p style="color: #f44336; font-weight: 600; margin: 0;"><img src="assets/wrong-svgrepo-com.svg" alt="Crossmark" style="width:16px; height:16px; vertical-align:middle; filter: brightness(0) saturate(100%) invert(26%) sepia(89%) saturate(1583%) hue-rotate(338deg) brightness(95%) contrast(93%);"> Policy Rejected - Chat functionality is limited</p>';
   }
   addMessage('You have chosen to reject the privacy policy. Please note that chat functionality will be limited. You can still view information but cannot interact with the AI assistant.', false);
 }

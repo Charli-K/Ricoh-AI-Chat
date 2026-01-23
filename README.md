@@ -36,6 +36,9 @@ This project uses the following open-source libraries (loaded via CDN):
 - **Sun SVG Vector**: https://www.svgrepo.com/svg/470899/sun
 - **Lincense**: MIT License
 
+- **Tick SVG Vector**: https://www.svgrepo.com/svg/442801/tick
+- **Lincense**: MIT License
+
 - **User SVG Vector**: https://www.svgrepo.com/svg/487965/user
 - **Lincense**: MIT License
 
@@ -61,4 +64,7 @@ This project uses the following open-source libraries (loaded via CDN):
 - **Lincense**: CC0 License
 
 - **Logout SVG Vector**: https://www.svgrepo.com/svg/150530/logout
+- **Lincense**: CC0 License
+
+- **Wrong SVG Vector**: https://www.svgrepo.com/svg/111735/wrong
 - **Lincense**: CC0 License
