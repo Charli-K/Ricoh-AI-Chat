@@ -24,7 +24,6 @@ function toggleMenu() {
     toggleBtn.classList.toggle('menu-collapsed');
     document.body.classList.toggle('menu-collapsed');
     
-    // Save state to localStorage
     const isCollapsed = header.classList.contains('menu-collapsed');
     localStorage.setItem('menuCollapsed', isCollapsed ? 'true' : 'false');
   }
@@ -613,6 +612,7 @@ if (processFilter) {
       updateDynamicColumns(selectedProcess);
     } else {
       showNoProcessMessage();
+      updateDynamicColumns(''); 
     }
     applyTableFilters();
   });
@@ -623,7 +623,6 @@ function applyTableFilters() {
   const selectedProcess = processFilter ? processFilter.value : "";
   const rows = document.querySelectorAll("#dataTable tbody tr");
   
-  // Show all rows when filtering (no process selected = show all)
   rows.forEach(tr => {
     const searchMatch = tr.innerText.toLowerCase().includes(searchQuery);
     
@@ -1209,6 +1208,10 @@ function renderTableData(filterProcess = '') {
   
   tbody.innerHTML = '';
   
+  // Get current header order
+  const headers = document.querySelectorAll('#dataTable thead th');
+  const columnOrder = Array.from(headers).map(th => parseInt(th.getAttribute('data-column')));
+  
   // Filter data if process is selected
   let filteredData = filterProcess ? processData.filter(item => item.process === filterProcess) : processData;
   
@@ -1229,126 +1232,65 @@ function renderTableData(filterProcess = '') {
     // Create instance link
     const instanceLink = `<a href=\"https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1\" target=\"_blank\" style=\"color: #00a2ff; text-decoration: underline;\">${item.instance}</a>`;
     
-    // Common columns (0-5)
-    row.innerHTML = `
-      <td>${item.process}</td>
-      <td>${instanceLink}</td>
-      <td>${item.createdDate}</td>
-      <td>${item.department}</td>
-      <td>${statusBadge}</td>
-      <td>${item.assignedTo}</td>
-    `;
+    // Map data-column indices to values
+    const columnData = {
+      0: item.process,
+      1: instanceLink,
+      2: item.createdDate,
+      3: item.department,
+      4: statusBadge,
+      5: item.assignedTo,
+      6: item.applicantName || '',
+      7: item.idAccountNumber || '',
+      8: item.loanAmountCreditLimit || '',
+      9: item.interestRate || '',
+      10: item.approvalDate || '',
+      11: item.supportingDocuments || '',
+      12: item.budgetPeriod || '',
+      13: item.requestedAmount || '',
+      14: item.approvedAmount || '',
+      15: item.costCenter || '',
+      16: item.reviewer || '',
+      17: item.justification || '',
+      18: item.reportPeriod || '',
+      19: item.regionMarket || '',
+      20: item.salesAmount || '',
+      21: item.productCategory || '',
+      22: item.clientName || '',
+      23: item.surveyDate || '',
+      24: item.surveyType || '',
+      25: item.scoreRating || ''
+    };
     
-    // If no process is selected, only show common columns
-    if (!filterProcess) {
-      // Add empty hidden cells for process-specific columns
-      for (let i = 0; i < 20; i++) {
-        row.innerHTML += `<td style=\"display:none;\"></td>`;
+    // Build row HTML according to current column order
+    let rowHTML = '';
+    columnOrder.forEach(colIndex => {
+      const value = columnData[colIndex] || '';
+      const isProcessSpecific = colIndex >= 6;
+      
+      // Determine if this cell should be hidden based on process
+      let shouldHide = false;
+      if (!filterProcess && isProcessSpecific) {
+        shouldHide = true;
+      } else if (filterProcess && isProcessSpecific) {
+        // Check if this column belongs to the current process
+        if (item.process === 'Card / Loan Application') {
+          shouldHide = colIndex < 6 || colIndex > 11;
+        } else if (item.process === 'Budget Review') {
+          shouldHide = colIndex < 12 || colIndex > 17;
+        } else if (item.process === 'Sales Report') {
+          shouldHide = colIndex < 18 || colIndex > 21;
+        } else if (item.process === 'Client Survey') {
+          shouldHide = colIndex < 22 || colIndex > 25;
+        } else {
+          shouldHide = isProcessSpecific;
+        }
       }
-      tbody.appendChild(row);
-      return;
-    }
+      
+      rowHTML += `<td${shouldHide ? ' style="display:none;"' : ''}>${value}</td>`;
+    });
     
-    // Process-specific columns (6-25)
-    if (item.process === 'Card / Loan Application') {
-      row.innerHTML += `
-        <td>${item.applicantName || ''}</td>
-        <td>${item.idAccountNumber || ''}</td>
-        <td>${item.loanAmountCreditLimit || ''}</td>
-        <td>${item.interestRate || ''}</td>
-        <td>${item.approvalDate || ''}</td>
-        <td>${item.supportingDocuments || ''}</td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-      `;
-    } else if (item.process === 'Budget Review') {
-      row.innerHTML += `
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td>${item.budgetPeriod || ''}</td>
-        <td>${item.requestedAmount || ''}</td>
-        <td>${item.approvedAmount || ''}</td>
-        <td>${item.costCenter || ''}</td>
-        <td>${item.reviewer || ''}</td>
-        <td>${item.justification || ''}</td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-      `;
-    } else if (item.process === 'Sales Report') {
-      row.innerHTML += `
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td>${item.reportPeriod || ''}</td>
-        <td>${item.regionMarket || ''}</td>
-        <td>${item.salesAmount || ''}</td>
-        <td>${item.productCategory || ''}</td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-      `;
-    } else if (item.process === 'Client Survey') {
-      row.innerHTML += `
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td style=\"display:none;\"></td>
-        <td>${item.clientName || ''}</td>
-        <td>${item.surveyDate || ''}</td>
-        <td>${item.surveyType || ''}</td>
-        <td>${item.scoreRating || ''}</td>
-      `;
-    } else {
-      // Empty columns for unknown process types
-      for (let i = 0; i < 20; i++) {
-        row.innerHTML += `<td style=\"display:none;\"></td>`;
-      }
-    }
-    
+    row.innerHTML = rowHTML;
     tbody.appendChild(row);
   });
   
@@ -1469,6 +1411,10 @@ function renderSortedTableData(sortedData, filterProcess) {
   
   tbody.innerHTML = '';
   
+  // Get current header order
+  const headers = document.querySelectorAll('#dataTable thead th');
+  const columnOrder = Array.from(headers).map(th => parseInt(th.getAttribute('data-column')));
+  
   sortedData.forEach(item => {
     const row = document.createElement('tr');
     
@@ -1477,121 +1423,65 @@ function renderSortedTableData(sortedData, filterProcess) {
     
     const instanceLink = `<a href="https://apps.ricohsolution.com.hk:1443/laserfiche/#?id=1" target="_blank" style="color: #00a2ff; text-decoration: underline;">${item.instance}</a>`;
     
-    row.innerHTML = `
-      <td>${item.process}</td>
-      <td>${instanceLink}</td>
-      <td>${item.createdDate}</td>
-      <td>${item.department}</td>
-      <td>${statusBadge}</td>
-      <td>${item.assignedTo}</td>
-    `;
+    // Map data-column indices to values
+    const columnData = {
+      0: item.process,
+      1: instanceLink,
+      2: item.createdDate,
+      3: item.department,
+      4: statusBadge,
+      5: item.assignedTo,
+      6: item.applicantName || '',
+      7: item.idAccountNumber || '',
+      8: item.loanAmountCreditLimit || '',
+      9: item.interestRate || '',
+      10: item.approvalDate || '',
+      11: item.supportingDocuments || '',
+      12: item.budgetPeriod || '',
+      13: item.requestedAmount || '',
+      14: item.approvedAmount || '',
+      15: item.costCenter || '',
+      16: item.reviewer || '',
+      17: item.justification || '',
+      18: item.reportPeriod || '',
+      19: item.regionMarket || '',
+      20: item.salesAmount || '',
+      21: item.productCategory || '',
+      22: item.clientName || '',
+      23: item.surveyDate || '',
+      24: item.surveyType || '',
+      25: item.scoreRating || ''
+    };
     
-    if (!filterProcess) {
-      for (let i = 0; i < 20; i++) {
-        row.innerHTML += `<td style="display:none;"></td>`;
+    // Build row HTML according to current column order
+    let rowHTML = '';
+    columnOrder.forEach(colIndex => {
+      const value = columnData[colIndex] || '';
+      const isProcessSpecific = colIndex >= 6;
+      
+      // Determine if this cell should be hidden based on process
+      let shouldHide = false;
+      if (!filterProcess && isProcessSpecific) {
+        shouldHide = true;
+      } else if (filterProcess && isProcessSpecific) {
+        // Check if this column belongs to the current process
+        if (item.process === 'Card / Loan Application') {
+          shouldHide = colIndex < 6 || colIndex > 11;
+        } else if (item.process === 'Budget Review') {
+          shouldHide = colIndex < 12 || colIndex > 17;
+        } else if (item.process === 'Sales Report') {
+          shouldHide = colIndex < 18 || colIndex > 21;
+        } else if (item.process === 'Client Survey') {
+          shouldHide = colIndex < 22 || colIndex > 25;
+        } else {
+          shouldHide = isProcessSpecific;
+        }
       }
-      tbody.appendChild(row);
-      return;
-    }
+      
+      rowHTML += `<td${shouldHide ? ' style="display:none;"' : ''}>${value}</td>`;
+    });
     
-    if (item.process === 'Card / Loan Application') {
-      row.innerHTML += `
-        <td>${item.applicantName || ''}</td>
-        <td>${item.idAccountNumber || ''}</td>
-        <td>${item.loanAmountCreditLimit || ''}</td>
-        <td>${item.interestRate || ''}</td>
-        <td>${item.approvalDate || ''}</td>
-        <td>${item.supportingDocuments || ''}</td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-      `;
-    } else if (item.process === 'Budget Review') {
-      row.innerHTML += `
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td>${item.budgetPeriod || ''}</td>
-        <td>${item.requestedAmount || ''}</td>
-        <td>${item.approvedAmount || ''}</td>
-        <td>${item.costCenter || ''}</td>
-        <td>${item.reviewer || ''}</td>
-        <td>${item.justification || ''}</td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-      `;
-    } else if (item.process === 'Sales Report') {
-      row.innerHTML += `
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td>${item.reportPeriod || ''}</td>
-        <td>${item.regionMarket || ''}</td>
-        <td>${item.salesAmount || ''}</td>
-        <td>${item.productCategory || ''}</td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-      `;
-    } else if (item.process === 'Client Survey') {
-      row.innerHTML += `
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td style="display:none;"></td>
-        <td>${item.clientName || ''}</td>
-        <td>${item.surveyDate || ''}</td>
-        <td>${item.surveyType || ''}</td>
-        <td>${item.scoreRating || ''}</td>
-      `;
-    } else {
-      for (let i = 0; i < 20; i++) {
-        row.innerHTML += `<td style="display:none;"></td>`;
-      }
-    }
-    
+    row.innerHTML = rowHTML;
     tbody.appendChild(row);
   });
   
