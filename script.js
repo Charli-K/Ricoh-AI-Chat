@@ -844,12 +844,10 @@ function rebindAllHeaderEvents() {
 }
 
 function rebindSortEvents() {
-  // This function is kept for compatibility but now calls rebindAllHeaderEvents
   rebindAllHeaderEvents();
 }
 
 function rebindDragEvents() {
-  // This function is kept for compatibility but now calls rebindAllHeaderEvents
   rebindAllHeaderEvents();
 }
 
@@ -1210,7 +1208,15 @@ function renderTableData(filterProcess = '') {
   
   // Get current header order
   const headers = document.querySelectorAll('#dataTable thead th');
-  const columnOrder = Array.from(headers).map(th => parseInt(th.getAttribute('data-column')));
+  const columnOrder = Array.from(headers)
+    .map(th => parseInt(th.getAttribute('data-column')))
+    .filter(col => !isNaN(col)); // Filter out invalid column indices
+  
+  // If columnOrder is empty or invalid, return early
+  if (columnOrder.length === 0) {
+    console.error('No valid column order found');
+    return;
+  }
   
   // Filter data if process is selected
   let filteredData = filterProcess ? processData.filter(item => item.process === filterProcess) : processData;
@@ -1265,6 +1271,9 @@ function renderTableData(filterProcess = '') {
     // Build row HTML according to current column order
     let rowHTML = '';
     columnOrder.forEach(colIndex => {
+      // Skip invalid column indices
+      if (isNaN(colIndex) || colIndex < 0 || colIndex > 25) return;
+      
       const value = columnData[colIndex] || '';
       const isProcessSpecific = colIndex >= 6;
       
@@ -1413,7 +1422,15 @@ function renderSortedTableData(sortedData, filterProcess) {
   
   // Get current header order
   const headers = document.querySelectorAll('#dataTable thead th');
-  const columnOrder = Array.from(headers).map(th => parseInt(th.getAttribute('data-column')));
+  const columnOrder = Array.from(headers)
+    .map(th => parseInt(th.getAttribute('data-column')))
+    .filter(col => !isNaN(col)); // Filter out invalid column indices
+  
+  // If columnOrder is empty or invalid, return early
+  if (columnOrder.length === 0) {
+    console.error('No valid column order found');
+    return;
+  }
   
   sortedData.forEach(item => {
     const row = document.createElement('tr');
@@ -1456,6 +1473,9 @@ function renderSortedTableData(sortedData, filterProcess) {
     // Build row HTML according to current column order
     let rowHTML = '';
     columnOrder.forEach(colIndex => {
+      // Skip invalid column indices
+      if (isNaN(colIndex) || colIndex < 0 || colIndex > 25) return;
+      
       const value = columnData[colIndex] || '';
       const isProcessSpecific = colIndex >= 6;
       
