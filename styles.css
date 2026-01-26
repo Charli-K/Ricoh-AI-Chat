@@ -24,7 +24,7 @@ html, body {
   --table-grid:rgba(0, 0, 0, 0.252);
   --table-head-border:rgba(0, 0, 0, 0.2);
   --hover:rgba(176, 176, 176, 0.485);
-  --shadow:rgba(0,0,0,0.35);
+  --shadow:rgba(0,0,0,0.15);
   --glow:rgba(8, 9, 9, 0.35);
 }
 
