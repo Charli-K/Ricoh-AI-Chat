@@ -1,5 +1,14 @@
 let processData = [];
 
+// Store column order for each process separately
+let processColumnOrders = {
+  '': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25], // Select Processes (default)
+  'Card / Loan Application': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
+  'Budget Review': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
+  'Sales Report': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
+  'Client Survey': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+};
+
 function toggleDarkMode() {
   document.body.classList.toggle('dark-mode');
   const isDarkMode = document.body.classList.contains('dark-mode');
@@ -91,18 +100,46 @@ function getProcessDataFromTable() {
 }
 
 let pieCharts = {};
-let selectedProcesses = ['', '', '', '']; 
+// Store selected processes for charts for each process filter
+let processChartSelections = {
+  '': ['', '', '', ''],
+  'Card / Loan Application': ['', '', '', ''],
+  'Budget Review': ['', '', '', ''],
+  'Sales Report': ['', '', '', ''],
+  'Client Survey': ['', '', '', '']
+};
+
+// Store date ranges for each process filter
+let processDateRanges = {
+  '': { from: '2022-01-01', to: '2025-12-31' },
+  'Card / Loan Application': { from: '2022-01-01', to: '2025-12-31' },
+  'Budget Review': { from: '2022-01-01', to: '2025-12-31' },
+  'Sales Report': { from: '2022-01-01', to: '2025-12-31' },
+  'Client Survey': { from: '2022-01-01', to: '2025-12-31' }
+};
 
 function initializeProcessDropdowns() {
+  const processFilter = document.getElementById('processFilter');
+  const currentProcess = processFilter ? processFilter.value : '';
   const processCounts = getProcessDataFromTable();
   const processes = Object.keys(processCounts).sort();
   
-  selectedProcesses = [
-    processes[0] || '',
-    processes[1] || '',
-    processes[2] || '',
-    processes[3] || ''
-  ];
+  // Get or initialize chart selections for current process
+  if (!processChartSelections[currentProcess]) {
+    processChartSelections[currentProcess] = ['', '', '', ''];
+  }
+  let selectedProcesses = processChartSelections[currentProcess];
+  
+  // Initialize with available processes if not set
+  if (selectedProcesses.every(p => !p)) {
+    selectedProcesses = [
+      processes[0] || '',
+      processes[1] || '',
+      processes[2] || '',
+      processes[3] || ''
+    ];
+    processChartSelections[currentProcess] = selectedProcesses;
+  }
   
   document.querySelectorAll('.process-selector-dropdown').forEach((dropdown, index) => {
     dropdown.innerHTML = '';
@@ -118,8 +155,10 @@ function initializeProcessDropdowns() {
     });
     
     dropdown.addEventListener('change', (e) => {
+      const processFilter = document.getElementById('processFilter');
+      const currentProcess = processFilter ? processFilter.value : '';
       const chartIndex = parseInt(e.target.getAttribute('data-chart-index'));
-      selectedProcesses[chartIndex] = e.target.value;
+      processChartSelections[currentProcess][chartIndex] = e.target.value;
       updateChart(chartIndex, e.target.value);
     });
   });
@@ -148,7 +187,10 @@ function updateChart(chartIndex, processName) {
 }
 
 function renderAllProcessCharts() {
+  const processFilter = document.getElementById('processFilter');
+  const currentProcess = processFilter ? processFilter.value : '';
   const processCounts = getProcessDataFromTable();
+  const selectedProcesses = processChartSelections[currentProcess] || ['', '', '', ''];
   
   selectedProcesses.forEach((processName, index) => {
     if (processName) {
@@ -538,8 +580,16 @@ function parseDate(dateStr) {
 }
 
 function filterTableByDate() {
+  const processFilter = document.getElementById('processFilter');
+  const currentProcess = processFilter ? processFilter.value : '';
   const fromDate = dateFrom.value ? new Date(dateFrom.value) : null;
   const toDate = dateTo.value ? new Date(dateTo.value) : null;
+  
+  // Save date range for current process
+  processDateRanges[currentProcess] = {
+    from: dateFrom.value || '2022-01-01',
+    to: dateTo.value || '2025-12-31'
+  };
   
   if (toDate) {
     toDate.setHours(23, 59, 59, 999);
@@ -578,10 +628,25 @@ if (applyDateFilter) {
 
 if (resetDateFilter) {
   resetDateFilter.addEventListener("click", () => {
+    const processFilter = document.getElementById('processFilter');
+    const currentProcess = processFilter ? processFilter.value : '';
+    
     dateFrom.value = "2022-01-01";
     dateTo.value = "2025-12-31";
+    
+    // Reset date range for current process
+    processDateRanges[currentProcess] = {
+      from: '2022-01-01',
+      to: '2025-12-31'
+    };
+    
     if (processFilter) {
       processFilter.value = "";
+      // Also reset for 'Select Processes'
+      processDateRanges[''] = {
+        from: '2022-01-01',
+        to: '2025-12-31'
+      };
     }
     if (tableSearch) {
       tableSearch.value = "";
@@ -604,7 +669,26 @@ if (tableSearch) {
 if (processFilter) {
   processFilter.addEventListener("change", () => {
     const selectedProcess = processFilter.value;
-    // Re-render table data with the selected process filter
+    
+    // Restore date range for this process
+    const dateFrom = document.getElementById('dateFrom');
+    const dateTo = document.getElementById('dateTo');
+    if (dateFrom && dateTo) {
+      const savedRange = processDateRanges[selectedProcess] || processDateRanges[''];
+      dateFrom.value = savedRange.from;
+      dateTo.value = savedRange.to;
+      updateTokenDisplay(savedRange.from, savedRange.to);
+      if (typeof updateLineChart === 'function') {
+        updateLineChart(savedRange.from, savedRange.to);
+      }
+    }
+    
+    // Restore chart selections for this process
+    if (typeof initializeProcessDropdowns === 'function') {
+      initializeProcessDropdowns();
+    }
+    
+    // Re-render table data with the selected process filter and restore column order
     renderTableData(selectedProcess);
     // Update dynamic columns based on selection
     if (selectedProcess) {
@@ -783,6 +867,14 @@ function swapColumns(fromDataCol, toDataCol) {
     }
   });
   
+  // Save the new column order for current process
+  const processFilter = document.getElementById('processFilter');
+  const currentProcess = processFilter ? processFilter.value : '';
+  const newHeaders = table.querySelectorAll('thead th');
+  processColumnOrders[currentProcess] = Array.from(newHeaders)
+    .map(th => parseInt(th.getAttribute('data-column')))
+    .filter(col => !isNaN(col));
+  
   rebindAllHeaderEvents();
 }
 
@@ -844,10 +936,12 @@ function rebindAllHeaderEvents() {
 }
 
 function rebindSortEvents() {
+  // This function is kept for compatibility but now calls rebindAllHeaderEvents
   rebindAllHeaderEvents();
 }
 
 function rebindDragEvents() {
+  // This function is kept for compatibility but now calls rebindAllHeaderEvents
   rebindAllHeaderEvents();
 }
 
@@ -1199,6 +1293,39 @@ async function loadProcessData() {
   }
 }
 
+// Restore header order for a specific process
+function restoreHeaderOrder(filterProcess = '') {
+  const table = document.getElementById('dataTable');
+  if (!table) return;
+  
+  const thead = table.querySelector('thead');
+  const headerRow = thead.querySelector('tr');
+  if (!headerRow) return;
+  
+  const columnOrder = processColumnOrders[filterProcess] || processColumnOrders[''];
+  const currentHeaders = Array.from(headerRow.querySelectorAll('th'));
+  
+  // Create a map of data-column to header element
+  const headerMap = {};
+  currentHeaders.forEach(th => {
+    const dataCol = parseInt(th.getAttribute('data-column'));
+    if (!isNaN(dataCol)) {
+      headerMap[dataCol] = th;
+    }
+  });
+  
+  // Reorder headers based on saved column order
+  headerRow.innerHTML = '';
+  columnOrder.forEach(colIndex => {
+    if (headerMap[colIndex]) {
+      headerRow.appendChild(headerMap[colIndex]);
+    }
+  });
+  
+  // Rebind events after reordering
+  rebindAllHeaderEvents();
+}
+
 // Render table rows from JSON data
 function renderTableData(filterProcess = '') {
   const tbody = document.querySelector('#dataTable tbody');
@@ -1206,17 +1333,17 @@ function renderTableData(filterProcess = '') {
   
   tbody.innerHTML = '';
   
-  // Get current header order
-  const headers = document.querySelectorAll('#dataTable thead th');
-  const columnOrder = Array.from(headers)
-    .map(th => parseInt(th.getAttribute('data-column')))
-    .filter(col => !isNaN(col)); // Filter out invalid column indices
+  // Get column order for this specific process
+  const columnOrder = processColumnOrders[filterProcess] || processColumnOrders[''];
   
   // If columnOrder is empty or invalid, return early
   if (columnOrder.length === 0) {
     console.error('No valid column order found');
     return;
   }
+  
+  // Restore header order for this process
+  restoreHeaderOrder(filterProcess);
   
   // Filter data if process is selected
   let filteredData = filterProcess ? processData.filter(item => item.process === filterProcess) : processData;
@@ -1420,17 +1547,17 @@ function renderSortedTableData(sortedData, filterProcess) {
   
   tbody.innerHTML = '';
   
-  // Get current header order
-  const headers = document.querySelectorAll('#dataTable thead th');
-  const columnOrder = Array.from(headers)
-    .map(th => parseInt(th.getAttribute('data-column')))
-    .filter(col => !isNaN(col)); // Filter out invalid column indices
+  // Get column order for this specific process
+  const columnOrder = processColumnOrders[filterProcess] || processColumnOrders[''];
   
   // If columnOrder is empty or invalid, return early
   if (columnOrder.length === 0) {
     console.error('No valid column order found');
     return;
   }
+  
+  // Restore header order for this process
+  restoreHeaderOrder(filterProcess);
   
   sortedData.forEach(item => {
     const row = document.createElement('tr');
