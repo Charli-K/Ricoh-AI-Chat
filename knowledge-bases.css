@@ -373,9 +373,15 @@ body.dark-mode .form-group label {
 body.dark-mode .form-group input[type="text"],
 body.dark-mode .form-group textarea,
 body.dark-mode .form-group select {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: var(--text);
+  background: rgba(45, 55, 72, 0.8);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+}
+
+body.dark-mode .form-group select option {
+  background: #2d3748;
+  color: #e2e8f0;
+  padding: 8px;
 }
 
 body.dark-mode .form-group input[type="text"]::placeholder,
