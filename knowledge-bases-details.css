@@ -1,4 +1,4 @@
-/* Two Column Layout */
+
 .kb-two-column-layout {
   display: grid;
   grid-template-columns: 400px 1fr;
@@ -12,7 +12,6 @@
   }
 }
 
-/* Left Column - Details */
 .kb-details-container {
   background: white;
   border-radius: 8px;
