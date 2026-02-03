@@ -234,6 +234,16 @@ function loadKnowledgeBaseDetails() {
   document.getElementById('detailCreatedDate').textContent = formatDate(currentKnowledgeBase.createdDate);
   document.getElementById('detailModifiedDate').textContent = formatDate(currentKnowledgeBase.modifiedDate);
 
+  // Show/hide Chat button based on status
+  const chatButton = document.getElementById('chatWithKBBtn');
+  if (chatButton) {
+    if (currentKnowledgeBase.status === 'active') {
+      chatButton.style.display = 'flex';
+    } else {
+      chatButton.style.display = 'none';
+    }
+  }
+
   // Load files
   allFiles = currentKnowledgeBase.documents || [];
   

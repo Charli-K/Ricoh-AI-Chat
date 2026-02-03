@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ricoh AI</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./dark-mode.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+</head>
+<section class="logo">
+  <a href="index.html" style="cursor: pointer;"><img src="assets/Ricoh_Logo.svg" alt="Ricoh Logo" /></a>
+</section>
+
+<body>
+  <header class="header" id="mainHeader">
+    <nav class="nav-menu">
+      <button class="nav-btn" onclick="window.location.href='index.html'">
+        <img src="assets/dashboard-svgrepo-com.svg" alt="Dashboard" width="30" />
+        <span class="nav-text">Dashboard</span>
+      </button>
+      <button class="nav-btn" onclick="window.location.href='Knowledge_Bases.html'">
+        <img src="assets/literature-book-knowledge-library-svgrepo-com.svg" alt="Knowledge Bases" width="30" />
+        <span class="nav-text">Knowledge Bases</span>
+      </button>
+      <button class="nav-btn" onclick="window.location.href='AI Chat.html'">
+        <img src="assets/chat-text-fill-svgrepo-com.svg" alt="AI Chat" width="30" />
+        <span class="nav-text">AI Chat</span>
+      </button>
+      <button class="nav-btn" onclick="window.location.href='admin_page.html'">
+        <img src="assets/setting-svgrepo-com.svg" alt="Configuration" width="30" />
+        <span class="nav-text">Admin</span>
+      </button>
+      <button class="nav-btn" onclick="window.location.href='https://apps.ricohsolution.com.hk:1443/Forms/Home/Reports#/reports/insights'">
+        <img src="assets/article-story-report-piece-svgrepo-com.svg" alt="Report" width="30" />
+        <span class="nav-text">Reports</span>
+      </button>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()">
+      <span class="theme-icon"><img src="assets/moon-night-svgrepo-com.svg" alt="Toggle Light / Dark Mode"
+          width="30" /></span>
+      <span class="nav-text">Toggle Theme</span>
+    </button>
+    <div class="user-menu">
+      <img src="assets/user-svgrepo-com.svg" alt="User Profile" width="30" />
+      <span class="nav-text">Hi, Charli</span>
+    </div>
+    <button class="nav-btn" onclick="window.location.href='#'">
+      <img src="assets/logout-svgrepo-com.svg" alt="Logout" width="30" />
+      <span class="nav-text">Logout</span>
+    </button>
+  </header>

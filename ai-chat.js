@@ -300,6 +300,18 @@ function openKnowledgeBaseModal() {
   const modal = document.getElementById('kbSelectionModal');
   const listContainer = document.getElementById('kbSelectionList');
 
+  // Check if user came from a knowledge base details page
+  const selectedKBId = localStorage.getItem('selectedKnowledgeBaseId');
+  if (selectedKBId) {
+    const kbId = parseInt(selectedKBId);
+    if (!selectedKnowledgeBases.includes(kbId)) {
+      selectedKnowledgeBases.push(kbId);
+    }
+    // Clear the stored value after using it
+    localStorage.removeItem('selectedKnowledgeBaseId');
+    localStorage.removeItem('selectedKnowledgeBaseName');
+  }
+
   // Load latest knowledge bases from localStorage
   let knowledgeBases = getKnowledgeBases();
 
@@ -400,11 +412,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const selectedKBName = localStorage.getItem('selectedKnowledgeBaseName');
   
   if (selectedKBId && selectedKBName) {
-    // Clear the stored values
-    localStorage.removeItem('selectedKnowledgeBaseId');
-    localStorage.removeItem('selectedKnowledgeBaseName');
-    
     // Show welcome message from assistant
+    // Note: localStorage values will be cleared when opening the KB selection modal
     setTimeout(() => {
       addMessage(`I'm now using the "${selectedKBName}" Knowledge Base.`, false);
     }, 500);

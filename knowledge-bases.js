@@ -236,7 +236,6 @@ function renderKnowledgeBases(filter = '', sortBy = 'name') {
   if (filtered.length === 0) {
     kbGrid.innerHTML = `
       <div class="empty-state">
-        <div class="empty-state-icon">📚</div>
         <div class="empty-state-text">No knowledge bases found</div>
         <div class="empty-state-subtext">Create your first knowledge base to get started</div>
       </div>
