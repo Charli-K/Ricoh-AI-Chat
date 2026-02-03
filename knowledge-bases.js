@@ -543,7 +543,7 @@ function renderUploadedFiles() {
           <div class="file-size">${formatFileSize(file.size)}</div>
         </div>
       </div>
-      <button type="button" class="file-remove" onclick="removeFile(${index})" title="Remove">×</button>
+      <button type="button" class="file-remove" onclick="removeFile(${index})" title="Remove"><img src="assets/times-svgrepo-com.svg" width="16" height="16" alt="Remove"></button>
     </div>
   `).join('');
 }
