@@ -277,7 +277,7 @@ function chatWithKnowledgeBase() {
     localStorage.setItem('selectedKnowledgeBaseName', currentKnowledgeBase.name);
     
     // Redirect to AI Chat page
-    window.location.href = 'AI Chat.html';
+    window.location.href = 'ai-chat.html';
   }
 }
 

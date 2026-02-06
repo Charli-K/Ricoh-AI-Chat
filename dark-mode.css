@@ -838,3 +838,9 @@ body.dark-mode .stat-value {
   margin-bottom: 4px;
   color: rgba(0, 232, 220, 0.933)
 }
+
+body.dark-mode .btn-add-column {
+      background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+  }

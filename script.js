@@ -1271,6 +1271,13 @@ async function loadProcessData() {
   try {
     const response = await fetch('data/processes.json');
     processData = await response.json();
+    
+    // Sync column orders with column config
+    syncColumnOrders();
+    
+    // Update all header texts from column config before rendering
+    updateAllHeaderTexts();
+    
     renderTableData();
     initializeTableDisplay();
     initTableSorting();
@@ -1292,6 +1299,111 @@ async function loadProcessData() {
   }
 }
 
+// Sync column orders with column config to include new columns
+function syncColumnOrders() {
+  const columnConfig = loadColumnConfigFromStorage();
+  if (!columnConfig) return;
+  
+  // Collect all column indices
+  const allIndices = new Set();
+  
+  if (columnConfig.common) {
+    columnConfig.common.forEach(col => allIndices.add(col.index));
+  }
+  
+  for (const [processName, columns] of Object.entries(columnConfig)) {
+    if (processName === 'common') continue;
+    
+    // Add process-specific columns to the process's column order
+    const processIndices = [...allIndices]; // Start with common columns
+    columns.forEach(col => {
+      processIndices.push(col.index);
+      allIndices.add(col.index);
+    });
+    
+    // Update processColumnOrders for this process
+    if (processColumnOrders[processName]) {
+      // Merge existing order with new columns
+      const existingOrder = processColumnOrders[processName];
+      const newColumns = processIndices.filter(idx => !existingOrder.includes(idx));
+      processColumnOrders[processName] = [...existingOrder, ...newColumns];
+    } else {
+      processColumnOrders[processName] = processIndices.sort((a, b) => a - b);
+    }
+  }
+  
+  // Update "All Processes" order
+  const allIndicesArray = Array.from(allIndices).sort((a, b) => a - b);
+  const existingAllOrder = processColumnOrders[''];
+  const newAllColumns = allIndicesArray.filter(idx => !existingAllOrder.includes(idx));
+  processColumnOrders[''] = [...existingAllOrder, ...newAllColumns];
+}
+
+// Update all header texts from column config
+function updateAllHeaderTexts() {
+  const table = document.getElementById('dataTable');
+  if (!table) return;
+  
+  const headerRow = table.querySelector('thead tr');
+  if (!headerRow) return;
+  
+  const columnConfig = loadColumnConfigFromStorage();
+  if (!columnConfig) return;
+  
+  // Get existing headers
+  const existingHeaders = Array.from(headerRow.querySelectorAll('th[data-column]'));
+  const existingIndices = new Set(existingHeaders.map(th => parseInt(th.getAttribute('data-column'))));
+  
+  // Update existing headers
+  existingHeaders.forEach(th => {
+    const dataCol = parseInt(th.getAttribute('data-column'));
+    if (!isNaN(dataCol)) {
+      updateHeaderText(th, dataCol, columnConfig);
+    }
+  });
+  
+  // Add new headers for newly created columns
+  const allColumns = [];
+  
+  // Collect all columns from config
+  if (columnConfig.common) {
+    allColumns.push(...columnConfig.common);
+  }
+  for (const [processName, columns] of Object.entries(columnConfig)) {
+    if (processName === 'common') continue;
+    allColumns.push(...columns.map(col => ({ ...col, process: processName })));
+  }
+  
+  // Create headers for new columns that don't exist yet
+  allColumns.forEach(col => {
+    if (!existingIndices.has(col.index)) {
+      const th = document.createElement('th');
+      th.setAttribute('draggable', 'true');
+      th.setAttribute('data-column', col.index);
+      th.textContent = col.name;
+      
+      if (col.process) {
+        th.classList.add('process-specific-column');
+        th.setAttribute('data-process', col.process);
+        th.style.display = 'none';
+      } else {
+        th.classList.add('common-column');
+      }
+      
+      headerRow.appendChild(th);
+    }
+  });
+  
+  // Remove headers for deleted columns
+  existingHeaders.forEach(th => {
+    const dataCol = parseInt(th.getAttribute('data-column'));
+    const stillExists = allColumns.some(col => col.index === dataCol);
+    if (!stillExists && dataCol >= 6) { // Don't remove common columns (0-5)
+      th.remove();
+    }
+  });
+}
+
 // Restore header order for a specific process
 function restoreHeaderOrder(filterProcess = '') {
   const table = document.getElementById('dataTable');
@@ -1304,11 +1416,16 @@ function restoreHeaderOrder(filterProcess = '') {
   const columnOrder = processColumnOrders[filterProcess] || processColumnOrders[''];
   const currentHeaders = Array.from(headerRow.querySelectorAll('th'));
   
+  // Load column config from localStorage to update header names
+  const columnConfig = loadColumnConfigFromStorage();
+  
   // Create a map of data-column to header element
   const headerMap = {};
   currentHeaders.forEach(th => {
     const dataCol = parseInt(th.getAttribute('data-column'));
     if (!isNaN(dataCol)) {
+      // Update header text from columnConfig if available
+      updateHeaderText(th, dataCol, columnConfig);
       headerMap[dataCol] = th;
     }
   });
@@ -1323,6 +1440,43 @@ function restoreHeaderOrder(filterProcess = '') {
   
   // Rebind events after reordering
   rebindAllHeaderEvents();
+}
+
+// Load column config from localStorage
+function loadColumnConfigFromStorage() {
+  const saved = localStorage.getItem('columnConfig');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      console.error('Failed to load column config:', e);
+    }
+  }
+  return null;
+}
+
+// Update header text from column config
+function updateHeaderText(th, dataCol, columnConfig) {
+  if (!columnConfig) return;
+  
+  // Check common columns
+  if (columnConfig.common) {
+    const commonCol = columnConfig.common.find(col => col.index === dataCol);
+    if (commonCol) {
+      th.textContent = commonCol.name;
+      return;
+    }
+  }
+  
+  // Check process-specific columns
+  for (const [processName, columns] of Object.entries(columnConfig)) {
+    if (processName === 'common') continue;
+    const col = columns.find(c => c.index === dataCol);
+    if (col) {
+      th.textContent = col.name;
+      return;
+    }
+  }
 }
 
 // Render table rows from JSON data

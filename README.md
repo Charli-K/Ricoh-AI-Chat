@@ -68,3 +68,9 @@ This project uses the following open-source libraries (loaded via CDN):
 
 - **Wrong SVG Vector**: https://www.svgrepo.com/svg/111735/wrong
 - **Lincense**: CC0 License
+
+- **icon-admin icon**: https://www.veryicon.com/icons/miscellaneous/yuanql/icon-admin.html
+- **Lincense**: Free for personal and commercial purpose.
+
+- **user icon**: https://www.veryicon.com/icons/internet--web/prejudice/user-128.html
+- **Lincense**: Free for personal and commercial purpose.

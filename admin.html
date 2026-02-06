@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - Ricoh AI</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./dark-mode.css" />
+  <link rel="stylesheet" href="./admin.css" />
+</head>
+
+<body>
+  <section class="logo">
+    <a href="index.html" style="cursor: pointer;"><img src="assets/Ricoh_Logo.svg" alt="Ricoh Logo" /></a>
+  </section>
+
+  <header class="header" id="mainHeader">
+    <nav class="nav-menu">
+      <button class="nav-btn" onclick="window.location.href='index.html'">
+        <img src="assets/dashboard-svgrepo-com.svg" alt="Dashboard" width="30" />
+        <span class="nav-text">Dashboard</span>
+      </button>
+      <button class="nav-btn" onclick="window.location.href='Knowledge_Bases.html'">
+        <img src="assets/literature-book-knowledge-library-svgrepo-com.svg" alt="Knowledge Bases" width="30" />
+        <span class="nav-text">Knowledge Bases</span>
+      </button>
+      <button class="nav-btn" onclick="window.location.href='ai-chat.html'">
+        <img src="assets/chat-text-fill-svgrepo-com.svg" alt="AI Chat" width="30" />
+        <span class="nav-text">AI Chat</span>
+      </button>
+      <button class="nav-btn" onclick="window.location.href='admin.html'">
+        <img src="assets/icon-admin.svg" alt="Configuration" width="30" />
+        <span class="nav-text">Admin</span>
+      </button>
+      <button class="nav-btn" onclick="window.location.href='https://apps.ricohsolution.com.hk:1443/Forms/Home/Reports#/reports/insights'">
+        <img src="assets/article-story-report-piece-svgrepo-com.svg" alt="Report" width="30" />
+        <span class="nav-text">Reports</span>
+      </button>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()">
+      <span class="theme-icon"><img src="assets/moon-night-svgrepo-com.svg" alt="Toggle Theme" width="20" /></span>
+      <span class="nav-text">Toggle Theme</span>
+    </button>
+    <div class="user-menu">
+      <img src="assets/user-128.svg" alt="User Profile" width="30" />
+      <span class="nav-text">Hi, Charli</span>
+    </div>
+    <button class="nav-btn" onclick="window.location.href='#'">
+      <img src="assets/logout-svgrepo-com.svg" alt="Logout" width="30" />
+      <span class="nav-text">Logout</span>
+    </button>
+  </header>
+  
+  <div class="container">
+    <main class="main-content">
+      <div class="dashboard-header">
+        <h1>Admin Configuration</h1>
+      </div>
+
+      <div class="admin-main-tabs" id="mainTabs">
+        <button class="admin-main-tab active" data-section="columns" onclick="switchMainTab('columns')">Columns</button>
+      </div>
+
+      <div id="columnsSection" class="admin-section">
+        <div class="admin-tabs" id="processTabs">
+          <button class="admin-tab active" data-process="">All Processes</button>
+          <button class="admin-tab" data-process="Card / Loan Application">Card / Loan Application</button>
+          <button class="admin-tab" data-process="Budget Review">Budget Review</button>
+          <button class="admin-tab" data-process="Sales Report">Sales Report</button>
+          <button class="admin-tab" data-process="Client Survey">Client Survey</button>
+        </div>
+
+        <div class="admin-content">
+          <div class="columns-header">
+            <h2 id="processTitle">All Processes Columns</h2>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn-secondary" onclick="resetColumnConfig()" title="Reset to default configuration">
+                Reset
+              </button>
+              <button class="btn-add-column" onclick="openAddColumnModal()">
+                <span>Add Column</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="columnsContainer">
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="admin-modal" id="columnModal">
+    <div class="admin-modal-content">
+      <div class="admin-modal-header">
+        <h2 id="modalTitle">Add Column</h2>
+        <button class="admin-modal-close" onclick="closeColumnModal()">×</button>
+      </div>
+      <div class="admin-modal-body">
+        <div class="form-group">
+          <label for="columnName">Column Name</label>
+          <input type="text" id="columnName" placeholder="Enter column name" />
+        </div>
+        <input type="hidden" id="columnIndex" value="" />
+        <input type="hidden" id="editingProcess" value="" />
+      </div>
+      <div class="admin-modal-footer">
+        <button class="btn-secondary" onclick="closeColumnModal()">Cancel</button>
+        <button class="btn-primary" onclick="saveColumn()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./admin.js"></script>
+</body>
+
+</html>
