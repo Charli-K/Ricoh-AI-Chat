@@ -8,6 +8,14 @@ let processColumnOrders = {
   'Client Survey': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
 };
 
+function getTodayISO() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function toggleDarkMode() {
   document.body.classList.toggle('dark-mode');
   const isDarkMode = document.body.classList.contains('dark-mode');
@@ -19,7 +27,7 @@ function toggleDarkMode() {
   if (typeof updateLineChart === 'function' && lineChartInstance) {
     const dateFrom = document.getElementById('dateFrom');
     const dateTo = document.getElementById('dateTo');
-    updateLineChart(dateFrom?.value || '2022-01-01', dateTo?.value || '2025-12-31');
+    updateLineChart(dateFrom?.value || '2025-01-01', dateTo?.value || getTodayISO());
   }
 }
 
@@ -110,11 +118,11 @@ let processChartSelections = {
 
 // Store date ranges for each process filter
 let processDateRanges = {
-  '': { from: '2022-01-01', to: '2025-12-31' },
-  'Card / Loan Application': { from: '2022-01-01', to: '2025-12-31' },
-  'Budget Review': { from: '2022-01-01', to: '2025-12-31' },
-  'Sales Report': { from: '2022-01-01', to: '2025-12-31' },
-  'Client Survey': { from: '2022-01-01', to: '2025-12-31' }
+  '': { from: '2025-01-01', to: getTodayISO() },
+  'Card / Loan Application': { from: '2025-01-01', to: getTodayISO() },
+  'Budget Review': { from: '2025-01-01', to: getTodayISO() },
+  'Sales Report': { from: '2025-01-01', to: getTodayISO() },
+  'Client Survey': { from: '2025-01-01', to: getTodayISO() }
 };
 
 function initializeProcessDropdowns() {
@@ -235,8 +243,8 @@ const tokenData = [
 ];
 
 function filterTokenData(fromDate, toDate) {
-  const from = fromDate ? new Date(fromDate) : new Date('2022-01-01');
-  const to = toDate ? new Date(toDate) : new Date('2025-12-31');
+  const from = fromDate ? new Date(fromDate) : new Date('2025-01-01');
+  const to = toDate ? new Date(toDate) : new Date(getTodayISO());
   to.setHours(23, 59, 59, 999);
   
   return tokenData.filter(item => {
@@ -410,8 +418,8 @@ function getTableData() {
 
 function generateLineChartData(fromDate, toDate) {
   const tableData = getTableData();
-  const from = fromDate ? new Date(fromDate) : new Date('2022-01-01');
-  const to = toDate ? new Date(toDate) : new Date('2025-12-31');
+  const from = fromDate ? new Date(fromDate) : new Date('2025-01-01');
+  const to = toDate ? new Date(toDate) : new Date(getTodayISO());
   to.setHours(23, 59, 59, 999);
   
   const filteredData = tableData.filter(item => item.date >= from && item.date <= to);
@@ -586,8 +594,8 @@ function filterTableByDate() {
   
   // Save date range for current process
   processDateRanges[currentProcess] = {
-    from: dateFrom.value || '2022-01-01',
-    to: dateTo.value || '2025-12-31'
+    from: dateFrom.value || '2025-01-01',
+    to: dateTo.value || getTodayISO()
   };
   
   if (toDate) {
@@ -630,21 +638,21 @@ if (resetDateFilter) {
     const processFilter = document.getElementById('processFilter');
     const currentProcess = processFilter ? processFilter.value : '';
     
-    dateFrom.value = "2022-01-01";
-    dateTo.value = "2025-12-31";
+    dateFrom.value = "2025-01-01";
+    dateTo.value = getTodayISO();
     
     // Reset date range for current process
     processDateRanges[currentProcess] = {
-      from: '2022-01-01',
-      to: '2025-12-31'
+      from: '2025-01-01',
+      to: getTodayISO()
     };
     
     if (processFilter) {
       processFilter.value = "";
       // Also reset for 'Select Processes'
       processDateRanges[''] = {
-        from: '2022-01-01',
-        to: '2025-12-31'
+        from: '2025-01-01',
+        to: getTodayISO()
       };
     }
     if (tableSearch) {
@@ -654,8 +662,8 @@ if (resetDateFilter) {
     rows.forEach(tr => {
       tr.style.display = "";
     });
-    updateLineChart('2022-01-01', '2025-12-31');
-    updateTokenDisplay('2022-01-01', '2025-12-31');
+    updateLineChart('2025-01-01', getTodayISO());
+    updateTokenDisplay('2025-01-01', getTodayISO());
   });
 }
 
@@ -1134,34 +1142,63 @@ const processColumns = {
   ]
 };
 
+function getProcessSpecificColumns(selectedProcess) {
+  const columnConfig = loadColumnConfigFromStorage();
+  if (columnConfig && Array.isArray(columnConfig[selectedProcess])) {
+    return columnConfig[selectedProcess].map(col => ({
+      id: col.index,
+      name: col.name
+    }));
+  }
+  return processColumns[selectedProcess] || [];
+}
+
 // Update dynamic columns based on selected process
 function updateDynamicColumns(selectedProcess) {
   const dynamicColumnsContainer = document.getElementById('dynamicColumns');
   if (!dynamicColumnsContainer) return;
+
+  // Refresh header text from column config to reflect renamed columns
+  updateAllHeaderTexts();
   
   // Clear existing dynamic columns
   dynamicColumnsContainer.innerHTML = '';
   
-  // Hide all process-specific columns in table
-  document.querySelectorAll('.process-specific-column').forEach(th => {
-    th.style.display = 'none';
-  });
-  
-  // Hide all process-specific cells in tbody
-  const tbody = document.querySelector('#dataTable tbody');
-  if (tbody) {
-    tbody.querySelectorAll('tr').forEach(row => {
-      for (let i = 6; i <= 25; i++) {
-        if (row.cells[i]) {
-          row.cells[i].style.display = 'none';
-        }
+  const table = document.getElementById('dataTable');
+  const tbody = table ? table.querySelector('tbody') : null;
+
+  // Build a map from data-column to actual column position
+  const headerPositions = new Map();
+  if (table) {
+    const headers = table.querySelectorAll('thead th');
+    headers.forEach((th, index) => {
+      const dataCol = parseInt(th.getAttribute('data-column'));
+      if (!isNaN(dataCol)) {
+        headerPositions.set(dataCol, index);
       }
     });
   }
+
+  // Hide all process-specific columns in table (by data-column)
+  headerPositions.forEach((pos, dataCol) => {
+    if (dataCol >= 6) {
+      const th = table?.querySelector(`thead th[data-column="${dataCol}"]`);
+      if (th) th.style.display = 'none';
+      if (tbody) {
+        tbody.querySelectorAll('tr').forEach(row => {
+          const td = row.cells[pos];
+          if (td) td.style.display = 'none';
+        });
+      }
+    }
+  });
   
   // If a process is selected, show its specific columns
-  if (selectedProcess && processColumns[selectedProcess]) {
-    const columns = processColumns[selectedProcess];
+  if (selectedProcess) {
+    const columns = getProcessSpecificColumns(selectedProcess);
+    if (!columns.length) {
+      return;
+    }
     
     columns.forEach(col => {
       // Add to column manager
@@ -1174,17 +1211,17 @@ function updateDynamicColumns(selectedProcess) {
       dynamicColumnsContainer.appendChild(option);
       
       // Show corresponding table header
-      const th = document.querySelector(`th[data-column="${col.id}"][data-process="${selectedProcess}"]`);
+      const th = table?.querySelector(`thead th[data-column="${col.id}"]`);
       if (th) {
         th.style.display = '';
       }
       
-      // Show corresponding table cells
-      if (tbody) {
+      // Show corresponding table cells using actual column position
+      const colPosition = headerPositions.get(col.id);
+      if (tbody && colPosition !== undefined) {
         tbody.querySelectorAll('tr').forEach(row => {
-          if (row.cells[col.id]) {
-            row.cells[col.id].style.display = '';
-          }
+          const td = row.cells[colPosition];
+          if (td) td.style.display = '';
         });
       }
       
@@ -1193,18 +1230,19 @@ function updateDynamicColumns(selectedProcess) {
       checkbox.addEventListener('change', (e) => {
         const columnIndex = parseInt(e.target.getAttribute('data-column'));
         const isChecked = e.target.checked;
-        
-        const th = document.querySelector(`th[data-column="${columnIndex}"]`);
+        const th = table?.querySelector(`thead th[data-column="${columnIndex}"]`);
         if (th) {
           th.classList.toggle('hidden', !isChecked);
         }
-        
-        tbody.querySelectorAll('tr').forEach(row => {
-          const td = row.cells[columnIndex];
-          if (td) {
-            td.classList.toggle('hidden', !isChecked);
-          }
-        });
+        const colPosition = headerPositions.get(columnIndex);
+        if (tbody && colPosition !== undefined) {
+          tbody.querySelectorAll('tr').forEach(row => {
+            const td = row.cells[colPosition];
+            if (td) {
+              td.classList.toggle('hidden', !isChecked);
+            }
+          });
+        }
       });
     });
   }
@@ -1287,7 +1325,7 @@ async function loadProcessData() {
       initializeProcessDropdowns();
     }
     if (typeof updateLineChart === 'function') {
-      updateLineChart('2022-01-01', '2025-12-31');
+      updateLineChart('2025-01-01', getTodayISO());
     }
     
     // Initialize pagination after data is loaded
@@ -1304,7 +1342,7 @@ function syncColumnOrders() {
   const columnConfig = loadColumnConfigFromStorage();
   if (!columnConfig) return;
   
-  // Collect all column indices
+  // Collect all valid column indices from config
   const allIndices = new Set();
   
   if (columnConfig.common) {
@@ -1314,29 +1352,26 @@ function syncColumnOrders() {
   for (const [processName, columns] of Object.entries(columnConfig)) {
     if (processName === 'common') continue;
     
-    // Add process-specific columns to the process's column order
-    const processIndices = [...allIndices]; // Start with common columns
+    // Collect indices for this process (common + process-specific)
+    const processIndices = [];
+    
+    // Add common columns first
+    if (columnConfig.common) {
+      columnConfig.common.forEach(col => processIndices.push(col.index));
+    }
+    
+    // Add process-specific columns
     columns.forEach(col => {
       processIndices.push(col.index);
       allIndices.add(col.index);
     });
     
-    // Update processColumnOrders for this process
-    if (processColumnOrders[processName]) {
-      // Merge existing order with new columns
-      const existingOrder = processColumnOrders[processName];
-      const newColumns = processIndices.filter(idx => !existingOrder.includes(idx));
-      processColumnOrders[processName] = [...existingOrder, ...newColumns];
-    } else {
-      processColumnOrders[processName] = processIndices.sort((a, b) => a - b);
-    }
+    // Update processColumnOrders for this process - only keep valid columns
+    processColumnOrders[processName] = processIndices;
   }
   
-  // Update "All Processes" order
-  const allIndicesArray = Array.from(allIndices).sort((a, b) => a - b);
-  const existingAllOrder = processColumnOrders[''];
-  const newAllColumns = allIndicesArray.filter(idx => !existingAllOrder.includes(idx));
-  processColumnOrders[''] = [...existingAllOrder, ...newAllColumns];
+  // Update "All Processes" order - only include columns that exist in config
+  processColumnOrders[''] = Array.from(allIndices).sort((a, b) => a - b);
 }
 
 // Update all header texts from column config
@@ -1861,8 +1896,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Initialize Token Display with default date range
-  const fromDate = dateFromInput?.value || '2022-01-01';
-  const toDate = dateToInput?.value || '2025-12-31';
+  const fromDate = dateFromInput?.value || '2025-01-01';
+  const toDate = dateToInput?.value || getTodayISO();
   updateTokenDisplay(fromDate, toDate);
   
   loadProcessData();

@@ -97,15 +97,15 @@
 }
 
 .btn-add-column {
-    padding: 10px 20px;
-    background: var(--bg);
-    color: var(--text);
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  padding: 10px 20px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .btn-add-column:hover {
@@ -267,6 +267,7 @@
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -361,17 +362,15 @@
 }
 
 .btn-secondary:hover {
-  background: var(--card-hover);
   border-color: var(--primary);
   transform: translateY(-1px);
-
 }
 
 .btn-primary {
   padding: 10px 20px;
-  background: var(--primary);
-  color: white;
-  border: none;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--card-border);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -380,7 +379,8 @@
 }
 
 .btn-primary:hover {
-  background: #0090e0;
+  border-color: var(--primary);
+  transform: translateY(-1px);
 }
 
 .empty-state {

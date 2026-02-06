@@ -315,12 +315,11 @@ function saveColumn() {
         const column = columnConfig[process].find(col => col.index === index);
         if (column) {
             column.name = name;
-            alert('Column updated successfully! Please refresh the Dashboard page to see the changes.');
         }
     } else {
         // Add new column
         // Find next available index
-        let maxIndex = 5; // Common columns are 0-5
+        let maxIndex = 5;
         for (const [key, columns] of Object.entries(columnConfig)) {
             if (key === 'common') continue;
             columns.forEach(col => {
@@ -343,7 +342,6 @@ function saveColumn() {
     closeColumnModal();
 }
 
-// Delete column
 function deleteColumn(index, process) {
     if (!confirm('Are you sure you want to delete this column? Please refresh the Dashboard page after deletion.')) {
         return;
@@ -354,19 +352,15 @@ function deleteColumn(index, process) {
     columnConfig[process] = columnConfig[process].filter(col => col.index !== index);
     saveColumnConfig();
     renderColumns(currentProcess);
-    
-    alert('Column deleted successfully! Please refresh the Dashboard page to see the changes.');
 }
-// Reset column config to default
+
 function resetColumnConfig() {
     if (!confirm('Are you sure you want to reset all column configurations to default? This will remove all custom columns.')) {
         return;
     }
     
-    // Clear localStorage
     localStorage.removeItem('columnConfig');
     
-    // Reset to default config
     columnConfig = {
         common: [
             { index: 0, name: 'Process', editable: false },
@@ -407,6 +401,4 @@ function resetColumnConfig() {
     };
     
     renderColumns(currentProcess);
-    
-    alert('Column configuration has been reset to default. Please refresh the Dashboard page.');
 }
